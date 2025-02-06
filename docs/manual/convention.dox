@@ -1,0 +1,110 @@
+/** \page convention Conventions
+
+1. \ref naming
+2. \ref instances
+3. \ref iterators
+
+\section naming Function Naming
+
+For Veritable Lasagna, function names are broken up into three main components.
+- Library Acronym
+- Structure
+- Operation
+
+Modeled after the OpenGL and Vulkan APIs, this naming convention offers the following benefits:
+- Keeps the library safe from overpopulating the global namespace.
+- Plays nicely with IDE autocomplete features.
+- Solves a "rule of three" for function names, which is that they should succinctly describe:
+    - Where the function comes from.
+    - What the function works with and/or on.
+    - What kind of work the function performs.
+
+That is to say, all functions regarding lists are of the form <code>vlList...</code>, all functions for queues are of
+the form <code>vlQueue...</code>, and so on.
+
+\image html vl_function_naming.svg "Naming Diagram"
+
+<HR>
+
+\section instances Instantiation and Destruction
+
+Instantiating and destroying any data structure (aside from those provided by the <code>vl_memory.h</code> header)
+is accomplished with two primary methods, being <code>Init / Free</code> and <code>New / Delete</code>.
+
+- <code>Init / Free</code>
+    - Used when a memory location for the structure already exists (usually, on the stack).
+    - Avoids a separate heap allocation just for the structure metadata.
+        - Just don't forget to free it.
+- <code>New / Delete</code>
+    - Used when a new memory location is needed for the structure metadata to exist in.
+        - Most useful when stack allocation is not an option (e.g, returning a pointer to a data structure from a function).
+    - No stack-related lifetime restrictions.
+        - Just don't forget to delete it.
+    - Just a wrapper over <code> Init / Free</code> wherein the structure is allocated on the heap.
+    <details>
+      vlStructureNew(...)
+
+      <code>
+      vl_structure* struct = malloc(sizeof(vl_structure));
+
+      vlStructInit(struct, ...);
+      </code>
+
+      vlStructureDelete(...)
+
+      <code>
+      vlStructFree(struct);
+
+      free(struct);
+      </code>
+    </details>
+
+\image html vl_inst_memgraph.svg "Instantiation"
+
+<details>
+\code{.c}
+#include <vl/vl_list.h>
+
+int main(int argc, const char** argv){
+    //Start with a vl_list variable on the stack.
+    vl_list list;
+
+    //Initialize the list at its known location.
+    vlListInit(&list, sizeof(int));
+
+    //Use the list...
+
+    //Then free the list.
+    vlListFree(&list);
+
+    return 0;
+}
+\endcode
+
+\code{.c}
+#include <vl/vl_list.h>
+
+int main(int argc, const char** argv){
+    //Initialize the list at a new location.
+    vl_list* list = vlListNew(sizeof(int));
+
+    //Use the list...
+
+    //Then delete the list.
+    vlListDelete(list);
+
+    return 0;
+}
+\endcode
+</details>
+
+<HR>
+
+\section iterators Iterators
+
+Conventional data structures offered by this library offer the ability to iterate their elements.
+They come equipped with their own <code>VL_XXX_FOREACH</code> macros, and also <code>VL_XXX_FOREACH_REVERSE</code> in most cases.
+Iterator types are never anything more than some integer, however the specific type used is dependent on which kind of structure
+it is associated with. Meaning, the iterator types for Hash Tables and Linked Lists (as examples) are not guaranteed to be the same type of integer.
+
+*/

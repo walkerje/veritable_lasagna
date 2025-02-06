@@ -1,0 +1,182 @@
+#ifndef VL_LIBCONFIG_H
+#define VL_LIBCONFIG_H
+
+/***********************************************************************************
+ * Library Version
+ ***********************************************************************************
+ */
+
+#define VL_BUILD_TYPE_@VL_BUILD_TYPE@
+
+#define VL_VERSION_MAJOR @VL_VERSION_MAJOR@
+#define VL_VERSION_MINOR @VL_VERSION_MINOR@
+#define VL_VERSION_PATCH @VL_VERSION_PATCH@
+
+#define VL_VERSION_STRING "@VL_VERSION@"
+#define VL_BUILD_STRING "vlasagna_@VL_VERSION@_@VL_BUILD_TYPE@"
+
+/***********************************************************************************
+ * System Endianness
+ ***********************************************************************************
+ *
+ * This region indicates the endianness of the system that built the library.
+ * Its properties can influence data structure layout (i.e, rgba/abgr unions)
+ */
+
+/**
+ * \brief BIG_ENDIAN macro = 1
+ *
+ * Indicates the big endian byte order.
+ */
+#define VL_BIG_ENDIAN 1
+
+/**
+ * \brief LITTLE_ENDIAN macro = 0
+ *
+ * Indicates the little endian byte order.
+ */
+#define VL_LITTLE_ENDIAN 0
+
+#define VL_SYSTEM_BYTE_ORDER @VL_BYTE_ORDER@
+
+#if VL_SYSTEM_BYTE_ORDER
+/**
+ * \brief Defined only when the compiling system has big endian byte order.
+ */
+#define VL_SYSTEM_BIG_ENDIAN 1
+#else
+/**
+ * \brief Defined only when the compiling system has little endian byte order.
+ */
+#define VL_SYSTEM_LITTLE_ENDIAN 1
+#endif
+
+/***********************************************************************************
+ * Primitive Types
+ *
+ * A range of primitive number types of varying sizes and uses.
+ * These types detected and defined relative to their size during the CMake configuration step.
+
+ * Depending on what platform this library was compiled for, some
+ * of these types will be redundant or explicitly disallowed.
+ */
+
+/**
+ * \brief Signed 8-bit integer type.
+ */
+#cmakedefine VL_I8_T                @VL_I8_T@
+/**
+ * \brief Signed 16-bit integer type.
+ */
+#cmakedefine VL_I16_T               @VL_I16_T@
+/**
+ * \brief Signed 32-bit integer type.
+ */
+#cmakedefine VL_I32_T               @VL_I32_T@
+/**
+ * \brief Signed 64-bit integer type.
+ */
+#cmakedefine VL_I64_T               @VL_I64_T@
+/**
+ * \brief Unsigned 8-bit integer type.
+ */
+#cmakedefine VL_U8_T                @VL_U8_T@
+/**
+ * \brief Unsigned 16-bit integer type.
+ */
+#cmakedefine VL_U16_T               @VL_U16_T@
+/**
+ * \brief Unsigned 32-bit integer type.
+ */
+#cmakedefine VL_U32_T               @VL_U32_T@
+/**
+ * \brief Unsigned 64-bit integer type.
+ */
+#cmakedefine VL_U64_T               @VL_U64_T@
+/**
+ * \brief Smallest available signed integer type.
+ */
+#cmakedefine VL_ISMALL_T            @VL_ISMALL_T@
+/**
+ * \brief Smallest available unsigned integer type.
+ */
+#cmakedefine VL_USMALL_T            @VL_USMALL_T@
+/**
+ * \brief Largest available signed integer type.
+ */
+#cmakedefine VL_ILARGE_T            @VL_ILARGE_T@
+/**
+ * \brief Largest available unsigned integer type.
+ */
+#cmakedefine VL_ULARGE_T            @VL_ULARGE_T@
+
+/**
+ * \brief Standard signed integer type.
+ *
+ * Usually defaults to 32-bit integers, but may be smaller on some platforms.
+ */
+#cmakedefine VL_INT_T               @VL_INT_T@
+
+/**
+ * \brief Standard unsigned integer type.
+ *
+ * Usually defaults to 32-bit integers, but may be smaller on some platforms.
+ */
+#cmakedefine VL_UINT_T              @VL_UINT_T@
+
+/**
+ * \brief Signed integer type suitable for expressing memory addresses.
+ */
+#cmakedefine VL_IPTR_T              @VL_IPTR_T@
+
+/**
+ * \brief Unsigned integer type suitable for expressing memory addresses.
+ */
+#cmakedefine VL_UPTR_T              @VL_UPTR_T@
+
+/**
+ * \brief 32-bit floating point number type.
+ *
+ * Assumed to be of IEEE-754 single-precision standard on all platforms.
+ * https://en.wikipedia.org/wiki/Single-precision_floating-point_format
+ */
+#cmakedefine VL_F32_T               @VL_F32_T@
+
+/**
+ * \brief 32-bit floating point number type.
+ *
+ * Assumed to be of IEEE-754 float64 standard format on all platforms.
+ * https://en.wikipedia.org/wiki/Double-precision_floating-point_format
+ */
+#cmakedefine VL_F64_T               @VL_F64_T@
+
+/**
+ * \brief Highest precision floating point type available.
+ *
+ * Spans N bits (Undefined size)
+ *
+ * The format of this data type is undefined, and varies between compilers/OS/sun/moon/weather/etc.
+ * On some platforms, this can be an 128-bit type, offering extended precision over even float64.
+ * On others this can be synonymous with VL_F64_T or even (in unfortunate cases) VL_F32_T.
+ */
+#cmakedefine VL_FHIGHP_T            @VL_FHIGHP_T@
+
+/***********************************************************************************
+ * Library Types & Constants
+ *
+ * These types are used by various data structures and vl_memory to specify
+ * properties of data structures.
+ */
+
+#cmakedefine VL_STRUCTURE_OFFSET_T  @VL_STRUCTURE_OFFSET_T@
+#cmakedefine VL_STRUCTURE_INDEX_T   @VL_STRUCTURE_INDEX_T@
+
+/**
+ * \brief Maximum value to be held by any instance of VL_STRUCTURE_INDEX_T.
+ */
+#cmakedefine VL_STRUCTURE_INDEX_MAX @VL_STRUCTURE_INDEX_MAX@
+
+#cmakedefine VL_MEMORY_T            @VL_MEMORY_T@
+#cmakedefine VL_MEMORY_SIZE_T       @VL_MEMORY_SIZE_T@
+
+#endif //VL_LIBCONFIG_H

@@ -1,0 +1,11 @@
+/** \page manual Manual
+
+<H3> Chapters </H3>
+
+1. \subpage convention "Conventions"
+2. \subpage memory "Memory"
+3. \subpage structures "Structures"
+4. \subpage testing "Testing"
+5. \subpage examples "Examples"
+
+*/

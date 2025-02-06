@@ -1,0 +1,36 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+set(VL_VERSION_MAJOR    @VL_VERSION_MAJOR@)
+set(VL_VERSION_MINOR    @VL_VERSION_MINOR@)
+set(VL_VERSION_PATCH    @VL_VERSION_PATCH@)
+set(VL_VERSION          @VL_VERSION@)
+
+# There are no dependencies for VLasagna aside from the C standard library.
+
+set(VL_U8_T                     @VL_U8_T@)
+set(VL_U16_T                    @VL_U16_T@)
+set(VL_U32_T                    @VL_U32_T@)
+set(VL_U64_T                    @VL_U64_T@)
+set(VL_I8_T                     @VL_I8_T@)
+set(VL_I16_T                    @VL_I16_T@)
+set(VL_I32_T                    @VL_I32_T@)
+set(VL_I64_T                    @VL_I64_T@)
+set(VL_INT_T                    @VL_INT_T@)
+set(VL_UINT_T                   @VL_UINT_T@)
+set(VL_IPTR_T                   @VL_IPTR_T@)
+set(VL_UPTR_T                   @VL_UPTR_T@)
+set(VL_F32_T                    @VL_F32_T@)
+set(VL_F64_T                    @VL_F64_T@)
+set(VL_FHIGHP_T                 @VL_FHIGHP_T@)
+
+set(VL_STRUCTURE_OFFSET_T       @VL_STRUCTURE_OFFSET_T@)
+set(VL_STRUCTURE_INDEX_T        @VL_STRUCTURE_INDEX_T@)
+set(VL_MEMORY_T                 @VL_MEMORY_T@)
+set(VL_MEMORY_SIZE_T            @VL_MEMORY_SIZE_T@)
+set(VL_STRUCTURE_INDEX_MAX      @VL_STRUCTURE_INDEX_MAX@)
+
+set(VL_BYTE_ORDER               @VL_BYTE_ORDER@)
+
+include("${CMAKE_CURRENT_LIST_DIR}/VLasagnaTargets.cmake")
