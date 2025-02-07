@@ -174,7 +174,7 @@ vl_list_iter    vlListInsertBefore(vl_linked_list* list, vl_list_iter target, co
  * \par Complexity of O(1) constant.
  * \return total elements
  */
-#define vlListSize(listPtr) (vl_dsidx_t)((listPtr)->nodePool.totalTaken)
+#define vlListSize(listPtr) (vl_dsidx_t)((listPtr)->length)
 #endif
 
 #ifndef vlListReserve

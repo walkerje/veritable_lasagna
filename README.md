@@ -5,9 +5,10 @@
 [![Tested with GoogleTest](https://img.shields.io/badge/Testing%20With%20GTest-gray?style=for-the-badge&logo=googlesearchconsole&logoColor=orange&labelColor=black)](https://github.com/google/googletest)
 [![Support development](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=orange&labelColor=black)](https://www.buymeacoffee.com/walkerje)
 
-# Table of Contents
+# v0.10.17 Table of Contents
 - [Introduction](#introduction)
-  - [Code Examples](#code-samples)
+  - [Roadmap](#roadmap-to-v100)
+  - [Code Samples](#code-samples)
 - [Quick Start & Build Guide](#quick-start--building-with-cmake)
   - [Building](#building)
   - [Testing](#building-and-running-tests)
@@ -29,39 +30,60 @@ one another by design.
 This interdependent design is sensitive to regression when the behavior of any structure is modified.
 Veritable Lasagna offers a suite of unit tests to verify persistent behavior between updates to help prevent this.
 
-# Quick Start & Building with CMake
-Start by cloning this repo to your project directory.
+### Roadmap to v1.0.0
 
-```bash
-git clone this_page_url
-```
+This roadmap specifies what it will take to consider this library feature-complete. Following this, additional features
+will be released as part of minor versions after however many patches it might take to implement them. A Major release would involve significant
+changes to the overall composition of this project. All proposed features are to be implemented in a cross-platform manner and are to  have  test suites developed for them.
 
-If your project lives on Git, consider making this repo a submodule. This step is optional, of course.
+- Memory Management
+  - Memory blocks with metadata `vl_memory` ✔
+  - Memory pools
+    - Linear Pool `vl_linearpool` ✔
+    - Fixed Pool `vl_fixedpool` ✔
+  - Arena Allocator `vl_arena` ✔
+- Data Structures
+  - Buffer `vl_buffer` ✔
+  - Stack `vl_stack` ✔
+  - Queue `vl_queue` ✔
+  - Deque `vl_deque` ✔
+  - Linked List `vl_linked_list` ✔
+  - Ordered Set `vl_set` ✔
+  - Hash Table  `vl_hashtable` ✔
+- Algorithms
+  - Pseudo-random number generator `vl_rand` ✔
+  - Hashing `vl_hash` ✔
+  - Comparisons `vl_compare` ✔
+  - Sorting
+    - Available to `vl_memory` and `vl_linked_list` ✔
+      - Implicit to `vl_set` ✔
+  - Search
+    - Sorted
+      - To be made available to `vl_memory` and `vl_linked_list` ✘
+    - Unsorted
+      - To be made available to `vl_memory` and `vl_linked_list` ✘
+    - Implicit to `vl_set` and `vl_hashtable`. ✔
+  - Regular Expressions ✘
+- Async 
+  - Primitives
+    - Threads ✘
+    - Atomics Types ✘
+    - Mutex ✘
+    - Semaphore ✘
+  - Data Structures
+    - Lockless Async Memory Pool ✘
+    - Lockless Async Queue ✘
+    - Async Message Bus ✘
+  - Structures
+    - Worker Thread Pool ✘
+    - Finite State Machine ✘
+- Filesystem
+  - Directory listing ✘
+  - Path handling ✘
+  - Data (De)Serialization (BSON) ✘
+- Runtime Dynamic Library Handling ✘
 
-```bash
-git submodule add this_page_url
-git submodule update --init
-```
-
-In your project `CMakeLists.txt`, add this library as a subdirectory.
-
-```CMake
-add_subdirectory(veritable_lasagna)
-```
-
-Then link the library like so:
-
-```CMake
-include_directories(${VL_INCLUDE})
-
-#..............
-# add targets
-#..............
-
-target_link_libraries(my_target_name ${VL_LIBRARY})
-```
-
-### Code Usage Samples
+### Code Samples
 
 Below are full examples for some common complex data structures.
 
@@ -163,18 +185,50 @@ int main(int argc, const char** argv){
     return EXIT_SUCCESS;
 }
 ```
+
+# Quick Start & Building with CMake
+Start by cloning this repo to your project directory.
+
+```bash
+git clone this_page_url
+```
+
+If your project lives on Git, consider making this repo a submodule. This step is optional, of course.
+
+```bash
+git submodule add this_page_url
+git submodule update --init
+```
+
+In your project `CMakeLists.txt`, add this library as a subdirectory.
+
+```CMake
+add_subdirectory(veritable_lasagna)
+```
+
+Then link the library like so:
+
+```CMake
+include_directories(${VL_INCLUDE})
+
+#..............
+# add targets
+#..............
+
+target_link_libraries(my_target_name ${VL_LIBRARY})
+```
+
 ### Building
 
 To build the shared and static versions of this library, VL provides CMake options.
 
-| Flag Name       | Type | Default |
-|-----------------|------|---------|
-| VL_BUILD_STATIC | BOOL | ON      |
-| VL_BUILD_SHARED | BOOL | OFF     |
-| VL_BUILD_TESTS  | BOOL | OFF     |
+| Flag Name        | Type | Default |
+|------------------|------|---------|
+| VL_BUILD_SHARED  | BOOL | OFF     |
+| VL_SHARED_TESTS  | BOOL | OFF     |
 
 When adding this library as a subdirectory to your project, static linking is preferred by default. 
-By having `VL_BUILD_STATIC` or `VL_BUILD_SHARED` set to `ON`, you may explicitly link to either one.
+By having `VL_BUILD_SHARED` set to `ON`, you may explicitly link to either `VL_STATIC_TARGET` or `VL_SHARED_TARGET`.
 When neither flag is set, the variable `${VL_LIBRARY}` will link directly to the compiled object files. In this case,
 there is no single "library file", and is roughly synonymous with static linking.
 
@@ -200,8 +254,9 @@ They can be executed using `ctest`, a testing utility that comes packaged with m
 ```bash
 cd veritable_lasagna 
 mkdir build && cd build
-cmake -DVL_BUILD_TESTS=ON ..
-make && cd test && ctest
+cmake ..
+cmake --build .
+cd test && ctest
 ```
 
 #### Generating Documentation
