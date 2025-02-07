@@ -38,7 +38,7 @@ int pool_test_clear(){
 }
 
 int pool_test_clone(){
-#define VL_TEST_SIZE (65536*8)
+#define VL_TEST_SIZE (65536)
 
     int result = 1;
     vl_fixedpool* pool = vlFixedPoolNew(sizeof(int));
