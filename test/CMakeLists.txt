@@ -15,12 +15,6 @@ FetchContent_MakeAvailable(googletest)
 
 set(VL_TESTS "memory" "buffer" "linearpool" "hashtable" "arena" "linked_list" "set" "stack" "queue" "random" "fixedpool")
 
-if(${VL_SHARED_TESTS})
-    set(VL_TEST_LIB ${VL_LIBRARY_SHARED})
-else ()
-    set(VL_TEST_LIB ${VL_LIBRARY})
-endif ()
-
 enable_testing()
 
 include(GoogleTest)
@@ -31,9 +25,8 @@ foreach (DEF IN LISTS VL_TESTS)
 
     add_executable(${VL_CURRENT_TEST} "${DEF}.cpp")
 
-    target_link_libraries(${VL_CURRENT_TEST} ${VL_TEST_LIB} GTest::gtest_main)
+    target_link_libraries(${VL_CURRENT_TEST} ${VL_STATIC_TARGET} GTest::gtest_main)
     target_include_directories(${VL_CURRENT_TEST} PRIVATE "${VL_INCLUDE}" "${VL_CONFIG_HEADER_INCLUDE}")
-    add_dependencies(${VL_CURRENT_TEST} ${VL_TEST_LIB})
     gtest_discover_tests(${VL_CURRENT_TEST})
 endforeach ()
 
