@@ -5,8 +5,6 @@
 [![Tested with GoogleTest](https://img.shields.io/badge/Testing%20With%20GTest-gray?style=for-the-badge&logo=googlesearchconsole&logoColor=orange&labelColor=black)](https://github.com/google/googletest)
 [![Support development](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=orange&labelColor=black)](https://www.buymeacoffee.com/walkerje)
 
-Released under the [MIT license](LICENSE).
-
 # Table of Contents
 - [Introduction](#introduction)
   - [Code Examples](#code-samples)
@@ -14,6 +12,8 @@ Released under the [MIT license](LICENSE).
   - [Building](#building)
   - [Testing](#building-and-running-tests)
   - [Generating Docs](#generating-documentation)
+
+![Test Status](https://github.com/walkerje/veritable_lasagna/actions/workflows/build_and_test.yml/badge.svg)
 
 ------------------
 # Introduction
