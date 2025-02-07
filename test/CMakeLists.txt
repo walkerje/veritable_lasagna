@@ -33,7 +33,6 @@ foreach (DEF IN LISTS VL_TESTS)
 
     target_link_libraries(${VL_CURRENT_TEST} ${VL_TEST_LIB} GTest::gtest_main)
     target_include_directories(${VL_CURRENT_TEST} PRIVATE "${VL_INCLUDE}" "${VL_CONFIG_HEADER_INCLUDE}")
-    add_dependencies(${VL_CURRENT_TEST} ${VL_TEST_LIB})
     gtest_discover_tests(${VL_CURRENT_TEST})
 endforeach ()
 
