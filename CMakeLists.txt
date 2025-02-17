@@ -6,7 +6,7 @@ include(CheckTypeSize)
 # Versioning
 set(VL_VERSION_MAJOR 0)
 set(VL_VERSION_MINOR 10)
-set(VL_VERSION_PATCH 17)
+set(VL_VERSION_PATCH 18)
 set(VL_VERSION ${VL_VERSION_MAJOR}.${VL_VERSION_MINOR}.${VL_VERSION_PATCH})
 
 # Configuration options

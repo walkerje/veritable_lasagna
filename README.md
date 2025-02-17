@@ -63,11 +63,10 @@ changes to the overall composition of this project. All proposed features are to
     - Unsorted
       - To be made available to `vl_memory` and `vl_linked_list` ✘
     - Implicit to `vl_set` and `vl_hashtable`. ✔
-  - Regular Expressions ✘
 - Async 
   - Primitives
     - Threads ✘
-    - Atomics Types ✘
+    - Atomics Types ✔
     - Mutex ✘
     - Semaphore ✘
   - Data Structures

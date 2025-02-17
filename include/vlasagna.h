@@ -29,4 +29,6 @@
 #include "vl/vl_deque.h"
 #include "vl/vl_rand.h"
 
+#include "vl/vl_atomic.h"
+
 #endif
