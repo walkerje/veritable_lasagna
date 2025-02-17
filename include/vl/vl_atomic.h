@@ -10,7 +10,8 @@
 
 /**
  * This header provides a wrapper over the C11 atomic functions, providing an abstraction using the VL number types.
- * Primarily used for "all in one place" documentation, the header
+ * Primarily used for "all in one place" documentation, the header is intended to "smooth out" usage of atomic types
+ * to conform to the way the rest of the library is documented and used.
  */
 
 #ifdef VL_ATOMIC

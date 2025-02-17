@@ -171,7 +171,7 @@ endif()
 
 if(MSVC)
     # Force experimental c11 atomics flag, non negotiable.
-    # There is probably a less destructive way to accomplish th
+    # There is probably a less destructive way to accomplish this.
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /experimental:c11atomics")
 endif ()
 

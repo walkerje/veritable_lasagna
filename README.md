@@ -66,7 +66,7 @@ changes to the overall composition of this project. All proposed features are to
 - Async 
   - Primitives
     - Threads ✘
-    - Atomics Types ✔
+    - Atomic Types ✔
     - Mutex ✘
     - Semaphore ✘
   - Data Structures
