@@ -169,6 +169,12 @@ else()
     set(VL_BUILD_TYPE RELEASE)
 endif()
 
+if(MSVC)
+    # Force experimental c11 atomics flag, non negotiable.
+    # There is probably a less destructive way to accomplish th
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /experimental:c11atomics")
+endif ()
+
 # This macro will add a source file to a list of sources.
 # It will print the path relative to the project path.
 macro(vl_add_source filepath)

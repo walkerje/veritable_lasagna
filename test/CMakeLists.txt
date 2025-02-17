@@ -1,8 +1,7 @@
-project(veritable-lasagna-test CXX)
+project(veritable-lasagna-test CXX C)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
 FetchContent_Declare(
