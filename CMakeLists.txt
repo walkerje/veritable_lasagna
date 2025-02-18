@@ -6,7 +6,7 @@ include(CheckTypeSize)
 # Versioning
 set(VL_VERSION_MAJOR 0)
 set(VL_VERSION_MINOR 10)
-set(VL_VERSION_PATCH 18)
+set(VL_VERSION_PATCH 19)
 set(VL_VERSION ${VL_VERSION_MAJOR}.${VL_VERSION_MINOR}.${VL_VERSION_PATCH})
 
 # Configuration options
@@ -170,10 +170,9 @@ else()
 endif()
 
 if(MSVC)
-    # Force experimental c11 atomics flag, non negotiable.
-    # There is probably a less destructive way to accomplish this.
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /experimental:c11atomics")
+    set(VL_COMPILE_OPTIONS "${VL_COMPILE_OPTIONS} /experimental:c11atomics")
 endif ()
+
 
 # This macro will add a source file to a list of sources.
 # It will print the path relative to the project path.
@@ -186,7 +185,7 @@ macro(vl_add_source filepath)
 endmacro()
 
 # This function will configure a header file and output it to the specified location.
-# The input path is relative to the calling cmakelists, while
+# The input path is relative to the calling cmakelists.
 macro(vl_configure_header filepath outname)
     set(VL_HEADER_ABSPATH "${CMAKE_CURRENT_LIST_DIR}/${filepath}")
     string(SUBSTRING ${VL_HEADER_ABSPATH} ${VL_PROJECT_PATH_LEN} -1 VL_HEADER_RELPATH)
@@ -207,11 +206,15 @@ set(VL_INSTALL_TARGETS  ${VL_STATIC_TARGET})
 add_library(${VL_OBJECT_TARGET} OBJECT ${VL_SOURCES})
 target_include_directories  (${VL_OBJECT_TARGET} PRIVATE include/vl ${VL_CONFIG_HEADER_PATH} ${VL_CONFIG_HEADER_INCLUDE})
 set_property                (TARGET ${VL_OBJECT_TARGET} PROPERTY POSITION_INDEPENDENT_CODE ON)
+target_compile_options(${VL_OBJECT_TARGET} PUBLIC "${VL_COMPILE_OPTIONS}")
+
 
 add_library(${VL_STATIC_TARGET} STATIC $<TARGET_OBJECTS:${VL_OBJECT_TARGET}>)
 target_include_directories(${VL_STATIC_TARGET} PRIVATE include/vl ${VL_CONFIG_HEADER_PATH} ${VL_CONFIG_HEADER_INCLUDE})
 set_target_properties(${VL_STATIC_TARGET} PROPERTIES OUTPUT_NAME "${VL_STATIC_TARGET}" DEBUG_POSTFIX "d")
 add_dependencies(${VL_STATIC_TARGET} ${VL_OBJECT_TARGET})
+
+target_compile_options(${VL_STATIC_TARGET} PUBLIC "${VL_COMPILE_OPTIONS}")
 
 if(VL_BUILD_SHARED)
     set(VL_SHARED_TARGET vlasagna_shared)
@@ -220,6 +223,7 @@ if(VL_BUILD_SHARED)
     add_library(${VL_SHARED_TARGET} SHARED $<TARGET_OBJECTS:${VL_OBJECT_TARGET}>)
     target_include_directories(${VL_SHARED_TARGET} PRIVATE include/vl ${VL_CONFIG_HEADER_PATH} ${VL_CONFIG_HEADER_INCLUDE})
     set_target_properties(${VL_SHARED_TARGET} PROPERTIES OUTPUT_NAME "${VL_STATIC_TARGET}" DEBUG_POSTFIX "d")
+    target_compile_options(${VL_SHARED_TARGET} PUBLIC "${VL_COMPILE_OPTIONS}")
     add_dependencies(${VL_SHARED_TARGET} ${VL_OBJECT_TARGET})
 
     if(MSVC)
