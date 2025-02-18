@@ -22,8 +22,8 @@
 #undef VL_ATOMIC_TYPEDEF
 #endif
 
-#define VL_ATOMIC(x) _Atomic x
-#define VL_ATOMIC_TYPEDEF(x) typedef VL_ATOMIC(x)
+#define VL_ATOMIC _Atomic
+#define VL_ATOMIC_TYPEDEF(x) typedef VL_ATOMIC x
 
 VL_ATOMIC_TYPEDEF(vl_bool_t)        vl_atomic_bool_t;
 
@@ -86,7 +86,7 @@ VL_ATOMIC_TYPEDEF(vl_int32_t)       VL_ATOMIC_I32_T;
 VL_ATOMIC_TYPEDEF(vl_int64_t)       VL_ATOMIC_I64_T;
 #endif
 
-VL_ATOMIC_TYPEDEF(vl_bool_t)                vl_atomic_flag_t;
+VL_ATOMIC_TYPEDEF(atomic_flag)          vl_atomic_flag_t;
 
 
 /**
@@ -394,7 +394,7 @@ typedef enum VL_MEMORY_ORDER{
  * \sa VL_MEMORY_ORDER
  * \param order Memory order used for the current context.
  */
-#define vlAtomicThreadFence(order)          atomic_thread_fence((memor_order)(order))
+#define vlAtomicThreadFence(order)          atomic_thread_fence((memory_order)(order))
 
 /**
  * \brief Atomically sets a flag to true and returns the old value.

@@ -7,7 +7,7 @@ extern "C"{
 
 #include <vl/vl_numtypes.h>
 
-vl_bool_t vlTESTAtomicCompile();
+vl_bool_t vlTestAtomicCounter();
 
 #ifdef __cplusplus
 }

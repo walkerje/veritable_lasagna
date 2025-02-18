@@ -5,8 +5,8 @@ include(CheckTypeSize)
 
 # Versioning
 set(VL_VERSION_MAJOR 0)
-set(VL_VERSION_MINOR 10)
-set(VL_VERSION_PATCH 19)
+set(VL_VERSION_MINOR 11)
+set(VL_VERSION_PATCH 1)
 set(VL_VERSION ${VL_VERSION_MAJOR}.${VL_VERSION_MINOR}.${VL_VERSION_PATCH})
 
 # Configuration options
@@ -169,10 +169,28 @@ else()
     set(VL_BUILD_TYPE RELEASE)
 endif()
 
+# Platform configuration.
+
+if(NOT WIN32)
+    set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+    set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+endif ()
+
+find_package(Threads REQUIRED)
+
+if(${CMAKE_USE_WIN32_THREADS_INIT})
+    set(VL_THREADS_WIN32 1)
+elseif (${CMAKE_USE_PTHREADS_INIT})
+    set(VL_THREADS_PTHREAD 1)
+endif ()
+
+set(VL_SYSTEM_LIBS "Threads::Threads")
+
 if(MSVC)
     set(VL_COMPILE_OPTIONS "${VL_COMPILE_OPTIONS} /experimental:c11atomics")
 endif ()
 
+# Macro definitions.
 
 # This macro will add a source file to a list of sources.
 # It will print the path relative to the project path.
@@ -207,12 +225,13 @@ add_library(${VL_OBJECT_TARGET} OBJECT ${VL_SOURCES})
 target_include_directories  (${VL_OBJECT_TARGET} PRIVATE include/vl ${VL_CONFIG_HEADER_PATH} ${VL_CONFIG_HEADER_INCLUDE})
 set_property                (TARGET ${VL_OBJECT_TARGET} PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_options(${VL_OBJECT_TARGET} PUBLIC "${VL_COMPILE_OPTIONS}")
-
+target_link_libraries(${VL_OBJECT_TARGET} PUBLIC "${VL_SYSTEM_LIBS}")
 
 add_library(${VL_STATIC_TARGET} STATIC $<TARGET_OBJECTS:${VL_OBJECT_TARGET}>)
 target_include_directories(${VL_STATIC_TARGET} PRIVATE include/vl ${VL_CONFIG_HEADER_PATH} ${VL_CONFIG_HEADER_INCLUDE})
 set_target_properties(${VL_STATIC_TARGET} PROPERTIES OUTPUT_NAME "${VL_STATIC_TARGET}" DEBUG_POSTFIX "d")
 add_dependencies(${VL_STATIC_TARGET} ${VL_OBJECT_TARGET})
+target_link_libraries(${VL_STATIC_TARGET} PUBLIC "${VL_SYSTEM_LIBS}")
 
 target_compile_options(${VL_STATIC_TARGET} PUBLIC "${VL_COMPILE_OPTIONS}")
 
@@ -224,6 +243,7 @@ if(VL_BUILD_SHARED)
     target_include_directories(${VL_SHARED_TARGET} PRIVATE include/vl ${VL_CONFIG_HEADER_PATH} ${VL_CONFIG_HEADER_INCLUDE})
     set_target_properties(${VL_SHARED_TARGET} PROPERTIES OUTPUT_NAME "${VL_STATIC_TARGET}" DEBUG_POSTFIX "d")
     target_compile_options(${VL_SHARED_TARGET} PUBLIC "${VL_COMPILE_OPTIONS}")
+    target_link_libraries(${VL_SHARED_TARGET} PUBLIC "${VL_SYSTEM_LIBS}")
     add_dependencies(${VL_SHARED_TARGET} ${VL_OBJECT_TARGET})
 
     if(MSVC)

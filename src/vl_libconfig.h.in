@@ -16,6 +16,18 @@
 #define VL_BUILD_STRING "vlasagna_@VL_VERSION@_@VL_BUILD_TYPE@"
 
 /***********************************************************************************
+ * Platform
+ ***********************************************************************************
+ *
+ * This region indicates the platform this library was built for.
+ * Its properties can influence OS dependencies and code paths, such as in the case
+ * of async primitives and filesystem handling.
+ */
+
+#cmakedefine VL_THREADS_WIN32
+#cmakedefine VL_THREADS_PTHREAD
+
+/***********************************************************************************
  * System Endianness
  ***********************************************************************************
  *

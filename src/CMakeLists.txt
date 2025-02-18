@@ -14,3 +14,5 @@ vl_add_source("vl_hash.c")
 vl_add_source("vl_hashtable.c")
 vl_add_source("vl_rand.c")
 vl_add_source("vl_fixed_pool.c")
+
+vl_add_source("vl_thread.c")

@@ -6,6 +6,6 @@ extern "C" {
 
 //TODO: Real tests. Need threading.
 
-TEST(atomic, compile){
-    EXPECT_TRUE(vlTESTAtomicCompile());
+TEST(atomic, counter){
+    EXPECT_TRUE(vlTestAtomicCounter());
 }
