@@ -2,6 +2,9 @@
  * \file
  * \copyright Copyright 2025 Jesse Walker, released under the MIT license.
  * A Data Structure and Algorithms library for C11.
+ *
+ * Git Repository:  https://github.com/walkerje/veritable_lasagna
+ * Homepage:        https://bitshiftmountain.com/projects/vl/docs
  */
 
 /**

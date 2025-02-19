@@ -65,7 +65,7 @@ changes to the overall composition of this project. All proposed features are to
     - Implicit to `vl_set` and `vl_hashtable`. ✔
 - Async 
   - Primitives
-    - Threads ✔ (Work in progress)
+    - Threads ✔
     - Atomic Types ✔
     - Mutex ✘
     - Semaphore ✘

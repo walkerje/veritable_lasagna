@@ -1,5 +1,7 @@
 #include <time.h>
 #include <pthread.h>
+#include <unistd.h>
+
 
 typedef struct{
     pthread_t threadHandle;
@@ -7,6 +9,13 @@ typedef struct{
     pthread_cond_t      timeoutCondition;
     pthread_mutex_t     timeoutConditionMutex;
 } vl_posix_thread;
+
+vl_posix_thread mainThread;
+
+/**
+ * \brief Thread local pointer to the metadata of the current thread.
+ */
+VL_THREAD_LOCAL vl_posix_thread* currentThread = NULL;
 
 typedef struct{
     vl_posix_thread* meta;
@@ -20,6 +29,7 @@ void* vl_ThreadBootstrap(void* arg) {
     vl_thread_proc proc;
     void* userArg;
 
+
     {
         vl_thread_args* threadArgs = (vl_thread_args*)(arg);
 
@@ -30,7 +40,11 @@ void* vl_ThreadBootstrap(void* arg) {
         free(threadArgs);
     }
 
+    currentThread = meta;
+
     proc(userArg);
+
+    currentThread = NULL;
 
     pthread_mutex_lock(&meta->timeoutConditionMutex);
     pthread_cond_signal(&meta->timeoutCondition);
@@ -39,7 +53,9 @@ void* vl_ThreadBootstrap(void* arg) {
     return NULL;
 }
 
-vl_thread   vlThreadNew(vl_thread_proc threadProc, void* userArg){
+vl_thread vlThreadNew(vl_thread_proc threadProc, void* userArg){
+    vlThreadCurrent();
+
     vl_thread_args* args = malloc(sizeof(vl_thread_args));
 
     if (args == NULL) {
@@ -56,20 +72,20 @@ vl_thread   vlThreadNew(vl_thread_proc threadProc, void* userArg){
     args->threadProc = threadProc;
     args->userArg = userArg;
 
+    pthread_mutex_init(&meta->timeoutConditionMutex, NULL);
+    pthread_cond_init(&meta->timeoutCondition, NULL);
+
     if(pthread_create(&meta->threadHandle, NULL, vl_ThreadBootstrap, args) != 0){
         free(args);
         free(meta);
         return 0;
     }
 
-    pthread_mutex_init(&meta->timeoutConditionMutex, NULL);
-    pthread_cond_init(&meta->timeoutCondition, NULL);
-
     return (vl_thread) meta;
 }
 
 void        vlThreadDelete(vl_thread thread){
-    if(thread == 0)
+    if(thread == 0 || thread == ((vl_uintptr_t)&mainThread))
         return;
 
     vl_posix_thread* meta = (vl_posix_thread*) thread;
@@ -80,6 +96,9 @@ void        vlThreadDelete(vl_thread thread){
 }
 
 vl_bool_t   vlThreadJoin(vl_thread thread){
+    if(thread == 0 || thread == ((vl_uintptr_t)&mainThread))
+        return VL_FALSE;
+
     int result = pthread_join(((vl_posix_thread*)thread)->threadHandle, NULL);
     if (result == 0) {
         return VL_TRUE; // Finished execution.
@@ -88,6 +107,9 @@ vl_bool_t   vlThreadJoin(vl_thread thread){
 }
 
 vl_bool_t   vlThreadJoinTimeout(vl_thread thread, vl_uint_t milliseconds){
+    if(thread == 0 || thread == ((vl_uintptr_t)&mainThread))
+        return VL_FALSE;
+
     vl_posix_thread* meta = (vl_posix_thread*) thread;
     vl_int_t result;
 
@@ -114,6 +136,8 @@ vl_bool_t   vlThreadJoinTimeout(vl_thread thread, vl_uint_t milliseconds){
 
     if (result == 0) {
         // Thread finished within the timeout
+        // Join it "for real" for cleanup.
+        pthread_join(meta->threadHandle, NULL);
         return VL_TRUE;
     }
 
@@ -121,7 +145,25 @@ vl_bool_t   vlThreadJoinTimeout(vl_thread thread, vl_uint_t milliseconds){
     return VL_FALSE;
 }
 
-
 vl_thread   vlThreadCurrent(){
-    return (vl_thread) pthread_self();
+    switch((vl_uintptr_t)currentThread){
+        case 0:
+            currentThread = &mainThread;
+            currentThread->threadHandle = pthread_self();
+            //Timeout condition & mutex left uninitialized for the main thread.
+        default:
+            return (vl_thread) currentThread;
+    }
+}
+
+vl_bool_t        vlThreadYield(){
+    return sched_yield() == 0;
+}
+
+void vlThreadSleep(vl_ularge_t milliseconds){
+    usleep(milliseconds * 1000);
+}
+
+void vlThreadExit(){
+    pthread_exit(NULL);
 }
