@@ -183,6 +183,14 @@ void        vlMemSort(void* buffer, vl_memsize_t elementSize, vl_dsidx_t numElem
 void        vlMemCopyStride(const void* src, vl_dsoffs_t srcStride, void* dest, vl_dsoffs_t dstStride, vl_memsize_t elementSize, vl_dsidx_t numElements);
 
 /**
+ * \brief Reverses the order of bytes in the specified block of memory.
+ * \param src
+ * \param numBytes
+ * \par Complexity of O(n) linear.
+ */
+void        vlMemReverse(void* src, vl_memsize_t numBytes);
+
+/**
  * \brief Frees the specified block of memory.
  * \param mem pointer to block.
  */

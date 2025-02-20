@@ -4,6 +4,25 @@
 extern "C" {
 #include <vl/vl_memory.h>
 #include <vl/vl_numtypes.h>
+#include <vl/vl_rand.h>
+
+    vl_bool_t mem_test_reverse(){
+        vl_bool_t       result      = VL_TRUE;
+        vl_memory*      mem         = vlMemAlloc(VL_KB(1));
+
+        vl_rand rand = vlRandInit();
+        vlRandFill(&rand, mem, vlMemSize(mem));
+
+        vl_memory* memReversed = vlMemClone(mem);
+        vlMemReverse(memReversed, vlMemSize(memReversed));
+
+        for(vl_memsize_t i = 0; i < vlMemSize(mem) && result; i++)
+            result = (result && (mem[i] == memReversed[vlMemSize(memReversed) - i - 1]));
+
+        vlMemFree(memReversed);
+        vlMemFree(mem);
+        return result;
+    }
 
     vl_bool_t mem_test_align(vl_int_t alignment){
         vl_bool_t       result      = VL_TRUE;
@@ -23,8 +42,8 @@ extern "C" {
         vl_int_t*   const       numbers     = (vl_int_t*)mem;
         vl_bool_t               result      = VL_TRUE;
 
-        for(vl_uint_t i = 0; i < numArrayLen; i++)
-            numbers[i] = rand();
+        vl_rand rand = vlRandInit();
+        vlRandFill(&rand, mem, vlMemSize(mem));
 
         vlMemSort(mem, sizeof(vl_int_t), numArrayLen, vlCompareInt);
 
@@ -55,4 +74,8 @@ TEST(memory, sort){
     ASSERT_TRUE(mem_test_sort(10000));
     ASSERT_TRUE(mem_test_sort(100000));
     ASSERT_TRUE(mem_test_sort(1000000));
+}
+
+TEST(memory, reverse){
+    ASSERT_TRUE(mem_test_reverse());
 }

@@ -6,10 +6,12 @@
 
 #define VL_COMPARE_FUNC(funcName, type)                             \
 vl_int_t funcName (const void* dataA, const void* dataB){           \
-    return VL_DEREF(type, dataA) - VL_DEREF(type, dataB);           \
+    return  (VL_DEREF(type, dataA) > VL_DEREF(type, dataB)) -       \
+            (VL_DEREF(type, dataA) < VL_DEREF(type, dataB));        \
 }                                                                   \
 vl_int_t funcName##Reverse (const void* dataA, const void* dataB){  \
-    return VL_DEREF(type, dataB) - VL_DEREF(type, dataA);           \
+    return  (VL_DEREF(type, dataB) > VL_DEREF(type, dataA)) -       \
+            (VL_DEREF(type, dataB) < VL_DEREF(type, dataA));        \
 }
 
 #ifdef VL_I8_T

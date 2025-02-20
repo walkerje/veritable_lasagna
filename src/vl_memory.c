@@ -196,6 +196,23 @@ void vlMemCopyStride(const void* src, vl_dsoffs_t srcStride, void* dest, vl_dsof
     }
 }
 
+void vlMemReverse(void* mem, vl_memsize_t numBytes){
+    vl_usmall_t* first = mem;
+    vl_usmall_t* last = first + (numBytes - 1);
+    vl_usmall_t temp;
+    numBytes -= (numBytes % 2);
+    numBytes /= 2;
+
+    //Swap bytes from both ends, meeting in the middle of the memory block.
+    for(vl_dsidx_t curByte = 0; curByte < numBytes; curByte++){
+        temp = *last;
+        *last = *first;
+        *first = temp;
+        first++;
+        last--;
+    }
+}
+
 vl_uint_t vlMemAlignment(vl_memory* mem){
     return VL_MEMORY_HEADER_INLINE(mem)->alignment;
 }
