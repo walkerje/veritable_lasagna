@@ -5,7 +5,7 @@
 [![Tested with GoogleTest](https://img.shields.io/badge/Testing%20With%20GTest-gray?style=for-the-badge&logo=googlesearchconsole&logoColor=orange&labelColor=black)](https://github.com/google/googletest)
 [![Support development](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=orange&labelColor=black)](https://www.buymeacoffee.com/walkerje)
 
-# v0.11.1 Table of Contents
+# v0.11.2 Table of Contents
 - [Introduction](#introduction)
   - [Roadmap](#roadmap-to-v100)
   - [Code Samples](#code-samples)
@@ -67,7 +67,7 @@ changes to the overall composition of this project. All proposed features are to
   - Primitives
     - Threads ✔
     - Atomic Types ✔
-    - Mutex ✘
+    - Mutex ✔
     - Semaphore ✘
   - Data Structures
     - Lockless Async Memory Pool ✘

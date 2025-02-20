@@ -16,3 +16,4 @@ vl_add_source("vl_rand.c")
 vl_add_source("vl_fixed_pool.c")
 
 vl_add_source("vl_thread.c")
+vl_add_source("vl_mutex.c")

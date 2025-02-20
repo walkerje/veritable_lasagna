@@ -1,6 +1,7 @@
 #include "atomic.h"
 #include <vl/vl_atomic.h>
 #include <vl/vl_thread.h>
+#include <vl/vl_mutex.h>
 #include <stdio.h>
 
 typedef struct{
@@ -9,20 +10,22 @@ typedef struct{
     vl_uint32_t naiveCounter;
     vl_atomic_uint32_t atomicCounter;
 
-    vl_atomic_bool_t goSignal;
+    vl_mutex goLock;
 } vl_counter_test;
 
 void vlTestAtomicCounterThread(void* arg){
     vl_counter_test* test = (vl_counter_test*)arg;
 
-    //Spin until getting the go-ahead from the main thread.
-    while(!vlAtomicLoad(&test->goSignal));
+    //Wait to obtain a shared lock.
+    vlMutexObtainShared(test->goLock);
 
     //Then, slam the counters with increments.
     for(int i = 0; i < test->maxIterations; i++){
         test->naiveCounter++;
         vlAtomicFetchAdd(&test->atomicCounter, 1);
     }
+
+    vlMutexReleaseShared(test->goLock);
 }
 
 #define VL_TEST_ATOMIC_COUNTER_THREADS 8
@@ -37,6 +40,7 @@ vl_bool_t vlTestAtomicCounter(){
 
     vl_counter_test testVars;
     testVars.maxIterations = 1024;
+    testVars.goLock = vlMutexNew();
 
     vl_thread threads[VL_TEST_ATOMIC_COUNTER_THREADS];
     const vl_uint32_t expectedNaiveCounter = testVars.maxIterations * VL_TEST_ATOMIC_COUNTER_THREADS;
@@ -47,22 +51,22 @@ vl_bool_t vlTestAtomicCounter(){
 
         testVars.naiveCounter = 0;
         vlAtomicStore(&testVars.atomicCounter, 0);
-        vlAtomicStore(&testVars.goSignal, VL_FALSE);
 
         {
+            vlMutexObtain(testVars.goLock);
+
             for(int j = 0; j < VL_TEST_ATOMIC_COUNTER_THREADS; j++){
                 threads[j] = vlThreadNew(vlTestAtomicCounterThread, &testVars);
             }
 
             //Tell the threads to start incrementing.
-            vlAtomicStore(&testVars.goSignal, VL_TRUE);
+            vlMutexRelease(testVars.goLock);
 
             for(int j = 0; j < VL_TEST_ATOMIC_COUNTER_THREADS; j++){
                 vl_thread thread = threads[j];
                 vlThreadJoin(thread);
                 vlThreadDelete(thread);
             }
-
         }
 
         const vl_uint32_t atomicResult = vlAtomicLoad(&testVars.atomicCounter);
@@ -70,15 +74,17 @@ vl_bool_t vlTestAtomicCounter(){
         printf("Naive Result: %u\nAtomicResult: %u\n",testVars.naiveCounter, atomicResult);
 
         if((atomicResult == expectedNaiveCounter) && (testVars.naiveCounter != expectedNaiveCounter)) {
+            vlMutexDelete(testVars.goLock);
             return VL_TRUE;
         }
     }
 
+    vlMutexDelete(testVars.goLock);
+
     /**
      * THIS TEST MAY FAIL SPURIOUSLY DUE TO ITS ATOMIC NATURE.
      * We're trying to encourage a failure here as a demonstration.
-     * The "spinlock" with an atomic boolean will help encourage
-     * a race condition.
+     * The mutex is intended to encourage a race condition on the non-atomic counter.
      */
     return VL_FALSE;
 }

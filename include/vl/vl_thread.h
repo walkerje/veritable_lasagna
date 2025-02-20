@@ -53,7 +53,7 @@ vl_bool_t   vlThreadJoinTimeout(vl_thread thread, vl_uint_t milliseconds);
 
 /**
  * \brief Gets the current thread.
- * \return vl_thread representing the current thread, or NULL if called from the main thread.
+ * \return vl_thread representing the current thread.
  */
 vl_thread   vlThreadCurrent();
 
