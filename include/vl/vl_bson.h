@@ -1,8 +1,0 @@
-//
-// Created by silas on 2/20/2025.
-//
-
-#ifndef VERITABLE_LASAGNA_VL_BSON_H
-#define VERITABLE_LASAGNA_VL_BSON_H
-
-#endif //VERITABLE_LASAGNA_VL_BSON_H
