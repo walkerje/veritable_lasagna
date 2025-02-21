@@ -183,12 +183,81 @@ void        vlMemSort(void* buffer, vl_memsize_t elementSize, vl_dsidx_t numElem
 void        vlMemCopyStride(const void* src, vl_dsoffs_t srcStride, void* dest, vl_dsoffs_t dstStride, vl_memsize_t elementSize, vl_dsidx_t numElements);
 
 /**
- * \brief Reverses the order of bytes in the specified block of memory.
- * \param src
- * \param numBytes
+ * \brief Reverses the bytes in a series of elements of a defined length and stride between them.
+ *
+ * This function operates on a sequence of elements (or sub-arrays) within a memory block, where each element is separated
+ * by a defined stride. It reverses the bytes of each individual element but does not alter the overall structure of the memory.
+ * The elements are processed sequentially, one by one, with each element's bytes reversed in-place.
+ *
+ * This is useful when you need to reverse the bytes in each element of a collection of data structures that are tightly packed
+ * but may have a varying stride (i.e., distance between consecutive elements in memory).
+ *
+ * Example:
+ * Suppose we have an array of 32-bit integers, each 4 bytes, with a stride of 8 bytes:
+ *
+ *    Input (elements of size 4 bytes, stride of 8 bytes):
+ *    [0xAABBCCDD, 0x11223344, 0x55667788]
+ *    Memory block: [0xAABBCCDD, pad, 0x11223344, pad, 0x55667788, pad]
+ *    (Where 'pad' represents the unused memory between elements, i.e., stride.)
+ *
+ *    Output (each element reversed):
+ *    [0xDDCCBBAA, 0x44332211, 0x88776655]
+ *    Memory block: [0xDDCCBBAA, pad, 0x44332211, pad, 0x88776655, pad]
+ *
+ * The bytes within each element are reversed, but the stride between elements is respected.
+ *
+ * \param src memory block pointer. The base address of the memory containing the elements to be reversed.
+ * \param srcStride total number of bytes between each sub-array (or element). This defines the gap between consecutive elements.
+ * \param elementSize size of each sub-array (or element) in bytes. This is the number of bytes that constitute one element.
+ * \param numElements total number of sub-arrays (or elements). This is the number of individual elements to process.
  * \par Complexity of O(n) linear.
  */
-void        vlMemReverse(void* src, vl_memsize_t numBytes);
+void        vlMemReverseSubArraysStride(void* src, vl_dsoffs_t srcStride, vl_memsize_t elementSize, vl_dsidx_t numElements);
+
+#ifndef vlMemReverse
+/**
+ * \brief Reverses the order of bytes in the specified block of memory.
+ *
+ * This is to be used on tightly packed sequences of bytes.
+ * Attempting to blindly reverse the memory of a structure can result in
+ * unexpected results due to padding inserted by the compiler.
+ *
+ * Assuming the input is of the sequence [0x0A, 0x0B, 0x0C, 0x0D, 0x0E],
+ * the expected output would be [0x0E, 0x0D, 0x0C, 0x0B, 0x0A].
+ *
+ * \sa vlMemReverseSubArraysStride
+ *
+ * \param src memory block pointer
+ * \param numBytes total number of bytes to reverse
+ * \par Complexity of O(n) linear.
+ */
+#define vlMemReverse(src, numBytes) \
+        vlMemReverseSubArraysStride(src, 1, numBytes, 1)
+#endif
+
+#ifndef vlMemReverseSubArrays
+/**
+ * \brief Reverses the bytes in a tightly packed series of elements of a defined length.
+ *
+ * This is to be used on tightly packed sequences of elements.
+ * An element is defined as a discrete sub-array of bytes in a larger sequence.
+ *
+ * Assuming you have the following input: [0xAABBCCDD, 0x11223344, 0x55667788],
+ * the expected output would be: [0xDDCCBBAA, 0x44332211, 0x88776655].
+ *
+ * This differs from the vlMemReverse function, where given that input
+ * the expected output would be: [0x88776655, 0x44332211, 0xDDCCBBAA].
+ *
+ * \sa vlMemReverseSubArraysStride
+ *
+ * \param src memory block pointer
+ * \param elementSize size of each sub array, or element, in bytes
+ * \param numElements total number of sub arrays, or elements
+ * \par Complexity of O(n) linear.
+ */
+#define vlMemReverseSubArrays(src, elementSize, numElements) \
+        vlMemReverseSubArraysStride(src, elementSize, elementSize, numElements)
+#endif
 
 /**
  * \brief Frees the specified block of memory.

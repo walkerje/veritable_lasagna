@@ -79,7 +79,7 @@ changes to the overall composition of this project. All proposed features are to
 - Filesystem
   - Directory listing ✘
   - Path handling ✘
-  - Data (De)Serialization (BSON) ✘
+  - Data (De)Serialization (MessagePack) ✘ (Work in progress)
 - Runtime Dynamic Library Handling ✘
 
 ### Code Samples

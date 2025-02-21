@@ -31,7 +31,7 @@
  * \private
  */
 typedef struct vl_memory_header{
-    vl_memsize_t          length;   //size of the user-end allocation, in bytes.
+    vl_memsize_t    length;         //size of the user-end allocation, in bytes.
     vl_uint_t       headOffset;     //total number of bytes from the beginning of the allocation
     vl_uint_t       alignment;      //byte alignment of user-end pointer. For unaligned allocations, this defaults to VL_DEFAULT_MEMORY_ALIGN.
 } vl_memory_header;
@@ -196,20 +196,24 @@ void vlMemCopyStride(const void* src, vl_dsoffs_t srcStride, void* dest, vl_dsof
     }
 }
 
-void vlMemReverse(void* mem, vl_memsize_t numBytes){
-    vl_usmall_t* first = mem;
-    vl_usmall_t* last = first + (numBytes - 1);
-    vl_usmall_t temp;
-    numBytes -= (numBytes % 2);
-    numBytes /= 2;
+void vlMemReverseSubArraysStride(void* src, vl_dsoffs_t srcStride, vl_memsize_t elementSize, vl_dsidx_t numElements){
+    const vl_dsidx_t numSteps = elementSize / 2;
+    vl_usmall_t *srcPtr = src, *first, *last, temp;
+    vl_dsidx_t curElem, curStep;
 
-    //Swap bytes from both ends, meeting in the middle of the memory block.
-    for(vl_dsidx_t curByte = 0; curByte < numBytes; curByte++){
-        temp = *last;
-        *last = *first;
-        *first = temp;
-        first++;
-        last--;
+    for(curElem = 0; curElem < numElements; curElem++){
+        first = srcPtr;
+        last = first + (elementSize - 1);
+
+        for(curStep = 0; curStep < numSteps; curStep++){
+            temp = *last;
+            *last = *first;
+            *first = temp;
+            first++;
+            last--;
+        }
+
+        srcPtr += srcStride;
     }
 }
 
