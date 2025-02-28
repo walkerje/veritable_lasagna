@@ -3,17 +3,6 @@
 #include <string.h>
 
 /**
- * \brief Hashtable element header. Not very space efficient.
- * \private
- */
-typedef struct{
-    vl_memsize_t  keySize;
-    vl_memsize_t  valSize;
-    vl_hash keyHash;
-    vl_arena_ptr next;
-} vl_hashtable_header;
-
-/**
  * \brief Compare two byte sequences.
  * \private
  */
@@ -148,21 +137,19 @@ vl_hash_iter vlHashTableFind(vl_hashtable* table, const void* key, vl_memsize_t 
     const vl_dsidx_t tableSize = (vlMemSize(table->table) / sizeof(vl_hash_iter));
     const vl_dsidx_t tableIndex = hash % tableSize;
     vl_hash_iter curIter = ((vl_hash_iter*)table->table)[tableIndex];
+    vl_hashtable_header* curHeader;
 
     if(curIter == 0)
         return 0;
 
-    //only element in the list. just go ahead and return the iterator.
-    vl_hashtable_header* curHeader = (vl_hashtable_header*)vlArenaMemSample(&table->data, curIter);
-    if(curHeader->next == VL_HASHTABLE_ITER_INVALID)
-        return curIter;
+    while(curIter != VL_HASHTABLE_ITER_INVALID) {
+        curHeader = (vl_hashtable_header*)vlArenaMemSample(&table->data, curIter);
 
-    do{
         if (vl_HashTableBinCompare(curHeader + 1, curHeader->keySize, key, keySize))
             return curIter;
-        curIter = curHeader->next;
-        curHeader = (vl_hashtable_header*)vlArenaMemSample(&table->data, curIter);
-    } while(curIter != VL_HASHTABLE_ITER_INVALID);
+
+        curIter = curHeader->next; // Move to the next node
+    }
 
     return VL_HASHTABLE_ITER_INVALID;
 }

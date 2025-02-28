@@ -51,6 +51,17 @@ typedef struct{
 } vl_hashtable;
 
 /**
+ * \brief Hashtable element header. Not very space efficient.
+ * \private
+ */
+typedef struct{
+    vl_memsize_t  keySize;
+    vl_memsize_t  valSize;
+    vl_hash keyHash;
+    vl_arena_ptr next;
+} vl_hashtable_header;
+
+/**
  * \brief Initializes the specified table.
  * Specifies the hash function to use on keys.
  *

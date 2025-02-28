@@ -14,7 +14,7 @@ set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # These tests will compile just fine with C linkage, and can be tested "straight forward".
-set(VL_TESTS "memory" "buffer" "linearpool" "hashtable" "arena" "linked_list" "set" "stack" "queue" "random" "fixedpool")
+set(VL_TESTS "memory" "buffer" "linearpool" "hashtable" "arena" "linked_list" "set" "stack" "queue" "random" "fixedpool" "msgpack")
 
 # While these tests MUST be compiled as C and executed through static linkage.
 # The C test definition and C++ test executor will have the same file name, excluding extension.

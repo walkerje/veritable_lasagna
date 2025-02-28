@@ -11,6 +11,9 @@ typedef vl_uintptr_t       vl_arena_ptr;
 
 /**
  * \brief An explicit NULL integer constant that indicates a bad location in an arena.
+ *
+ * Using a regular 0 = NULL here works, as no valid allocation will have that offset.
+ * This is due to the implicit metadata prepended to each allocation.
  */
 #define VL_ARENA_NULL 0
 
@@ -45,7 +48,7 @@ typedef struct vl_arena_node{
  * linearly rather than having a "best-fit-and-slice" routine.
  *
  * This block of memory is automatically and dynamically resized when necessary by doubling its capacity.
- * One downside of Arenas that is also present in Pools for VL is that all references are unstable.
+ * One downside of Arenas that is also present in LinearPools is that all references are unstable.
  * If the underlying block of memory for the arena is resized, all standard pointers (e.g, language-level)
  * may be invalidated. vl_arena_ptr values would still remain valid, but would need freshly sampled pointers.
  *

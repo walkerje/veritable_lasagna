@@ -42,7 +42,7 @@ typedef VL_U64_T            vl_uint64_t;
 
 #ifdef VL_I8_T
 /**
- * \brief Signed 16-bit integer type.
+ * \brief Signed 8-bit integer type.
  */
 typedef VL_I8_T             vl_int8_t;
 #endif
