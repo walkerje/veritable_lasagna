@@ -3,6 +3,7 @@
 extern "C" {
 #include <vl/vl_msgpack.h>
 #include <vl/vl_msgpack_io.h>
+#include <vl/vl_rand.h>
 
     void vl_MsgPackEncodeTestMessage(vl_msgpack_encoder* enc){
         vlMsgPackIOEncodeMapBegin(enc);
@@ -127,6 +128,50 @@ extern "C" {
     }
 
     /**
+     * This test will pass if the encoder and decoder can work together
+     * to create an array and insert it in a DOM while retaining its value.
+     * \return
+     */
+    vl_bool_t vl_MsgPackPartialEncode(){
+        float expectedSum   =  0.0f;
+        float finalSum      = -1.0f;
+
+        vl_msgpack_encoder* enc = vlMsgPackIOEncoderNew();
+        //Encode an array of floats, then decode it into a DOM.
+        //This can be fairly useful for creating an array in a DOM without knowing its actual length beforehand.
+        {
+            vl_rand rand = vlRandInit();
+            vlMsgPackIOEncodeArrayBegin(enc);
+            {
+                for(int i = 0; i < 32; i++){
+                    float randValue = vlRandF(&rand) * 10;//Random float between 0 and 10
+                    expectedSum += randValue;
+                    vlMsgPackIOEncodeFloat32(enc, randValue);
+                }
+            }
+            vlMsgPackIOEncodeArrayEnd(enc);
+        }
+        vl_msgpack* pack = vlMsgPackNew();
+
+        vl_msgpack_decoder dec;
+        vlMsgPackIODecoderStart(&dec, enc->buffer.data, enc->buffer.size);
+
+        const char* arrayKey = "partial-encode";
+        const vl_msgpack_iter arrayIter = vlMsgPackIODecodeToDOM(&dec, pack, vlMsgPackRoot(pack), arrayKey, strlen(arrayKey));
+
+        if(arrayIter != VL_MSGPACK_ITER_INVALID){
+            finalSum = 0.0f;
+            VL_MSGPACK_FOREACH_CHILD(pack, arrayIter, curIter)
+                finalSum += vlMsgPackGetFloat32(pack, curIter, 0.0f);
+        }
+
+        vlMsgPackIOEncoderDelete(enc);
+        vlMsgPackDelete(pack);
+
+        return expectedSum == finalSum;
+    }
+
+    /**
      * This test encodes a test message, decodes it to dom, then re-encodes it from the DOM.
      * This test will only pass assuming that the output of the first test message encoding
      * is byte-level identical after going through the DOM and being re-encoded.
@@ -189,4 +234,8 @@ extern "C" {
 
 TEST(msgpack, round_trip){
     EXPECT_TRUE(vl_MsgPackRoundTrip());
+}
+
+TEST(msgpack, partial_encode){
+    EXPECT_TRUE(vl_MsgPackPartialEncode());
 }

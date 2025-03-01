@@ -18,8 +18,16 @@
 #ifndef VLASAGNA_H
 #define VLASAGNA_H
 
+/**
+ * Configuration, Types, and Low-Level Memory
+ */
+#include "vl/vl_libconfig.h"
 #include "vl/vl_numtypes.h"
 #include "vl/vl_memory.h"
+
+/**
+ * Data Structures & Algorithms
+ */
 #include "vl/vl_buffer.h"
 #include "vl/vl_hashtable.h"
 #include "vl/vl_arena.h"
@@ -32,6 +40,17 @@
 #include "vl/vl_deque.h"
 #include "vl/vl_rand.h"
 
+/**
+ * Asynchronous Structures
+ */
 #include "vl/vl_atomic.h"
+#include "vl/vl_thread.h"
+#include "vl/vl_mutex.h"
+
+/**
+ * Serialization & Deserialization
+ */
+#include "vl/vl_msgpack.h"
+#include "vl/vl_msgpack_io.h"
 
 #endif

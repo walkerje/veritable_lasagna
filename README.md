@@ -43,7 +43,7 @@ changes to the overall composition of this project. All proposed features are to
     - Linear Pool `vl_linearpool` ✔
     - Fixed Pool `vl_fixedpool` ✔
   - Arena Allocator `vl_arena` ✔
-  - Data (De)Serialization (MessagePack) ✔
+  - Data (De)Serialization `vl_msgpack` ✔
 - Data Structures
   - Buffer `vl_buffer` ✔
   - Stack `vl_stack` ✔
@@ -67,9 +67,9 @@ changes to the overall composition of this project. All proposed features are to
     - Implicit to `vl_set` and `vl_hashtable`. ✔
 - Async 
   - Primitives
-    - Threads ✔
-    - Atomic Types ✔
-    - Mutex ✔
+    - Threads `vl_thread` ✔
+    - Atomic Types `vl_atomic` ✔
+    - Mutex `vl_mutex `✔
     - Semaphore ✘
   - Data Structures
     - Lockless Async Memory Pool ✘
@@ -80,7 +80,7 @@ changes to the overall composition of this project. All proposed features are to
     - Finite State Machine ✘
 - Filesystem
   - Directory listing ✘
-  - Path handling ✘`
+  - Path handling ✘
 - Runtime Dynamic Library Handling ✘
 
 ### Code Samples
@@ -212,7 +212,7 @@ Test machine:
 |            	| Tokenizing 	| Tokenizing + DOM Creation (Cold) 	| Tokenizing + DOM Creation (Hot) 	|
 |------------	|------------	|----------------------------------	|---------------------------------	|
 | Time Spent 	|  14,027 ns 	|            563,136 ns            	|            301,857 ns           	|
-| Throughput 	| ~2.48 GB/s 	|              62 MB/s             	|            ~115 MB/s            	|
+| Throughput 	| ~2.48 GB/s 	|             ~62 MB/s             	|            ~115 MB/s            	|
 
 * The "Hot" benchmark is the case where enough memory has already been pre-allocated to the DOM for the entirety of the data set.
 
