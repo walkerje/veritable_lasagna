@@ -256,46 +256,79 @@ void                    vlMsgPackIOEncodeFromDOM(vl_msgpack_encoder* encoder, vl
  * Represents a single decoded value from a stream of encoded MessagePack values.
  */
 typedef struct vl_msgpack_io_token_{
+    /**
+     * \private
+     */
     union{
+        /**
+         * \private
+         */
         struct{
             vl_dsidx_t      elements;
         } array;
 
+        /**
+         * \private
+         */
         struct{
             vl_dsidx_t      keyValuePairs;
         } map;
 
+        /**
+         * \private
+         */
         struct{
             vl_ilarge_t     value;
         } integer;
 
+        /**
+         * \private
+         */
         struct{
             vl_ularge_t     value;
         } uinteger;
 
+        /**
+         * \private
+         */
         struct{
             vl_float32_t    value;
         } float32;
 
+        /**
+         * \private
+         */
         struct{
             vl_float64_t    value;
         } float64;
 
+        /**
+         * \private
+         */
         struct{
             vl_bool_t       value;
         } boolean;
 
+        /**
+         * \private
+         */
         struct{
             //UTF-8 Encoded
             const char*     ptr;
             vl_uint32_t     length;
         } string;
 
+        /**
+         * \private
+         */
         struct{
             const void*     ptr;
             vl_uint32_t     length;
         } binary;
 
+        /**
+         * \private
+         */
         struct{
             vl_int8_t       extType;
             const void*     ptr;

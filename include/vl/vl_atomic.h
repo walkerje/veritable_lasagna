@@ -194,9 +194,10 @@ typedef enum VL_MEMORY_ORDER{
  *
  * \note Using a memory order not listed here will result in undefined behavior.
  * \param ptr Pointer to the atomic object to access
+ * \param val
  * \param order Which memory ordering scheme to use for the operation.
  */
-#define vlAtomicStoreExplicit(ptr, order)       atomic_store_explicit(ptr, (memory_order)(order))
+#define vlAtomicStoreExplicit(ptr, val, order)       atomic_store_explicit(ptr, val, (memory_order)(order))
 
 //Arithmetic
 
@@ -306,10 +307,37 @@ typedef enum VL_MEMORY_ORDER{
  */
 #define vlAtomicFetchAndExplicit(ptr, arg, order)    atomic_fetch_and_explicit(ptr, arg, (memory_order)(order))
 
-//Compare & Swap
+//Exchange, Compare & Swap
 
 /**
- * \brief Atomically compares the memory at ptr with. If *ptr == *expectedPtr, *ptr = desired.
+ * \brief Performs an atomic exchange operation.
+ *
+ * This operation replaces the values at ptr with desired, and returns its the previous value.
+ *
+ * The memory order used for these operations is VL_MEMORY_ORDER_SEQ_CST.
+ *
+ * \sa VL_MEMORY_ORDER_SEQ_CST
+ * \param ptr Pointer to the atomic object to perform the operation on.
+ * \param desired Value to copy to the memory pointed to by ptr.
+ * \return previous value at ptr
+ */
+#define vlAtomicExchange(ptr, desired)                                  atomic_exchange(ptr, desired)
+
+/**
+ * \brief Performs an atomic exchange operation with explicit memory ordering.
+ *
+ * This operation replaces the values at ptr with desired, and returns its the previous value.
+ *
+ * \sa VL_MEMORY_ORDER
+ * \param ptr Pointer to the atomic object to perform the operation on.
+ * \param desired Value to copy to the memory pointed to by ptr.
+ * \param order Memory order used for the operation.
+ * \return previous value at ptr
+ */
+#define vlAtomicExchangeExplicit(ptr, desired, order)                   atomic_exchange_explicit(ptr, desired, (memory_order)(order))
+
+/**
+ * \brief Atomically compares and exchanges the memory at ptr. If *ptr == *expectedPtr, *ptr = desired.
  *
  * If the comparison is true, this performs a read-modify-write operation.
  * Otherwise, this only performs a read operation.
@@ -446,8 +474,9 @@ typedef enum VL_MEMORY_ORDER{
  * Atomic objects allocated on the stack and directly assigned do not need to be initialized.
  *
  * \ptr Pointer to the atomic object to initialize.
+ * \val Value to initialize to.
  */
-#define vlAtomicInit(ptr)                   atomic_init(ptr)
+#define vlAtomicInit(ptr, val)                   atomic_init(ptr, val)
 
 #undef VL_ATOMIC_TYPEDEF
 #endif //VL_ATOMIC_H

@@ -5,11 +5,10 @@
 [![Tested with GoogleTest](https://img.shields.io/badge/Testing%20With%20GTest-gray?style=for-the-badge&logo=googlesearchconsole&logoColor=orange&labelColor=black)](https://github.com/google/googletest)
 [![Support development](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=orange&labelColor=black)](https://www.buymeacoffee.com/walkerje)
 
-# v0.11.4 Table of Contents
+# v0.12.2 Table of Contents
 - [Introduction](#introduction)
   - [Roadmap](#roadmap-to-v100)
   - [Code Samples](#code-samples)
-  - [On MessagePack](#on-messagepack-)
 - [Quick Start & Build Guide](#quick-start--building-with-cmake)
   - [Building](#building)
   - [Testing](#building-and-running-tests)
@@ -25,8 +24,6 @@ The majority of this interface is loosely modeled on the C++ STL, and many funct
 **_There is absolutely no type safety in this library._** There are no macro templates provided for any structure. 
 All operations are performed on arbitrary byte sequences, regardless of type. Moreover, these structures are interdependent on
 one another by design.
-
-![Implementation Dependency Graph](docs/image/vl_struct_graph.svg)
 
 This interdependent design is sensitive to regression when the behavior of any structure is modified.
 Veritable Lasagna offers a suite of unit tests to verify persistent behavior between updates to help prevent this.
@@ -69,15 +66,12 @@ changes to the overall composition of this project. All proposed features are to
   - Primitives
     - Threads `vl_thread` ✔
     - Atomic Types `vl_atomic` ✔
-    - Mutex `vl_mutex `✔
+    - Mutex `vl_mutex` ✔
     - Semaphore ✘
   - Data Structures
-    - Lockless Async Memory Pool ✘
-    - Lockless Async Queue ✘
+    - Lockless Async Memory Pool ✔ `vl_async_pool`
+    - Lockless Async Queue ✔ `vl_async_queue`
     - Async Message Bus ✘
-  - Structures
-    - Worker Thread Pool ✘
-    - Finite State Machine ✘
 - Filesystem
   - Directory listing ✘
   - Path handling ✘
@@ -185,37 +179,6 @@ int main(int argc, const char** argv){
     return EXIT_SUCCESS;
 }
 ```
-
-
-#### On MessagePack 🚀
-
-[MessagePack](https://github.com/msgpack/msgpack) has been chosen as the preferred binary data format for this library due to its small size, ready compatibility
-for network-related tasks, and ease of implementation.
-
-The implementation defined in this library is *fairly* performant.
-The use of the DOM structure is entirely optional; using only the encoder/decoder is a perfectly valid alternative
-if the utmost performance is a concern. Similarly, the DOM structure is not fully compliant to the MessagePack spec,
-whereas the encoder and decoder APIs are. There is a small benchmark that has also been used to help verify the correctness of the implementation.
-The dataset used for a brief benchmark can be found [here](https://github.com/getml/reflect-cpp/blob/main/benchmarks/data/licenses.json); it was converted to a
-MessagePack using [this tool](https://llamerada-jp.github.io/json-messagepack-converter/jmc.html) hosted here on GitHub.
-The total size of the MessagePack that represents the dataset is 35,139 bytes (~3.4KB), and was slurped into memory
-in its entirety for this benchmark.
-
-Test machine:
-- CPU: Core I7-12700H (Base 2.3ghz, 4.7ghz Turbo, 14 cores / 20 threads)
-- RAM: 32GB DDR5 @ 4800Mhz
-- OS: Windows 11 x64
-- Compiler: WSL GCC 11.4.0
-  - Flags: `-O3 -NDEBUG`
-
-
-|            	| Tokenizing 	| Tokenizing + DOM Creation (Cold) 	| Tokenizing + DOM Creation (Hot) 	|
-|------------	|------------	|----------------------------------	|---------------------------------	|
-| Time Spent 	|  14,027 ns 	|            563,136 ns            	|            301,857 ns           	|
-| Throughput 	| ~2.48 GB/s 	|             ~62 MB/s             	|            ~115 MB/s            	|
-
-* The "Hot" benchmark is the case where enough memory has already been pre-allocated to the DOM for the entirety of the data set.
-
 
 # Quick Start & Building with CMake
 Start by cloning this repo to your project directory.

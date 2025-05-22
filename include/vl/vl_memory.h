@@ -57,11 +57,11 @@ typedef VL_MEMORY_SIZE_T    vl_memsize_t;
  * \par pad bytes to pad it to.
  * \return len
  */
-#define VL_MEMORY_PAD_UP(len, pad) (vl_ularge_t)((len) + ((len) % (pad)))
+#define VL_MEMORY_PAD_UP(len, pad) (vl_ularge_t)((len) + (pad - ((len) % (pad))))
 #endif
 
 /**
- * The typedef for vl_memory is simply void.
+ * The typedef for vl_memory is defined as the smallest possible word size.
  * This is intended to improve code readability and intent.
  *
  * This is used only to indicate blocks of memory allocated through vlMemAlloc(/Aligned) and vlMemRealloc.
@@ -76,7 +76,7 @@ typedef VL_MEMORY_SIZE_T    vl_memsize_t;
 typedef VL_MEMORY_T vl_memory;
 
 /**
- * The typedef for vl_transient is, similarly, void.
+ * The typedef for vl_transient is, similarly, the smallest possible word size.
  * This is intended to improve code readability and intent.
  *
  * This is used to indicate pointers to blocks of memory which that might be moved, deleted,
@@ -156,8 +156,7 @@ vl_uint_t           vlMemAlignment(vl_memory* mem);
 /**
  * \brief Sorts the specified buffer in-place according to the specified element and comparator function.
  *
- * This function implements an iterative Quicksort, allocating a temporary workspace on either the stack
- * or the heap depending on the size of the data being sorted.
+ * This function implements an iterative Quicksort.
  *
  * \param buffer
  * \param elementSize

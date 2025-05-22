@@ -282,7 +282,7 @@ vl_set*         vlSetUnion(vl_set* a, vl_set* b, vl_set* dest);
  * Otherwise, this is a no-op and will return null.
  *
  * The 'dest' set pointer may be null, but if it is not null it must be initialized.
- * If the 'dest' set pointer is null, a new list is created via vlListNew.
+ * If the 'dest' set pointer is null, a new set is created via vlSetNew.
  *
  * The set notation for this operation is: A n B
  *
@@ -307,7 +307,7 @@ vl_set*         vlSetIntersection(vl_set* a, vl_set* b, vl_set* dest);
  * Otherwise, this is a no-op and will return null.
  *
  * The 'dest' set pointer may be null, but if it is not null it must be initialized.
- * If the 'dest' set pointer is null, a new list is created via vlListNew.
+ * If the 'dest' set pointer is null, a new set is created via vlSetNew.
  *
  * The set notation for this operation is: A - B
  *

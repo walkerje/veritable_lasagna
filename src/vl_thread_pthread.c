@@ -2,7 +2,9 @@
 #include <pthread.h>
 #include <unistd.h>
 
-
+/**
+ * \private
+ */
 typedef struct{
     pthread_t threadHandle;
 
@@ -10,6 +12,9 @@ typedef struct{
     pthread_mutex_t     timeoutConditionMutex;
 } vl_posix_thread;
 
+/**
+ * \private
+ */
 vl_posix_thread mainThread;
 
 /**
@@ -17,6 +22,9 @@ vl_posix_thread mainThread;
  */
 VL_THREAD_LOCAL vl_posix_thread* currentThread = NULL;
 
+/**
+ * \private
+ */
 typedef struct{
     vl_posix_thread* meta;
 
@@ -162,6 +170,17 @@ vl_bool_t        vlThreadYield(){
 
 void vlThreadSleep(vl_ularge_t milliseconds){
     usleep(milliseconds * 1000);
+}
+
+void vlThreadSleepNano(vl_ularge_t nanoseconds){
+    //1000000000 nanoseconds per second.
+    const vl_ularge_t nsecs = nanoseconds % 1000000000ull;
+    const vl_ularge_t seconds = (nanoseconds - nsecs) / 1000000000ull;
+
+    struct timespec request;
+    request.tv_sec = seconds;
+    request.tv_nsec = nsecs;
+    nanosleep(&request, NULL);
 }
 
 void vlThreadExit(){

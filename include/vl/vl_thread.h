@@ -70,6 +70,12 @@ vl_bool_t   vlThreadYield();
 void        vlThreadSleep(vl_ularge_t milliseconds);
 
 /**
+ * \brief Sleeps the current thread a specified total number of nanoseconds.
+ * \param nanoseconds
+ */
+void        vlThreadSleepNano(vl_ularge_t nanoseconds);
+
+/**
  * \brief Exits the calling thread.
  * \note Does not return to the caller.
  */

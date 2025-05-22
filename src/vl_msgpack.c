@@ -3,6 +3,9 @@
 
 static const char   ROOT_STRING[]       = {'@', 'R', 'O', 'O', 'T'};
 
+/**
+ * \private
+ */
 typedef struct vl_msgpack_element_{
     vl_msgpack_iter     parent;
     vl_msgpack_type     type;
@@ -11,7 +14,13 @@ typedef struct vl_msgpack_element_{
 
     vl_int8_t           extType;
 
+    /**
+     * \private
+     */
     union{
+        /**
+         * \private
+         */
         struct{
             //Payload references other nodes in the hierarchy.
             //Maps are initialized as empty (firstChild = VL_MSGPACK_ITER_INVALID; totalChildren = 0)
@@ -20,6 +29,9 @@ typedef struct vl_msgpack_element_{
             vl_dsidx_t          totalChildren;
         } mapBranch;
 
+        /**
+         * \private
+         */
         struct{
             //Payload is stored in value arena as an actual array.
             //Arrays are initialized as full of NIL, with a defined length.
@@ -28,6 +40,9 @@ typedef struct vl_msgpack_element_{
             vl_dsidx_t          arrayLength;
         } arrayBranch;
 
+        /**
+         * \private
+         */
         struct{
             vl_arena_ptr        value;
         } leaf;

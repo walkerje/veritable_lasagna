@@ -5,9 +5,18 @@
 #include <process.h>
 #include <windows.h>
 
+/**
+ * \private
+ */
 HANDLE mainThread = NULL;
+/**
+ * \private
+ */
 VL_THREAD_LOCAL HANDLE currentThread = NULL;
 
+/**
+ * \private
+ */
 typedef struct{
     HANDLE threadHandle;
 
@@ -15,6 +24,9 @@ typedef struct{
     void*           userArg;
 } vl_thread_args;
 
+/**
+ * \private
+ */
 unsigned __stdcall vl_ThreadBootstrap(void* arg){
     HANDLE threadHandle;
     vl_thread_proc proc;
@@ -94,6 +106,7 @@ vl_bool_t vlThreadJoinTimeout(vl_thread thread, vl_uint_t milliseconds){
 
     return VL_FALSE;//Timed out or failed to wait.
 }
+
 vl_thread vlThreadCurrent(){
     switch((vl_uintptr_t)currentThread){
         case 0:
@@ -110,6 +123,34 @@ vl_bool_t vlThreadYield(){
 
 void vlThreadSleep(vl_ularge_t milliseconds){
     Sleep(milliseconds);
+}
+
+void vlThreadSleepNano(vl_ularge_t nanoseconds){
+    if(nanoseconds <= 100ull){
+        //Very small sleep. Spin using QueryPerformance API.
+        LARGE_INTEGER freq, start, now;
+        QueryPerformanceFrequency(&freq);
+        QueryPerformanceCounter(&start);
+
+        LONGLONG elapsed_ticks = 0;
+        LONGLONG wait_ticks = (nanoseconds * freq.QuadPart) / 1000000000LL;
+
+        do {
+            QueryPerformanceCounter(&now);
+            elapsed_ticks = now.QuadPart - start.QuadPart;
+        } while (elapsed_ticks < wait_ticks);
+    }else{
+        //Larger delay. Use the WaitableTimer API.
+        HANDLE timer = CreateWaitableTimer(NULL, TRUE, NULL);
+
+        // Convert to 100-nanosecond intervals (negative = relative time)
+        LARGE_INTEGER li;
+        li.QuadPart = -nanoseconds / 100;
+
+        SetWaitableTimer(timer, &li, 0, NULL, NULL, FALSE);
+        WaitForSingleObject(timer, INFINITE);
+        CloseHandle(timer);
+    }
 }
 
 void vlThreadExit(){

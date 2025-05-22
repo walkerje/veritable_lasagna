@@ -19,7 +19,7 @@ set(VL_TESTS "memory" "buffer" "linearpool" "hashtable" "arena" "linked_list" "s
 # While these tests MUST be compiled as C and executed through static linkage.
 # The C test definition and C++ test executor will have the same file name, excluding extension.
 # The C test definition must be in the "linked" subdirectory, while the bootstrap is in the regular test directory.
-set(VL_LINKED_TESTS "atomic")
+set(VL_LINKED_TESTS "atomic" "async_pool" "async_queue")
 
 enable_testing()
 
@@ -37,17 +37,22 @@ foreach (DEF IN LISTS VL_TESTS)
 endforeach ()
 
 foreach(DEF IN LISTS VL_LINKED_TESTS)
-    set(VL_CURRENT_TEST vlasagna_test_${DEF})
-    set(VL_CURRENT_TEST_LIB ${VL_CURRENT_TEST}_lib)
-    message(STATUS "    ${VL_CURRENT_TEST} (Linked to ${VL_CURRENT_TEST_LIB})")
+    set(VL_LINKED_TESTS_SRC ${VL_LINKED_TESTS_SRC} "linked/${DEF}.c")
+endforeach ()
 
-    add_library(${VL_CURRENT_TEST_LIB} STATIC "linked/${DEF}.c")
-    target_include_directories(${VL_CURRENT_TEST_LIB} PRIVATE "${VL_INCLUDE}" "${VL_CONFIG_HEADER_INCLUDE}")
-    target_link_libraries(${VL_CURRENT_TEST_LIB} ${VL_STATIC_TARGET})
+set(VL_TEST_LIB vl_test_lib)
+
+add_library(${VL_TEST_LIB} STATIC ${VL_LINKED_TESTS_SRC})
+target_include_directories(${VL_TEST_LIB} PRIVATE "${VL_INCLUDE}" "${VL_CONFIG_HEADER_INCLUDE}")
+target_link_libraries(${VL_TEST_LIB} ${VL_STATIC_TARGET})
+
+foreach(DEF IN LISTS VL_LINKED_TESTS)
+    set(VL_CURRENT_TEST vlasagna_test_${DEF})
+    message(STATUS "    ${VL_CURRENT_TEST} (Linked to ${VL_TEST_LIB})")
 
     add_executable(${VL_CURRENT_TEST} "${DEF}.cpp")
     target_include_directories(${VL_CURRENT_TEST} PRIVATE "${VL_INCLUDE}" "${VL_CONFIG_HEADER_INCLUDE}")
-    target_link_libraries(${VL_CURRENT_TEST} ${VL_STATIC_TARGET} ${VL_CURRENT_TEST_LIB} GTest::gtest_main)
+    target_link_libraries(${VL_CURRENT_TEST} ${VL_STATIC_TARGET} ${VL_TEST_LIB} GTest::gtest_main)
     gtest_discover_tests(${VL_CURRENT_TEST})
 endforeach ()
 

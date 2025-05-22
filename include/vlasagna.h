@@ -44,8 +44,11 @@
  * Asynchronous Structures
  */
 #include "vl/vl_atomic.h"
+#include "vl/vl_atomic_ptr.h"
 #include "vl/vl_thread.h"
 #include "vl/vl_mutex.h"
+#include "vl/vl_async_pool.h"
+#include "vl/vl_async_queue.h"
 
 /**
  * Serialization & Deserialization

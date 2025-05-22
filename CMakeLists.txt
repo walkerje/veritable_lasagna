@@ -5,8 +5,8 @@ include(CheckTypeSize)
 
 # Versioning
 set(VL_VERSION_MAJOR 0)
-set(VL_VERSION_MINOR 11)
-set(VL_VERSION_PATCH 4)
+set(VL_VERSION_MINOR 12)
+set(VL_VERSION_PATCH 2)
 set(VL_VERSION ${VL_VERSION_MAJOR}.${VL_VERSION_MINOR}.${VL_VERSION_PATCH})
 
 # Configuration options
@@ -184,7 +184,11 @@ elseif (${CMAKE_USE_PTHREADS_INIT})
     set(VL_THREADS_PTHREAD 1)
 endif ()
 
-set(VL_SYSTEM_LIBS "Threads::Threads")
+set(VL_SYSTEM_LIBS Threads::Threads)
+
+if(NOT MSVC)
+    set(VL_SYSTEM_LIBS ${VL_SYSTEM_LIBS} atomic)
+endif ()
 
 if(MSVC)
     set(VL_COMPILE_OPTIONS "${VL_COMPILE_OPTIONS} /experimental:c11atomics")
