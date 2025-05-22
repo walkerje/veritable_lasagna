@@ -77,7 +77,8 @@ vl_bool_t vlTestAsyncPoolMPMC(){
 
     vl_uint32_t actualLength = 0;
     {
-        vl_uintptr_t current = vlAtomicLoad(&args.atomicPool.freeStack).ptr;
+        vl_tagged_ptr stackTop = vlAtomicLoad(&args.atomicPool.freeStack);
+        vl_uintptr_t current = stackTop.ptr;
         for(int i = 0; i < (vlAtomicLoad(&args.atomicPool.freeLength)); i++){
             vl_async_pool_header* header = (vl_async_pool_header*)current;
             if(!header)

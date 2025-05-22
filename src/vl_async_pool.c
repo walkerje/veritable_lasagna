@@ -82,7 +82,8 @@ void vlAsyncPoolInit(vl_async_pool* pool, vl_uint16_t elementSize){
 }
 
 void vlAsyncPoolFree(vl_async_pool* pool){
-    vl_uintptr_t current = vlAtomicLoad(&pool->primaryBlock).ptr;
+    vl_tagged_ptr primaryBlock = vlAtomicLoad(&pool->primaryBlock);
+    vl_uintptr_t current = primaryBlock.ptr;
 
     while(current){
         vl_async_block* block = (vl_async_block*)(current);
@@ -104,7 +105,8 @@ void vlAsyncPoolDelete(vl_async_pool* pool){
 }
 
 void vlAsyncPoolReset(vl_async_pool* pool){
-    vl_uintptr_t current = vlAtomicLoad(&pool->primaryBlock).ptr;
+    vl_tagged_ptr primaryBlock = vlAtomicLoad(&pool->primaryBlock);
+    vl_uintptr_t current = primaryBlock.ptr;
     vl_async_block* block = NULL;
 
     while(current){
@@ -126,7 +128,8 @@ void vlAsyncPoolReset(vl_async_pool* pool){
 }
 
 void vlAsyncPoolClear(vl_async_pool* pool){
-    vl_uintptr_t current = vlAtomicLoad(&pool->primaryBlock).ptr;
+    vl_tagged_ptr primaryBlock = vlAtomicLoad(&pool->primaryBlock);
+    vl_uintptr_t current = primaryBlock.ptr;
 
     while(current){
         vl_async_block* block = (vl_async_block*)(current);
@@ -155,7 +158,8 @@ void* vlAsyncPoolTake(vl_async_pool* pool) {
         }
 
         //Take a fresh element from the primary block.
-        vl_async_block* block = (vl_async_block*)(vlAtomicLoad(&pool->primaryBlock)).ptr;
+        vl_tagged_ptr primaryBlock = vlAtomicLoad(&pool->primaryBlock);
+        vl_async_block* block = (vl_async_block*)primaryBlock.ptr;
         vl_uint32_t blockTaken = vlAtomicLoad(&block->taken);
         const vl_uint32_t nextTaken = blockTaken + 1;
 
