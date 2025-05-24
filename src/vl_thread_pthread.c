@@ -173,9 +173,22 @@ void vlThreadSleep(vl_ularge_t milliseconds){
 }
 
 void vlThreadSleepNano(vl_ularge_t nanoseconds){
-    //1000000000 nanoseconds per second.
+    const vl_ularge_t busy_threshold = 10000; // 10,000 ns = 10 µs
+    if(nanoseconds < busy_threshold){
+        struct timespec start, current;
+        clock_gettime(CLOCK_MONOTONIC, &start);
+
+        vl_ularge_t elapsed;
+        do {
+            clock_gettime(CLOCK_MONOTONIC, &current);
+            elapsed = (current.tv_sec - start.tv_sec) * 1000000000ull +
+                      (current.tv_nsec - start.tv_nsec);
+        } while (elapsed < nanoseconds);
+        return;
+    }
+
     const vl_ularge_t nsecs = nanoseconds % 1000000000ull;
-    const vl_ularge_t seconds = (nanoseconds - nsecs) / 1000000000ull;
+    const vl_ularge_t seconds = nanoseconds / 1000000000ull;
 
     struct timespec request;
     request.tv_sec = seconds;

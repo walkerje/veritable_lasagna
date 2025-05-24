@@ -126,7 +126,8 @@ void vlThreadSleep(vl_ularge_t milliseconds){
 }
 
 void vlThreadSleepNano(vl_ularge_t nanoseconds){
-    if(nanoseconds <= 100ull){
+    const vl_ularge_t busy_threshold = 10000; // 10,000 ns = 10 µs
+    if(nanoseconds <= busy_threshold){// 10 µs
         //Very small sleep. Spin using QueryPerformance API.
         LARGE_INTEGER freq, start, now;
         QueryPerformanceFrequency(&freq);
