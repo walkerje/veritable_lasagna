@@ -1,6 +1,6 @@
 project(veritable-lasagna-test CXX C)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
 include(FetchContent)
@@ -38,7 +38,7 @@ foreach (DEF IN LISTS VL_TESTS)
 
         add_custom_command(TARGET ${VL_CURRENT_TEST} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                $<TARGET_FILE:${VL_LIBRARY}>
+                $<TARGET_FILE:${VL_CORE_TARGET}>
                 $<TARGET_FILE_DIR:${VL_CURRENT_TEST}>
         )
     endif()
@@ -57,7 +57,7 @@ set(VL_TEST_LIB vl_test_lib)
 
 add_library(${VL_TEST_LIB} ${VL_LINKED_TESTS_SRC})
 target_include_directories(${VL_TEST_LIB} PRIVATE "${VL_INCLUDE}" "${VL_CONFIG_HEADER_INCLUDE}")
-target_link_libraries(${VL_TEST_LIB} VLasagna::Core)
+target_link_libraries(${VL_TEST_LIB} ${VL_CORE_TARGET})
 
 foreach(DEF IN LISTS VL_LINKED_TESTS)
     set(VL_CURRENT_TEST vl_test_${DEF})
@@ -72,7 +72,7 @@ foreach(DEF IN LISTS VL_LINKED_TESTS)
 
         add_custom_command(TARGET ${VL_CURRENT_TEST} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                $<TARGET_FILE:${VL_LIBRARY}>
+                $<TARGET_FILE:${VL_CORE_TARGET}>
                 $<TARGET_FILE_DIR:${VL_CURRENT_TEST}>
         )
     endif()

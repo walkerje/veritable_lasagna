@@ -18,6 +18,7 @@ project(veritable_lasagna VERSION ${VL_VERSION}
         DESCRIPTION "Data structures and algorithms."
         HOMEPAGE_URL "https://bitshiftmountain.com")
 
+
 set(CMAKE_C_STANDARD            11)
 
 include(GNUInstallDirs)
@@ -217,11 +218,12 @@ add_library                 (${VL_CORE_TARGET} ${VL_SOURCES})
 
 target_include_directories  (${VL_CORE_TARGET} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/vl>
-        $<INSTALL_INTERFACE:include/vl>
-        PRIVATE
-        ${VL_CONFIG_HEADER_PATH} ${VL_CONFIG_HEADER_INCLUDE})
+        $<INSTALL_INTERFACE:include>
+        PRIVATE ${VL_CONFIG_HEADER_PATH} ${VL_CONFIG_HEADER_INCLUDE})
 
-set_target_properties       (${VL_CORE_TARGET} PROPERTIES OUTPUT_NAME "vl_core" DEBUG_POSTFIX "d")
+set_target_properties       (${VL_CORE_TARGET} PROPERTIES
+        OUTPUT_NAME "vl_core"
+        DEBUG_POSTFIX "d")
 target_compile_options      (${VL_CORE_TARGET} PUBLIC "${VL_COMPILE_OPTIONS}")
 target_link_libraries       (${VL_CORE_TARGET} PUBLIC "${VL_SYSTEM_LIBS}")
 
@@ -240,12 +242,18 @@ if(BUILD_SHARED_LIBS)
     )
 endif()
 
-
 export(TARGETS ${VL_INSTALL_TARGETS} NAMESPACE VLasagna:: FILE VLasagnaTargets.cmake)
 
 if(BUILD_TESTING)
     add_subdirectory(test)
 endif ()
+
+if(MSVC AND BUILD_SHARED_LIBS)
+    # Ensure debug info is installed.
+    install(FILES $<TARGET_PDB_FILE:${VL_CORE_TARGET}>
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            OPTIONAL)
+endif()
 
 install(TARGETS ${VL_INSTALL_TARGETS} EXPORT VLasagnaTargets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -266,10 +274,10 @@ write_basic_package_version_file(
         COMPATIBILITY AnyNewerVersion
 )
 
-configure_package_config_file(VLasagnaConfig.cmake.in VLasagnaConfig.cmake INSTALL_DESTINATION lib/cmake/VLasagna)
+configure_package_config_file(VLasagnaConfig.cmake.in VLasagnaConfig.cmake INSTALL_DESTINATION lib/cmake/vlasagna)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/VLasagnaConfig.cmake"
         "${CMAKE_CURRENT_BINARY_DIR}/VLasagnaConfigVersion.cmake"
-        DESTINATION lib/cmake/VLasagna
+        DESTINATION lib/cmake/vlasagna
 )
 
 export(PACKAGE VLasagna)

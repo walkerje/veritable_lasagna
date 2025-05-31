@@ -200,6 +200,23 @@ vcpkg install --overlay-ports=.\veritable_lasagna\vcpkg veritable-lasagna
 wget -O - https://raw.githubusercontent.com/walkerje/veritable_lasagna/refs/heads/main/install.sh | bash
 ```
 
+You can reference the installation in your project by using `find_package` in your own
+`CMakeLists.txt`.
+
+```CMake
+# 
+# Your project setup...
+#
+
+find_package(VLasagna REQUIRED)
+
+#
+# Target setup...
+#
+
+target_link_libraries(my_target_name VLasagna::Core)
+```
+
 ## Option 2: Embed as Subdirectory
 
 Start by cloning this project into your project directory or adding it as a git submodule.
@@ -258,22 +275,8 @@ Installing this package to your system is as simple specifying the `install` tar
 cmake --build . --target install
 ```
 
-You can reference the installation in your project by using `find_package` in your own
-`CMakeLists.txt`.
-
-```CMake
-# 
-# Your project setup...
-#
-
-find_package(VLasagna REQUIRED)
-
-#
-# Target setup...
-#
-
-target_link_libraries(my_target_name VLasagna::Core)
-```
+See [Option 1](#option-1-recommended-automated-build--install-from-repo) for a snippet on finding the installed package
+from your `CMakeLists.txt`
 
 ## Configuration Options
 
