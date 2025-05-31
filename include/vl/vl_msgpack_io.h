@@ -5,7 +5,7 @@
 #include "vl_stack.h"
 #include "vl_msgpack.h"
 
-typedef enum vl_msgpack_io_error_{
+typedef enum vl_msgpack_io_error_ {
     VL_MSGPACK_IO_ERR_NONE,                 //No error. All good!
     VL_MSGPACK_IO_ERR_STACK_UNDERFLOW,      //Erroneous call to a container end encoding function.
     VL_MSGPACK_IO_ERR_UNEXPECTED_TOKEN,     //Expected a different token as "next" when decoding.
@@ -24,15 +24,15 @@ typedef enum vl_msgpack_io_error_{
  *
  * This encoder attempts to generates the smallest possible (smallest size) result in all cases.
  */
-typedef struct vl_msgpack_encoder_{
+typedef struct vl_msgpack_encoder_ {
     //Holds state of current structure (map/array), including how many elements.
-    vl_stack                        stateStack;
+    vl_stack stateStack;
     //Holds encoded data.
-    vl_buffer                       buffer;
+    vl_buffer buffer;
 
-    vl_msgpack_io_error             error;
-    vl_msgpack_type                 errorType;
-    vl_dsidx_t                      errorDepth;
+    vl_msgpack_io_error error;
+    vl_msgpack_type errorType;
+    vl_dsidx_t errorDepth;
 } vl_msgpack_encoder;
 
 /**
@@ -43,7 +43,7 @@ typedef struct vl_msgpack_encoder_{
  *
  * \param enc Pointer to the MessagePack encoder to initialize.
  */
-void vlMsgPackIOEncoderInit(vl_msgpack_encoder* enc);
+VL_API void vlMsgPackIOEncoderInit(vl_msgpack_encoder *enc);
 
 /**
  * \brief Frees the specified MessagePack encoder.
@@ -53,7 +53,7 @@ void vlMsgPackIOEncoderInit(vl_msgpack_encoder* enc);
  *
  * \param enc Pointer to the MessagePack encoder to free.
  */
-void vlMsgPackIOEncoderFree(vl_msgpack_encoder* enc);
+VL_API void vlMsgPackIOEncoderFree(vl_msgpack_encoder *enc);
 
 /**
  * \brief Allocates and initializes a MessagePack encoder.
@@ -64,7 +64,7 @@ void vlMsgPackIOEncoderFree(vl_msgpack_encoder* enc);
  * \sa vlMsgPackIOEncoderDelete
  * \return Pointer to the allocated and initialized MessagePack encoder.
  */
-vl_msgpack_encoder* vlMsgPackIOEncoderNew();
+VL_API vl_msgpack_encoder *vlMsgPackIOEncoderNew();
 
 /**
  * \brief Deletes the specified MessagePack encoder.
@@ -75,7 +75,7 @@ vl_msgpack_encoder* vlMsgPackIOEncoderNew();
  * \sa vlMsgPackIOEncoderNew
  * \param enc Pointer to the MessagePack encoder to delete.
  */
-void vlMsgPackIOEncoderDelete(vl_msgpack_encoder* enc);
+VL_API void vlMsgPackIOEncoderDelete(vl_msgpack_encoder *enc);
 
 /**
  * \brief Clears the state of the MessagePack encoder.
@@ -84,7 +84,7 @@ void vlMsgPackIOEncoderDelete(vl_msgpack_encoder* enc);
  *
  * \param enc Pointer to the encoder context.
  */
-void vlMsgPackIOEncoderClear(vl_msgpack_encoder* enc);
+VL_API void vlMsgPackIOEncoderClear(vl_msgpack_encoder *enc);
 
 /**
  * \brief Begins encoding a map in the MessagePack stream.
@@ -94,7 +94,7 @@ void vlMsgPackIOEncoderClear(vl_msgpack_encoder* enc);
  *
  * \param enc Pointer to the encoder context.
  */
-void vlMsgPackIOEncodeMapBegin(vl_msgpack_encoder* enc);
+VL_API void vlMsgPackIOEncodeMapBegin(vl_msgpack_encoder *enc);
 
 /**
  * \brief Ends encoding a map in the MessagePack stream.
@@ -106,7 +106,7 @@ void vlMsgPackIOEncodeMapBegin(vl_msgpack_encoder* enc);
  *
  * \param enc Pointer to the encoder context.
  */
-void vlMsgPackIOEncodeMapEnd(vl_msgpack_encoder* enc);
+VL_API void vlMsgPackIOEncodeMapEnd(vl_msgpack_encoder *enc);
 
 /**
  * \brief Begins encoding an array in the MessagePack stream.
@@ -116,7 +116,7 @@ void vlMsgPackIOEncodeMapEnd(vl_msgpack_encoder* enc);
  *
  * \param enc Pointer to the encoder context.
  */
-void vlMsgPackIOEncodeArrayBegin(vl_msgpack_encoder* enc);
+VL_API void vlMsgPackIOEncodeArrayBegin(vl_msgpack_encoder *enc);
 
 /**
  * \brief Ends encoding an array in the MessagePack stream.
@@ -128,7 +128,7 @@ void vlMsgPackIOEncodeArrayBegin(vl_msgpack_encoder* enc);
  *
  * \param enc Pointer to the encoder context.
  */
-void vlMsgPackIOEncodeArrayEnd(vl_msgpack_encoder* enc);
+VL_API void vlMsgPackIOEncodeArrayEnd(vl_msgpack_encoder *enc);
 
 /**
  * \brief Encodes a boolean value into the MessagePack stream.
@@ -139,7 +139,7 @@ void vlMsgPackIOEncodeArrayEnd(vl_msgpack_encoder* enc);
  * \param enc Pointer to the encoder context.
  * \param value The boolean value to encode.
  */
-void vlMsgPackIOEncodeBool(vl_msgpack_encoder* enc, vl_bool_t value);
+VL_API void vlMsgPackIOEncodeBool(vl_msgpack_encoder *enc, vl_bool_t value);
 
 /**
  * \brief Encodes a string's length into the MessagePack stream.
@@ -151,7 +151,7 @@ void vlMsgPackIOEncodeBool(vl_msgpack_encoder* enc, vl_bool_t value);
  * \param value Pointer to the string to encode.
  * \param len The length of the string to encode.
  */
-void vlMsgPackIOEncodeStringLen(vl_msgpack_encoder* enc, const char* value, vl_uint32_t len);
+VL_API void vlMsgPackIOEncodeStringLen(vl_msgpack_encoder *enc, const char *value, vl_uint32_t len);
 
 /**
  * \brief Encodes a UTF-8 string value into the MessagePack stream.
@@ -161,7 +161,7 @@ void vlMsgPackIOEncodeStringLen(vl_msgpack_encoder* enc, const char* value, vl_u
  * \param enc Pointer to the encoder context.
  * \param value The string value to encode.
  */
-static inline void      vlMsgPackIOEncodeString     (vl_msgpack_encoder* enc, const char* value){
+static inline void vlMsgPackIOEncodeString(vl_msgpack_encoder *enc, const char *value) {
     vlMsgPackIOEncodeStringLen(enc, value, strlen(value));
 }
 
@@ -174,7 +174,7 @@ static inline void      vlMsgPackIOEncodeString     (vl_msgpack_encoder* enc, co
  * \param enc Pointer to the encoder context.
  * \param value The 32-bit floating point value to encode.
  */
-void vlMsgPackIOEncodeFloat32(vl_msgpack_encoder* enc, vl_float32_t value);
+VL_API void vlMsgPackIOEncodeFloat32(vl_msgpack_encoder *enc, vl_float32_t value);
 
 /**
  * \brief Encodes a 64-bit floating point value into the MessagePack stream.
@@ -185,7 +185,7 @@ void vlMsgPackIOEncodeFloat32(vl_msgpack_encoder* enc, vl_float32_t value);
  * \param enc Pointer to the encoder context.
  * \param value The 64-bit floating point value to encode.
  */
-void vlMsgPackIOEncodeFloat64(vl_msgpack_encoder* enc, vl_float64_t value);
+VL_API void vlMsgPackIOEncodeFloat64(vl_msgpack_encoder *enc, vl_float64_t value);
 
 /**
  * \brief Encodes a binary value into the MessagePack stream.
@@ -197,7 +197,7 @@ void vlMsgPackIOEncodeFloat64(vl_msgpack_encoder* enc, vl_float64_t value);
  * \param value Pointer to the binary data to encode.
  * \param len The length of the binary data to encode.
  */
-void vlMsgPackIOEncodeBinary(vl_msgpack_encoder* enc, const void* value, vl_uint32_t len);
+VL_API void vlMsgPackIOEncodeBinary(vl_msgpack_encoder *enc, const void *value, vl_uint32_t len);
 
 /**
  * \brief Encodes an extension type value into the MessagePack stream.
@@ -210,7 +210,7 @@ void vlMsgPackIOEncodeBinary(vl_msgpack_encoder* enc, const void* value, vl_uint
  * \param value Pointer to the extension data to encode.
  * \param len The length of the extension data.
  */
-void vlMsgPackIOEncodeExt(vl_msgpack_encoder* enc, vl_int8_t type, const void* value, vl_uint32_t len);
+VL_API void vlMsgPackIOEncodeExt(vl_msgpack_encoder *enc, vl_int8_t type, const void *value, vl_uint32_t len);
 
 /**
  * \brief Encodes a signed integer value into the MessagePack stream.
@@ -220,7 +220,7 @@ void vlMsgPackIOEncodeExt(vl_msgpack_encoder* enc, vl_int8_t type, const void* v
  * \param enc Pointer to the encoder context.
  * \param value The signed integer value to encode.
  */
-void vlMsgPackIOEncodeInt(vl_msgpack_encoder* enc, vl_ilarge_t value);
+VL_API void vlMsgPackIOEncodeInt(vl_msgpack_encoder *enc, vl_ilarge_t value);
 
 /**
  * \brief Encodes an unsigned integer value into the MessagePack stream.
@@ -230,7 +230,7 @@ void vlMsgPackIOEncodeInt(vl_msgpack_encoder* enc, vl_ilarge_t value);
  * \param enc Pointer to the encoder context.
  * \param value The unsigned integer value to encode.
  */
-void vlMsgPackIOEncodeUInt(vl_msgpack_encoder* enc, vl_ularge_t value);
+VL_API void vlMsgPackIOEncodeUInt(vl_msgpack_encoder *enc, vl_ularge_t value);
 
 /**
  * \brief Encodes a nil value into the MessagePack stream.
@@ -240,7 +240,7 @@ void vlMsgPackIOEncodeUInt(vl_msgpack_encoder* enc, vl_ularge_t value);
  * 
  * \param enc Pointer to the encoder context.
  */
-void vlMsgPackIOEncodeNil(vl_msgpack_encoder* enc);
+VL_API void vlMsgPackIOEncodeNil(vl_msgpack_encoder *enc);
 
 /**
  * \brief Encodes from a MessagePack DOM.
@@ -248,91 +248,91 @@ void vlMsgPackIOEncodeNil(vl_msgpack_encoder* enc);
  * \param src Pointer to the source MessagePack DOM.
  * \param curIter iterator to fully encode.
  */
-void                    vlMsgPackIOEncodeFromDOM(vl_msgpack_encoder* encoder, vl_msgpack* src, vl_msgpack_iter curIter);
+VL_API void vlMsgPackIOEncodeFromDOM(vl_msgpack_encoder *encoder, vl_msgpack *src, vl_msgpack_iter curIter);
 
 /**
  * \brief A MessagePack Token.
  *
  * Represents a single decoded value from a stream of encoded MessagePack values.
  */
-typedef struct vl_msgpack_io_token_{
+typedef struct vl_msgpack_io_token_ {
     /**
      * \private
      */
-    union{
+    union {
         /**
          * \private
          */
-        struct{
-            vl_dsidx_t      elements;
+        struct {
+            vl_dsidx_t elements;
         } array;
 
         /**
          * \private
          */
-        struct{
-            vl_dsidx_t      keyValuePairs;
+        struct {
+            vl_dsidx_t keyValuePairs;
         } map;
 
         /**
          * \private
          */
-        struct{
-            vl_ilarge_t     value;
+        struct {
+            vl_ilarge_t value;
         } integer;
 
         /**
          * \private
          */
-        struct{
-            vl_ularge_t     value;
+        struct {
+            vl_ularge_t value;
         } uinteger;
 
         /**
          * \private
          */
-        struct{
-            vl_float32_t    value;
+        struct {
+            vl_float32_t value;
         } float32;
 
         /**
          * \private
          */
-        struct{
-            vl_float64_t    value;
+        struct {
+            vl_float64_t value;
         } float64;
 
         /**
          * \private
          */
-        struct{
-            vl_bool_t       value;
+        struct {
+            vl_bool_t value;
         } boolean;
 
         /**
          * \private
          */
-        struct{
+        struct {
             //UTF-8 Encoded
-            const char*     ptr;
-            vl_uint32_t     length;
+            const char *ptr;
+            vl_uint32_t length;
         } string;
 
         /**
          * \private
          */
-        struct{
-            const void*     ptr;
-            vl_uint32_t     length;
+        struct {
+            const void *ptr;
+            vl_uint32_t length;
         } binary;
 
         /**
          * \private
          */
-        struct{
-            vl_int8_t       extType;
-            const void*     ptr;
-            vl_uint32_t     length;
+        struct {
+            vl_int8_t extType;
+            const void *ptr;
+            vl_uint32_t length;
         } ext;
     };
 
@@ -344,14 +344,14 @@ typedef struct vl_msgpack_io_token_{
  *
  * The only job of the decoder is to produce a stream of decoded tokens from an arbitrary input buffer.
  */
-typedef struct vl_msgpack_decoder_{
-    const vl_uint8_t*       srcMem;
-    vl_memsize_t            srcLen;
-    vl_dsoffs_t             srcOffset;
+typedef struct vl_msgpack_decoder_ {
+    const vl_uint8_t *srcMem;
+    vl_memsize_t srcLen;
+    vl_dsoffs_t srcOffset;
 
-    vl_msgpack_io_error     error;              //Error.
-    vl_msgpack_type         errorType;          //Type associated with error.
-    vl_dsoffs_t             errorOffset;        //Offset in source buffer where error occurred.
+    vl_msgpack_io_error error;              //Error.
+    vl_msgpack_type errorType;          //Type associated with error.
+    vl_dsoffs_t errorOffset;        //Offset in source buffer where error occurred.
 } vl_msgpack_decoder;
 
 /**
@@ -364,7 +364,7 @@ typedef struct vl_msgpack_decoder_{
  * \param srcMem Pointer to the source memory containing the MessagePack data to decode.
  * \param srcLen Length of the source memory to decode.
  */
-void vlMsgPackIODecoderStart(vl_msgpack_decoder* dec, const void* srcMem, vl_memsize_t srcLen);
+VL_API void vlMsgPackIODecoderStart(vl_msgpack_decoder *dec, const void *srcMem, vl_memsize_t srcLen);
 
 /**
  * \brief Extracts the next token from the MessagePack stream.
@@ -376,7 +376,7 @@ void vlMsgPackIODecoderStart(vl_msgpack_decoder* dec, const void* srcMem, vl_mem
  * \param tkPtr Pointer to the token structure where the extracted token will be stored.
  * \return \c true if a token was successfully decoded, \c false otherwise.
  */
-vl_bool_t vlMsgPackIODecoderNext(vl_msgpack_decoder* decoder, vl_msgpack_io_token* tkPtr);
+VL_API vl_bool_t vlMsgPackIODecoderNext(vl_msgpack_decoder *decoder, vl_msgpack_io_token *tkPtr);
 
 /**
  * \brief Decodes MessagePack data into a DOM.
@@ -391,6 +391,7 @@ vl_bool_t vlMsgPackIODecoderNext(vl_msgpack_decoder* decoder, vl_msgpack_io_toke
  * \param keyLen Length of the key.
  * \return The iterator to the newly inserted element in the DOM.
  */
-vl_msgpack_iter vlMsgPackIODecodeToDOM(vl_msgpack_decoder* decoder, vl_msgpack* dest, vl_msgpack_iter parent, const void* key, vl_memsize_t keyLen);
+VL_API vl_msgpack_iter vlMsgPackIODecodeToDOM(vl_msgpack_decoder *decoder, vl_msgpack *dest, vl_msgpack_iter parent, const void *key,
+                       vl_memsize_t keyLen);
 
 #endif //VL_MSGPACK_IO_H

@@ -3,7 +3,7 @@
 
 #include "vl_set.h"
 
-typedef vl_uintptr_t       vl_arena_ptr;
+typedef vl_uintptr_t vl_arena_ptr;
 
 #ifdef VL_ARENA_NULL
 #undef VL_ARENA_NULL
@@ -23,9 +23,9 @@ typedef vl_uintptr_t       vl_arena_ptr;
  * Exposed due to possible uses in other data structures (see vl_hashtable implementation and tests).
  * \private
  */
-typedef struct vl_arena_node{
-    vl_arena_ptr        offset;
-    vl_memsize_t        size;
+typedef struct vl_arena_node {
+    vl_arena_ptr offset;
+    vl_memsize_t size;
 } vl_arena_node;
 
 /**
@@ -54,9 +54,9 @@ typedef struct vl_arena_node{
  *
  * (Writers note: This took a lot of research. I want a beer. :) )
  */
-typedef struct{
-    vl_memory*  data;       //Block of memory.
-    vl_set      freeSet;    //set is ordered according to the offset of each free node.
+typedef struct {
+    vl_memory *data;       //Block of memory.
+    vl_set freeSet;    //set is ordered according to the offset of each free node.
 } vl_arena;
 
 /**
@@ -68,14 +68,14 @@ typedef struct{
  * \param arena The vl_arena structure to be initialized.
  * \param initialSize The initial size of the arena.
  */
-void        vlArenaInit(vl_arena* arena, vl_memsize_t initialSize);
+VL_API void vlArenaInit(vl_arena *arena, vl_memsize_t initialSize);
 
 /**
  * \brief Frees memory allocated by an arena instance.
  *
  * \param arena Pointer to the arena instance to be freed.
  */
-void        vlArenaFree(vl_arena* arena);
+VL_API void vlArenaFree(vl_arena *arena);
 
 /**
  * \brief Creates a new arena with the specified initial size.
@@ -86,14 +86,14 @@ void        vlArenaFree(vl_arena* arena);
  * \param initialSize The initial size of the arena.
  * \return A pointer to the newly created arena, or NULL if the arena creation failed.
  */
-vl_arena*    vlArenaNew(vl_memsize_t initialSize);
+VL_API vl_arena *vlArenaNew(vl_memsize_t initialSize);
 
 /**
  * \brief Deletes the given VL arena, freeing all allocated memory.
  *
  * \param arena Pointer to the VL arena to be deleted.
  */
-void        vlArenaDelete(vl_arena* arena);
+VL_API void vlArenaDelete(vl_arena *arena);
 
 /**
  * \brief Clears all the elements in the given arena.
@@ -103,7 +103,7 @@ void        vlArenaDelete(vl_arena* arena);
  *
  * \param arena Pointer to the vl_arena structure.
  */
-void        vlArenaClear(vl_arena* arena);
+VL_API void vlArenaClear(vl_arena *arena);
 
 
 /**
@@ -120,7 +120,7 @@ void        vlArenaClear(vl_arena* arena);
  * \param dest pointer
  * \return pointer to arena that was copied to or created.
  */
-vl_arena*    vlArenaClone(const vl_arena* src, vl_arena* dest);
+VL_API vl_arena *vlArenaClone(const vl_arena *src, vl_arena *dest);
 
 /**
  * \brief Reserves storage in the underlying allocation of the given arena.
@@ -131,7 +131,7 @@ vl_arena*    vlArenaClone(const vl_arena* src, vl_arena* dest);
  * \param arena pointer
  * \param numBytes total bytes to reserve
  */
-void        vlArenaReserve(vl_arena* arena, vl_memsize_t numBytes);
+VL_API void vlArenaReserve(vl_arena *arena, vl_memsize_t numBytes);
 
 /**
  * \brief Take memory from the given arena.
@@ -145,7 +145,7 @@ void        vlArenaReserve(vl_arena* arena, vl_memsize_t numBytes);
  *
  * \return A pointer to the allocated memory, or NULL if allocation fails.
  */
-vl_arena_ptr vlArenaMemAlloc(vl_arena* arena, vl_memsize_t size);
+VL_API vl_arena_ptr vlArenaMemAlloc(vl_arena *arena, vl_memsize_t size);
 
 /**
  * \brief Reallocates memory for the given pointer in the given arena.
@@ -162,7 +162,7 @@ vl_arena_ptr vlArenaMemAlloc(vl_arena* arena, vl_memsize_t size);
  * \return A pointer to the newly reallocated block of memory, or NULL if reallocation fails.
  * \note The contents of the memory block pointed to by 'ptr' are preserved up to the lesser of the new and old sizes.
  */
-vl_arena_ptr    vlArenaMemRealloc(vl_arena* arena, vl_arena_ptr ptr, vl_memsize_t size);
+VL_API vl_arena_ptr vlArenaMemRealloc(vl_arena *arena, vl_arena_ptr ptr, vl_memsize_t size);
 
 /**
  * \brief Frees a memory block allocated in a vl_arena.
@@ -179,7 +179,7 @@ vl_arena_ptr    vlArenaMemRealloc(vl_arena* arena, vl_arena_ptr ptr, vl_memsize_
  * \sa vlArenaMemAlloc()
  * \sa vlArenaMemRealloc()
  */
-void        vlArenaMemFree(vl_arena* arena, vl_arena_ptr ptr);
+VL_API void vlArenaMemFree(vl_arena *arena, vl_arena_ptr ptr);
 
 /**
  * \brief Copies a block of memory to the end of the specified arena allocation
@@ -193,7 +193,7 @@ void        vlArenaMemFree(vl_arena* arena, vl_arena_ptr ptr);
  * \par Complexity of O(n) linear.
  * \return new dst arena pointer
  */
-vl_arena_ptr    vlArenaMemPrepend(vl_arena* arena, vl_arena_ptr dst, const void* src, vl_memsize_t length);
+VL_API vl_arena_ptr vlArenaMemPrepend(vl_arena *arena, vl_arena_ptr dst, const void *src, vl_memsize_t length);
 
 /**
  * \brief Copies a block of memory to the beginning of the specified arena allocation
@@ -207,7 +207,7 @@ vl_arena_ptr    vlArenaMemPrepend(vl_arena* arena, vl_arena_ptr dst, const void*
  * \par Complexity of O(n) linear.
  * \return new dst arena pointer
  */
-vl_arena_ptr    vlArenaMemAppend(vl_arena* arena, vl_arena_ptr dst, const void* src, vl_memsize_t length);
+VL_API vl_arena_ptr vlArenaMemAppend(vl_arena *arena, vl_arena_ptr dst, const void *src, vl_memsize_t length);
 
 /**
  * \brief Sampling function that calculates a transient pointer into the specified arena.
@@ -215,7 +215,7 @@ vl_arena_ptr    vlArenaMemAppend(vl_arena* arena, vl_arena_ptr dst, const void* 
  * \param arena The arena on which the operation is performed.
  * \param ptr The arena pointer indicating the memory location on the arena.
  */
-vl_transient*       vlArenaMemSample(vl_arena* arena, vl_arena_ptr ptr);
+VL_API vl_transient *vlArenaMemSample(vl_arena *arena, vl_arena_ptr ptr);
 
 /**
  * \brief Get the size of a memory block allocated in a VL arena.
@@ -233,7 +233,7 @@ vl_transient*       vlArenaMemSample(vl_arena* arena, vl_arena_ptr ptr);
  *       in the specified VL arena. Passing an invalid or previously freed pointer
  *       to this function may result in undefined behavior.
  */
-vl_memsize_t      vlArenaMemSize(vl_arena* arena, vl_arena_ptr ptr);
+VL_API vl_memsize_t vlArenaMemSize(vl_arena *arena, vl_arena_ptr ptr);
 
 /**
  * \brief Get the total capacity of the arena.
@@ -245,7 +245,7 @@ vl_memsize_t      vlArenaMemSize(vl_arena* arena, vl_arena_ptr ptr);
  * \param arena Pointer to the arena structure.
  * \return The total capacity of the arena.
  */
-vl_memsize_t      vlArenaTotalCapacity(vl_arena* arena);
+VL_API vl_memsize_t vlArenaTotalCapacity(vl_arena *arena);
 
 /**
  * \brief Get the total amount of free memory in the arena.
@@ -255,6 +255,6 @@ vl_memsize_t      vlArenaTotalCapacity(vl_arena* arena);
  * \param arena The pointer to the arena structure.
  * \return The total amount of free memory in the arena.
  */
-vl_memsize_t      vlArenaTotalFree(vl_arena* arena);
+VL_API vl_memsize_t vlArenaTotalFree(vl_arena *arena);
 
 #endif //VL_ARENA_H

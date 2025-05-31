@@ -2,7 +2,7 @@
 #define VL_ATOMIC_TEST_H
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 #include <vl/vl_numtypes.h>

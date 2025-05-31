@@ -1,6 +1,6 @@
 ![Veritable Lasagna](docs/image/vl_logo.svg)
 
-![Written in C11](https://img.shields.io/badge/C11-gray?style=for-the-badge&logo=C&logoColor=orange&labelColor=black) 
+![Written in C11](https://img.shields.io/badge/C11-gray?style=for-the-badge&logo=C&logoColor=orange&labelColor=black)
 [![Built with CMake](https://img.shields.io/badge/Built%20with%20CMake-gray?style=for-the-badge&logo=CMake&logoColor=orange&labelColor=black)](https://cmake.org/)
 [![Tested with GoogleTest](https://img.shields.io/badge/Testing%20With%20GTest-gray?style=for-the-badge&logo=googlesearchconsole&logoColor=orange&labelColor=black)](https://github.com/google/googletest)
 [![Support development](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=orange&labelColor=black)](https://www.buymeacoffee.com/walkerje)
@@ -21,8 +21,7 @@
 
 **Veritable Lasagna** **_(VL)_** is a cross-platform library written in C11. It implements a variety of common memory allocators, data structures, and algorithms.
 The majority of this interface is loosely modeled on the C++ STL, and many functions might seem familiar. There are no dependencies aside from the standard library.
-**_There is absolutely no type safety in this library._** There are no macro templates provided for any structure. 
-All operations are performed on arbitrary byte sequences, regardless of type. Moreover, these structures are interdependent on
+There are no macro templates provided for any structure. All operations are performed on arbitrary byte sequences, regardless of type. Moreover, these structures are interdependent on
 one another by design.
 
 This interdependent design is sensitive to regression when the behavior of any structure is modified.
@@ -34,11 +33,11 @@ This roadmap specifies what it will take to consider this library feature-comple
 will be released as part of minor versions after however many patches it might take to implement them. A Major release would involve significant
 changes to the overall composition of this project. All proposed features are to be implemented in a cross-platform manner and are to  have  test suites developed for them.
 
+**This library makes no promise to maintain ABI compatibility between versions until reaching version 1.0.0.**
+ 
 - Memory Management
   - Memory blocks with metadata `vl_memory` ✔
-  - Memory pools
-    - Linear Pool `vl_linearpool` ✔
-    - Fixed Pool `vl_fixedpool` ✔
+  - Memory Pools `vl_pool`, `vl_async_pool` ✔
   - Arena Allocator `vl_arena` ✔
   - Data (De)Serialization `vl_msgpack` ✔
 - Data Structures
@@ -58,20 +57,21 @@ changes to the overall composition of this project. All proposed features are to
       - Implicit to `vl_set` ✔
   - Search
     - Sorted
-      - To be made available to `vl_memory` and `vl_linked_list` ✘
+      - `vl_memory` ✔
     - Unsorted
-      - To be made available to `vl_memory` and `vl_linked_list` ✘
+      - `vl_memory` and `vl_linked_list` ✔
     - Implicit to `vl_set` and `vl_hashtable`. ✔
-- Async 
+- Async
   - Primitives
     - Threads `vl_thread` ✔
     - Atomic Types `vl_atomic` ✔
     - Mutex `vl_mutex` ✔
-    - Semaphore ✘
+    - SRWLock `vl_srwlock` ✔
+    - Conditional Variable `vl_condition` ✔
+    - Semaphore `vl_semaphore` ✔
   - Data Structures
     - Lockless Async Memory Pool ✔ `vl_async_pool`
     - Lockless Async Queue ✔ `vl_async_queue`
-    - Async Message Bus ✘
 - Filesystem
   - Directory listing ✘
   - Path handling ✘
@@ -79,7 +79,7 @@ changes to the overall composition of this project. All proposed features are to
 
 ### Code Samples
 
-Below are full examples for some common complex data structures.
+Below are full examples of common data structures.
 
 #### vl_linked_list
 ```c
@@ -180,75 +180,124 @@ int main(int argc, const char** argv){
 }
 ```
 
-# Quick Start & Building with CMake
-Start by cloning this repo to your project directory.
+# Quick Start
 
-```bash
-git clone this_page_url
+There are three documented ways to use this library:
+1. [Install as Package from Repository](#option-1-recommended-automated-build--install-from-repo)
+2. [Embed as a subdirectory](#option-2-embed-as-subdirectory)
+3. [Manual build and install](#option-3-manual-build-and-install)
+
+## Option 1 (Recommended): Automated Build & Install from Repo
+
+### Install with [vcpkg](https://vcpkg.io/) (Cross-Platform)
+```shell
+git clone https://github.com/walkerje/veritable_lasagna.git
+vcpkg install --overlay-ports=.\veritable_lasagna\vcpkg veritable-lasagna
 ```
 
-If your project lives on Git, consider making this repo a submodule. This step is optional, of course.
-
-```bash
-git submodule add this_page_url
-git submodule update --init
+### Bash (Linux/MSYS/Cygwin/etc) (See [install.sh](install.sh) first!)
+```shell
+wget -O - https://raw.githubusercontent.com/walkerje/veritable_lasagna/refs/heads/main/install.sh | bash
 ```
 
-In your project `CMakeLists.txt`, add this library as a subdirectory.
+## Option 2: Embed as Subdirectory
+
+Start by cloning this project into your project directory or adding it as a git submodule.
+
+* Submodule:
+  ```bash
+  git submodule add https://github.com/walkerje/veritable_lasagna.git
+  git submodule update --init
+  ```
+* Clone:
+  ```bash
+  git clone https://github.com/walkerje/veritable_lasagna.git
+  ```
+
+Then, somewhere in your own `CMakeLists.txt`, have the following:
 
 ```CMake
-add_subdirectory(veritable_lasagna)
-```
-
-Then link the library like so:
-
-```CMake
-include_directories(${VL_INCLUDE})
-
-#..............
-# add targets
-#..............
-
-target_link_libraries(my_target_name ${VL_LIBRARY})
-```
-
-### Building
-
-To build the shared and static versions of this library, VL provides CMake options.
-
-| Flag Name        | Type | Default |
-|------------------|------|---------|
-| VL_BUILD_SHARED  | BOOL | OFF     |
-| VL_SHARED_TESTS  | BOOL | OFF     |
-
-When adding this library as a subdirectory to your project, static linking is preferred by default. 
-By having `VL_BUILD_SHARED` set to `ON`, you may explicitly link to either `VL_STATIC_TARGET` or `VL_SHARED_TARGET`.
-When neither flag is set, the variable `${VL_LIBRARY}` will link directly to the compiled object files. In this case,
-there is no single "library file", and is roughly synonymous with static linking.
-
-```CMake
-# force shared building
-# this can also be set as a CMake command-line argument, e.g,-DVL_BUILD_SHARED=ON
-set(VL_BUILD_SHARED ON CACHE BOOL "" FORCE)
+# 
+# Your project setup...
+#
 
 add_subdirectory(veritable_lasagna)
 
-#static linking
-target_link_libraries(target_a ${VL_LIBRARY_STATIC})
-#shared linking
-target_link_libraries(target_b ${VL_LIBRARY_SHARED})
+#
+# Target setup...
+#
+
+target_link_libraries(my_target_name VLasagna::Core)
 ```
+
+## Option 3: Manual Build and Install
+
+Start by cloning this repo to your disk and moving into its directory.
+
+```bash
+git clone https://github.com/walkerje/veritable_lasagna.git
+cd veritable_lasagna
+```
+
+Now create a build directory and use CMake to configure the build.
+
+```bash
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+```
+
+Finally, build the library.
+
+```bash
+cmake --build .
+```
+
+Installing this package to your system is as simple specifying the `install` target.
+
+```bash
+cmake --build . --target install
+```
+
+You can reference the installation in your project by using `find_package` in your own
+`CMakeLists.txt`.
+
+```CMake
+# 
+# Your project setup...
+#
+
+find_package(VLasagna REQUIRED)
+
+#
+# Target setup...
+#
+
+target_link_libraries(my_target_name VLasagna::Core)
+```
+
+## Configuration Options
+
+These are the primary configuration options relevant to the library. Many of these are ubiquitous across CMake,
+but they are described here nonetheless.
+
+| Argument            | Type   | Default              | Description                                                                                                                                                                                                                                                       |
+|---------------------|--------|----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `CMAKE_BUILD_TYPE`  | STRING | `Toolchain Specific` | Specifies the build configuration type. Common values: <br>• `Debug` - No optimizations, includes debug info<br>• `Release` - Full optimizations, no debug info<br>• `RelWithDebInfo` - Full optimizations with debug info<br>• `MinSizeRel` - Size optimizations |
+| `BUILD_SHARED_LIBS` | BOOL   | `OFF`                | Global flag affecting the how the library is built: <br>• `ON` - Libraries are built as shared/dynamic (DLL/SO)<br>• `OFF` - Libraries are built as static (LIB/A)                                                                                                |
+| `BUILD_TESTING`     | BOOL   | `OFF`                | CTest module flag that controls test building:<br>• `ON` - Configure to build tests via CTest and GTest <br>• `OFF` - Skips building tests                                                                                                                        |
+
+
 
 #### Building and Running Tests
 
-Veritable Lasagna comes equipped with a test suite powered by [GTest](https://github.com/google/googletest)
-and [CTest](https://cmake.org/cmake/help/latest/manual/ctest.1.html). An appropriate build  script can be generated using the `VL_BUILD_TESTS` CMake flag. 
-They can be executed using `ctest`, a testing utility that comes packaged with most CMake installations.
+Veritable Lasagna comes equipped with test suites powered by [GTest](https://github.com/google/googletest)
+and [CTest](https://cmake.org/cmake/help/latest/manual/ctest.1.html). They can be executed using `ctest`, a testing utility
+that comes packaged with most CMake installations.
 
 ```bash
 cd veritable_lasagna 
 mkdir build && cd build
-cmake ..
+cmake -DBUILD_TESTING=ON ..
 cmake --build .
 cd test && ctest
 ```

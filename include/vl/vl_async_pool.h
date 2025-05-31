@@ -3,78 +3,85 @@
 
 #include "vl_atomic.h"
 #include "vl_atomic_ptr.h"
+#include "vl_memory.h"
 
 /**
- * \brief A Non-Blocking Atomic (/Asynchronous) Memory Pool
+ * \brief Lock-free Memory Pool with Thread-safe Operations
  *
- * Represents a memory pool that works in elements of a fixed size.
- * This requires notably more time and space overhead in comparison
- * to vl_linear_pool and vl_fixed_pool, but offers the benefit of thread safe taking and returning.
+ * A high-performance memory allocation system designed for concurrent access,
+ * providing thread-safe memory management for fixed-size elements. This pool
+ * implements a non-blocking algorithm that ensures thread safety without locks.
  *
- * \sa vl_linear_pool
- * \sa vl_fixed_pool
+ * Key Features:
+ * - Lock-free operations: All core operations are non-blocking
+ * - Thread-safe: Supports concurrent access from multiple threads
+ * - Fixed-size elements: Optimized for elements of consistent size
+ * - Alignment control: Supports custom memory alignment requirements
+ * - Memory reuse: Efficiently recycles freed elements
  *
- * This structure is implemented almost entirely using atomic primitives.
- * The action of taking/returning elements to/from this pool are entirely atomic,
- * and well-suited for multi-threaded computing.
+ * Memory Management:
+ * - Uses geometric growth for block allocation (2^4 to 2^16 elements)
+ * - Maintains a Treiber stack for freed elements
+ * - Employs tagged pointers to prevent ABA problems
+ * - Alignment-aware memory allocation and access
  *
- * Blocks of memory are allocated with a size following geometric growth up to a min/max of 2^(4/16) elements,
- * after which they have reached their maximum size and further allocated blocks continue to have that size.
+ * Performance Characteristics:
+ * - Take/Return operations are O(1) amortized
+ * - Non-blocking but not wait-free (operations may retry)
+ * - Space overhead per element includes alignment padding
+ * - Memory blocks grow geometrically up to a maximum size
  *
- * This structure is non-blocking; no single operation will block execution. All threads
- * operating on this pool will continue to make progress towards their individual operations.
- * Using Compare-And-Swap (CAS), failed operations are re-tried until their success (the "wait").
+ * Thread Safety Notes:
+ * - Take/Return operations are fully thread-safe
+ * - Global operations (clear/reset) require external synchronization
+ * - Element content synchronization must be handled by the caller
  *
- * Other pool-wide operations (clearing, resetting) require the user to bring their
- * own explicit synchronization methods. Similarly, element-level synchronization and
- * thread-safety also requires user-end synchronization, if applicable.
+ * Memory Layout:
+ * - Elements are stored in blocks with proper alignment
+ * - Each block contains a header followed by element storage
+ * - Free elements form a lock-free stack
  *
- * Taken elements will never be moved by the pool structure algorithm, but may be invalidated
- * via clearing, resetting, freeing, or deleting the pool.
+ * \warning Operations that affect the entire pool (clear/reset/free) are not
+ *          thread-safe and require external synchronization
  *
- * Returned nodes are pushed onto a Treiber stack for later reuse.
- * \see https://en.wikipedia.org/wiki/Treiber_stack
- *
- * The ABA problem is prevented through the use of pointer tagging.
- * \sa vl_tagged_ptr
- * \see https://en.wikipedia.org/wiki/ABA_problem
- *
- * \note    This structure is non-blocking, but is not wait-free.
+ * \sa vl_pool, vl_tagged_ptr
+ * \related https://en.wikipedia.org/wiki/ABA_problem
+ * \related https://en.wikipedia.org/wiki/Treiber_stack
  */
-typedef struct{
-    vl_atomic_ptr           freeStack;          // Head of the Treiber stack, storing free elements.
-    vl_atomic_uint32_t      freeLength;         // Total number of nodes in the free stack.
 
-    vl_atomic_ptr           primaryBlock;       //  Head of the list of memory blocks.
-    vl_atomic_bool_t        allocatingFlag;     //  Atomic allocation flag set when allocating a new block.
-    vl_atomic_uint16_t      totalBlocks;        //  Total number of allocated blocks.
+typedef struct {
+    vl_atomic_ptr freeStack;                // Head of the Treiber stack, storing free elements.
+    vl_atomic_uint32_t freeLength;          // Total number of nodes in the free stack.
 
-    vl_uint16_t             elementSize;        //  Size, in bytes, of each pool element.
-    vl_uint16_t             nodeSize;           //  Size in bytes, of an individual pool node.
+    vl_atomic_ptr primaryBlock;             //  Head of the list of memory blocks.
+    vl_atomic_bool_t allocatingFlag;        //  Atomic allocation flag set when allocating a new block.
+    vl_atomic_uint16_t totalBlocks;         //  Total number of allocated blocks.
+
+    vl_uint16_t elementSize;                //  Size, in bytes, of each pool element.
+    vl_uint16_t elementAlign;               //  Byte alignment of each pool element.
+    vl_uint16_t nodeSize;                   //  Size, in bytes, of an individual pool node.
 } vl_async_pool;
 
 /**
  * \private
  */
-typedef struct{
-    /**
-     * \private
-     */
-    union{
-        vl_uintptr_t next;
-        vl_tagged_ptr pad;
-    };
+typedef struct {
+    vl_uintptr_t next;
 } vl_async_pool_header;
 
 /**
- * \brief Byte-level alignment of individual vlAsyncPool memory blocks.
+ * \brief Initializes the specified async pool, with the specified alignment.
+ *
+ * The pool must be later freed via vlAsyncPoolFree.
+ *
+ * \warning alignment must be a power of 2.
+ *
+ * \sa vlAsyncPoolFree
+ * \param pool pointer to pool that will be initialized
+ * \param elementSize total size of a single element, in bytes.
+ * \param elementAlign byte alignment of pool elements.
  */
-extern const vl_ularge_t VL_ASYNC_POOL_BLOCK_ALIGNMENT;
-
-/**
- * \brief Byte-level alignment of individual vlAsyncPool element nodes.
- */
-extern const vl_ularge_t VL_ASYNC_POOL_NODE_ALIGNMENT;
+VL_API void vlAsyncPoolInitAligned(vl_async_pool *pool, vl_uint16_t elementSize, vl_uint16_t elementAlign);
 
 /**
  * \brief Initializes the specified async pool.
@@ -85,7 +92,9 @@ extern const vl_ularge_t VL_ASYNC_POOL_NODE_ALIGNMENT;
  * \param pool pointer to pool that will be initialized
  * \param elementSize total size of a single element, in bytes.
  */
-void            vlAsyncPoolInit(vl_async_pool* pool, vl_uint16_t elementSize);
+static inline void vlAsyncPoolInit(vl_async_pool *pool, vl_uint16_t elementSize) {
+    vlAsyncPoolInitAligned(pool, elementSize, VL_DEFAULT_MEMORY_ALIGN);
+}
 
 /**
  * \brief Frees the specified async pool, and all associated memory.
@@ -98,7 +107,21 @@ void            vlAsyncPoolInit(vl_async_pool* pool, vl_uint16_t elementSize);
  * \sa vlAsyncPoolInit
  * \param pool
  */
-void            vlAsyncPoolFree(vl_async_pool* pool);
+VL_API void vlAsyncPoolFree(vl_async_pool *pool);
+
+/**
+ * \brief Allocates and initializes a new async pool, and specified alignment.
+ *
+ * The specified pool must later be deleted via vlAsyncPoolDelete.
+ *
+ * \warning alignment must be a power of 2.
+ *
+ * \sa vlAsyncPoolDelete
+ * \param elementSize total size of a single element, in bytes.
+ * \param elementAlign byte alignment of pool elements.
+ * \return pointer to newly allocated async pool.
+ */
+VL_API vl_async_pool *vlAsyncPoolNewAligned(vl_uint16_t elementSize, vl_uint16_t elementAlign);
 
 /**
  * \brief Allocates and initializes a new async pool.
@@ -109,7 +132,9 @@ void            vlAsyncPoolFree(vl_async_pool* pool);
  * \param elementSize
  * \return pointer to newly allocated async pool.
  */
-vl_async_pool*  vlAsyncPoolNew(vl_uint16_t elementSize);
+static inline vl_async_pool *vlAsyncPoolNew(vl_uint16_t elementSize) {
+    return vlAsyncPoolNewAligned(elementSize, VL_DEFAULT_MEMORY_ALIGN);
+}
 
 /**
  * \brief Deinitializes and deletes the specified async pool, and all associated memory.
@@ -122,7 +147,7 @@ vl_async_pool*  vlAsyncPoolNew(vl_uint16_t elementSize);
  * \sa vlAsyncPoolNew
  * \param pool pointer to async pool to delete
  */
-void            vlAsyncPoolDelete(vl_async_pool* pool);
+VL_API void vlAsyncPoolDelete(vl_async_pool *pool);
 
 /**
  * \brief   Resets the specified async pool, returning it to its state when it
@@ -135,7 +160,7 @@ void            vlAsyncPoolDelete(vl_async_pool* pool);
  *
  * \param pool pointer to the async pool to reset
  */
-void            vlAsyncPoolReset(vl_async_pool* pool);
+VL_API void vlAsyncPoolReset(vl_async_pool *pool);
 
 /**
  * \brief   Resets the state of all blocks and the pool, retaining memory but invalidating taken elements.
@@ -147,7 +172,7 @@ void            vlAsyncPoolReset(vl_async_pool* pool);
  *
  * \param pool pointer to the async pool to clear
  */
-void            vlAsyncPoolClear(vl_async_pool* pool);
+VL_API void vlAsyncPoolClear(vl_async_pool *pool);
 
 /**
  * \brief Takes an element from the specified async pool.
@@ -155,7 +180,7 @@ void            vlAsyncPoolClear(vl_async_pool* pool);
  * \par Complexity of O(1) constant.
  * \return pointer to taken element
  */
-void*           vlAsyncPoolTake(vl_async_pool* pool);
+VL_API void *vlAsyncPoolTake(vl_async_pool *pool);
 
 /**
  * \brief Returns an element to the specified async pool.
@@ -164,6 +189,6 @@ void*           vlAsyncPoolTake(vl_async_pool* pool);
  * \param element pointer to returned element
  * \par Complexity of O(1) constant.
  */
-void       vlAsyncPoolReturn(vl_async_pool* pool, void* element);
+VL_API void vlAsyncPoolReturn(vl_async_pool *pool, void *element);
 
 #endif //VL_ASYNC_POOL_H

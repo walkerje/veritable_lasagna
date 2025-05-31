@@ -2,6 +2,8 @@
 
 include(CMakeFindDependencyMacro)
 
+find_dependency(Threads)
+
 set(VL_VERSION_MAJOR    @VL_VERSION_MAJOR@)
 set(VL_VERSION_MINOR    @VL_VERSION_MINOR@)
 set(VL_VERSION_PATCH    @VL_VERSION_PATCH@)

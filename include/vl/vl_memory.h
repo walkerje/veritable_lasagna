@@ -15,7 +15,7 @@
 #include "vl_numtypes.h"
 #include "vl_compare.h"
 
-typedef VL_MEMORY_SIZE_T    vl_memsize_t;
+typedef VL_MEMORY_SIZE_T vl_memsize_t;
 
 #ifndef VL_KB
 /**
@@ -53,11 +53,14 @@ typedef VL_MEMORY_SIZE_T    vl_memsize_t;
  *
  * This will return len when already a multiple of pad.
  *
+ * \warning pad must be a power of 2.
+ *
  * \par len size of the memory block
  * \par pad bytes to pad it to.
  * \return len
  */
-#define VL_MEMORY_PAD_UP(len, pad) (vl_ularge_t)((len) + (pad - ((len) % (pad))))
+#define VL_MEMORY_PAD_UP(len, pad) (((len) + (pad) - 1) & ~((pad) - 1))
+
 #endif
 
 /**
@@ -92,7 +95,7 @@ typedef VL_MEMORY_T vl_transient;
  * \param allocSize size of the allocation, in bytes.
  * \return pointer to allocated block, or NULL.
  */
- vl_memory*  vlMemAlloc(vl_memsize_t allocSize);
+VL_API vl_memory *vlMemAlloc(vl_memsize_t allocSize);
 
 /**
  * \brief Reallocates the specified block of memory to hold the specified total number of bytes.
@@ -103,7 +106,7 @@ typedef VL_MEMORY_T vl_transient;
  * \param allocSize new size of the allocation.
  * \return pointer to reallocated memory
  */
-vl_memory*  vlMemRealloc(vl_memory* mem, vl_memsize_t allocSize);
+VL_API vl_memory *vlMemRealloc(vl_memory *mem, vl_memsize_t allocSize);
 
 /**
  * \brief Allocates a block of memory with an alignment.
@@ -122,7 +125,7 @@ vl_memory*  vlMemRealloc(vl_memory* mem, vl_memsize_t allocSize);
  * \param align
  * \return pointer to the aligned block
  */
-vl_memory*  vlMemAllocAligned(vl_memsize_t allocSize, vl_uint_t align);
+VL_API vl_memory *vlMemAllocAligned(vl_memsize_t allocSize, vl_uint_t align);
 
 /**
  * \brief Clones the specified block of memory, returning a pointer to its new clone.
@@ -134,14 +137,14 @@ vl_memory*  vlMemAllocAligned(vl_memsize_t allocSize, vl_uint_t align);
  * \param mem pointer
  * \return cloned memory pointer
  */
-vl_memory*          vlMemClone(vl_memory* mem);
+VL_API vl_memory *vlMemClone(vl_memory *mem);
 
 /**
  * \brief Returns the size (in total number of bytes) of the specified block of vl_memory.
  * \par mem pointer to memory block
  * \return size of the specified memory block, in bytes.
  */
-vl_memsize_t        vlMemSize(vl_memory* mem);
+VL_API vl_memsize_t vlMemSize(vl_memory *mem);
 
 /**
  * \brief Returns the alignment of the specified block of memory.
@@ -151,7 +154,7 @@ vl_memsize_t        vlMemSize(vl_memory* mem);
  * \param mem pointer to memory block
  * \return alignment
  */
-vl_uint_t           vlMemAlignment(vl_memory* mem);
+VL_API vl_uint_t vlMemAlignment(vl_memory *mem);
 
 /**
  * \brief Sorts the specified buffer in-place according to the specified element and comparator function.
@@ -164,7 +167,7 @@ vl_uint_t           vlMemAlignment(vl_memory* mem);
  * \param comparator
  * \par Complexity of O(n log(n)) (space complexity of O(n)).
  */
-void        vlMemSort(void* buffer, vl_memsize_t elementSize, vl_dsidx_t numElements, vl_compare_function comparator);
+VL_API void vlMemSort(void *buffer, vl_memsize_t elementSize, vl_dsidx_t numElements, vl_compare_function comparator);
 
 /**
  * \brief Copies data from one buffer to another, with a stride applied to both.
@@ -179,7 +182,8 @@ void        vlMemSort(void* buffer, vl_memsize_t elementSize, vl_dsidx_t numElem
  * \param numElements total number of elements
  * \par Complexity of O(n) linear.
  */
-void        vlMemCopyStride(const void* src, vl_dsoffs_t srcStride, void* dest, vl_dsoffs_t dstStride, vl_memsize_t elementSize, vl_dsidx_t numElements);
+VL_API void vlMemCopyStride(const void *src, vl_dsoffs_t srcStride, void *dest, vl_dsoffs_t dstStride, vl_memsize_t elementSize,
+                vl_dsidx_t numElements);
 
 /**
  * \brief Reverses the bytes in a series of elements of a defined length and stride between them.
@@ -211,7 +215,7 @@ void        vlMemCopyStride(const void* src, vl_dsoffs_t srcStride, void* dest, 
  * \param numElements total number of sub-arrays (or elements). This is the number of individual elements to process.
  * \par Complexity of O(n) linear.
  */
-void        vlMemReverseSubArraysStride(void* src, vl_dsoffs_t srcStride, vl_memsize_t elementSize, vl_dsidx_t numElements);
+VL_API void vlMemReverseSubArraysStride(void *src, vl_dsoffs_t srcStride, vl_memsize_t elementSize, vl_dsidx_t numElements);
 
 #ifndef vlMemReverse
 /**
@@ -262,6 +266,6 @@ void        vlMemReverseSubArraysStride(void* src, vl_dsoffs_t srcStride, vl_mem
  * \brief Frees the specified block of memory.
  * \param mem pointer to block.
  */
-void        vlMemFree(vl_memory* mem);
+VL_API void vlMemFree(vl_memory *mem);
 
 #endif //VL_ALLOC_H

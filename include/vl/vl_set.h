@@ -1,8 +1,9 @@
 #ifndef VL_SET_H
 #define VL_SET_H
 
-#include "vl_linear_pool.h"
+#include "vl_pool.h"
 #include "vl_compare.h"
+#include "vl_memory.h"
 
 #define VL_SET_ITER_INVALID VL_STRUCTURE_INDEX_MAX
 
@@ -34,7 +35,7 @@
 #define vlSetSize(set) (size_t)((set)->nodePool.totalTaken)
 #endif
 
-typedef vl_linearpool_idx vl_set_iter;
+typedef vl_pool_idx vl_set_iter;
 
 /**
  * \brief An ordered set.
@@ -50,12 +51,13 @@ typedef vl_linearpool_idx vl_set_iter;
  * Elements of the set are sorted according to a key, but can also hold supplementary data
  * for each element that is stored in the same block of memory.
  */
-typedef struct{
-    vl_linearpool                 nodePool;     //node pool which holds all the data in the set.
-    vl_memsize_t            elementSize;        //size of each set element, in bytes.
-    vl_compare_function     comparator;         //comparator function pointer. see vl_compare.
+typedef struct {
+    vl_pool nodePool;               //node pool which holds all the data in the set.
+    vl_uint16_t elementSize;            //size of each set element, in bytes.
+    vl_dsidx_t totalElements;          //total number of elements in the set.
+    vl_compare_function comparator;         //comparator function pointer. see vl_compare.
 
-    vl_set_iter             root;               //root iterator. may change upon insert/remove operations.
+    vl_set_iter root;                       //root iterator. may change upon insert/remove operations.
 } vl_set;
 
 /**
@@ -67,7 +69,7 @@ typedef struct{
  * \sa vlSetFree
  * \par Complexity O(1) constant.
  */
-void            vlSetInit(vl_set* set, vl_memsize_t elementSize, vl_compare_function compFunc);
+VL_API void vlSetInit(vl_set *set, vl_memsize_t elementSize, vl_compare_function compFunc);
 
 /**
  * Frees the underlying storage buffers for the specified set.
@@ -76,7 +78,7 @@ void            vlSetInit(vl_set* set, vl_memsize_t elementSize, vl_compare_func
  * \sa vlSetInit
  * \par Complexity O(1) constant.
  */
-void            vlSetFree(vl_set* set);
+VL_API void vlSetFree(vl_set *set);
 
 /**
  * Allocates a new set on the heap.
@@ -88,7 +90,7 @@ void            vlSetFree(vl_set* set);
  * \sa vlSetDelete
  * \par Complexity O(1) constant.
  */
-vl_set*         vlSetNew(vl_memsize_t elementSize, vl_compare_function compFunc);
+VL_API vl_set *vlSetNew(vl_memsize_t elementSize, vl_compare_function compFunc);
 
 
 /**
@@ -99,7 +101,7 @@ vl_set*         vlSetNew(vl_memsize_t elementSize, vl_compare_function compFunc)
  * \sa vlSetNew
  * \par Complexity O(1) constant.
  */
-void            vlSetDelete(vl_set* set);
+VL_API void vlSetDelete(vl_set *set);
 
 /**
  * Returns an iterator to the last element in the set.
@@ -107,7 +109,7 @@ void            vlSetDelete(vl_set* set);
  * \par Complexity O(log(n)).
  * \return iterator of last element in the set.
  */
-vl_set_iter     vlSetFront(vl_set* set);
+VL_API vl_set_iter vlSetFront(vl_set *set);
 
 /**
  * Returns an iterator to the last element in the set.
@@ -115,7 +117,7 @@ vl_set_iter     vlSetFront(vl_set* set);
  * \par Complexity O(log(n)).
  * \return iterator of last element in the set.
  */
-vl_set_iter     vlSetBack(vl_set* set);
+VL_API vl_set_iter vlSetBack(vl_set *set);
 
 /**
  * Inserts the specified element into the set.
@@ -126,7 +128,7 @@ vl_set_iter     vlSetBack(vl_set* set);
  * \par Complexity of O(log(n)).
  * \return iterator to inserted or existing element
  */
-vl_set_iter     vlSetInsert(vl_set* set, const void* elem);
+VL_API vl_set_iter vlSetInsert(vl_set *set, const void *elem);
 
 /**
  * Returns the pointer to the element at the specified iterator in the set.
@@ -139,7 +141,7 @@ vl_set_iter     vlSetInsert(vl_set* set, const void* elem);
  * \par Complexity O(1) constant.
  * \return pointer to element data
  */
-vl_transient*     vlSetSample(vl_set* set, vl_set_iter iter);
+VL_API void *vlSetSample(vl_set *set, vl_set_iter iter);
 
 /**
  * Returns the iterator to the previous element in the set
@@ -153,7 +155,7 @@ vl_transient*     vlSetSample(vl_set* set, vl_set_iter iter);
  * \par Complexity O(log(n)).
  * \return iterator to next element relative to input iter.
  */
-vl_set_iter     vlSetNext(vl_set* set, vl_set_iter iter);
+VL_API vl_set_iter vlSetNext(vl_set *set, vl_set_iter iter);
 
 /**
  * Returns the iterator to the previous element in the set
@@ -167,7 +169,7 @@ vl_set_iter     vlSetNext(vl_set* set, vl_set_iter iter);
  * \par Complexity O(log(n)).
  * \return iterator to previous element relative to input iter.
  */
-vl_set_iter     vlSetPrev(vl_set* set, vl_set_iter iter);
+VL_API vl_set_iter vlSetPrev(vl_set *set, vl_set_iter iter);
 
 /**
  * Removes the specified iterator from the set.
@@ -177,7 +179,7 @@ vl_set_iter     vlSetPrev(vl_set* set, vl_set_iter iter);
  * \param iter set iterator
  * \par Complexity O(log(n)).
  */
-void            vlSetRemove(vl_set* set, vl_set_iter iter);
+VL_API void vlSetRemove(vl_set *set, vl_set_iter iter);
 
 /**
  * Removes the specified element from the set.
@@ -187,7 +189,7 @@ void            vlSetRemove(vl_set* set, vl_set_iter iter);
  * \param elem pointer to element.
  * \par Complexity O(log(n)).
  */
-void            vlSetRemoveElem(vl_set* set, const void* elem);
+VL_API void vlSetRemoveElem(vl_set *set, const void *elem);
 
 /**
  * Clears the specified set.
@@ -195,7 +197,7 @@ void            vlSetRemoveElem(vl_set* set, const void* elem);
  * \param set pointer to set
  * \par Complexity O(1).
  */
-void            vlSetClear(vl_set* set);
+VL_API void vlSetClear(vl_set *set);
 
 /**
  * \brief Clones the specified set to another.
@@ -212,7 +214,7 @@ void            vlSetClear(vl_set* set);
  * \param dest pointer
  * \return pointer to set that was copied to or created.
  */
-vl_set*         vlSetClone(const vl_set* src, vl_set* dest);
+VL_API vl_set *vlSetClone(const vl_set *src, vl_set *dest);
 
 /**
  * \brief Copies a range of elements from one set to another.
@@ -233,7 +235,7 @@ vl_set*         vlSetClone(const vl_set* src, vl_set* dest);
  * \par Complexity of O(nlog(n)) log-linear.
  * \return number of elements copied
  */
-int             vlSetCopy(vl_set* src, vl_set_iter begin, vl_set_iter end, vl_set* dest);
+VL_API int vlSetCopy(vl_set *src, vl_set_iter begin, vl_set_iter end, vl_set *dest);
 
 /**
  * Searches for the specified element in the set.
@@ -243,7 +245,7 @@ int             vlSetCopy(vl_set* src, vl_set_iter begin, vl_set_iter end, vl_se
  * \par Complexity O(log(n)).
  * \return iterator of found element, or VL_SET_ITER_INVALID.
  */
-vl_set_iter     vlSetFind(vl_set* set, const void* elem);
+VL_API vl_set_iter vlSetFind(vl_set *set, const void *elem);
 
 /**
  * \brief Computes the union between sets A and B, stored in set dest.
@@ -267,7 +269,7 @@ vl_set_iter     vlSetFind(vl_set* set, const void* elem);
  * \par Complexity of O(nlog(n)) log-linear.
  * \return pointer to set that was copied to or created, or NULL on mismatched sets.
  */
-vl_set*         vlSetUnion(vl_set* a, vl_set* b, vl_set* dest);
+VL_API vl_set *vlSetUnion(vl_set *a, vl_set *b, vl_set *dest);
 
 /**
  * \brief Computes the intersection between sets A and B, stored in set dest.
@@ -292,7 +294,7 @@ vl_set*         vlSetUnion(vl_set* a, vl_set* b, vl_set* dest);
  * \par Complexity of O(nlog(n)) log-linear.
  * \return pointer to set that was copied to or created, or NULL on mismatched sets.
  */
-vl_set*         vlSetIntersection(vl_set* a, vl_set* b, vl_set* dest);
+VL_API vl_set *vlSetIntersection(vl_set *a, vl_set *b, vl_set *dest);
 
 /**
  * \brief Compute the difference between sets A and B, stored in set dest.
@@ -317,6 +319,6 @@ vl_set*         vlSetIntersection(vl_set* a, vl_set* b, vl_set* dest);
  * \par Complexity of O(nlog(n)) log-linear.
  * \return pointer to set that was copied to or created, or NULL on mismatched sets.
  */
-vl_set*         vlSetDifference(vl_set* a, vl_set* b, vl_set* dest);
+VL_API vl_set *vlSetDifference(vl_set *a, vl_set *b, vl_set *dest);
 
 #endif //VL_SET_H

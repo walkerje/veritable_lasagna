@@ -7,9 +7,13 @@
 #include "vl_mutex.h"
 
 #ifdef VL_THREADS_WIN32
+
 #include "vl_mutex_win32.c"
+
 #elif defined VL_THREADS_PTHREAD
+
 #include "vl_mutex_pthread.c"
+
 #else
 #error Failed to configure vl_mutex implementation.
 #endif

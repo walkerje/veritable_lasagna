@@ -9,13 +9,13 @@
  * \return comparison
  * \private
  */
-int vl_ArenaNodeCompare(const void* a, const void* b){
-    const vl_arena_ptr nodeA = *(const vl_arena_ptr*)a;
-    const vl_arena_ptr nodeB = *(const vl_arena_ptr*)b;
+int vl_ArenaNodeCompare(const void *a, const void *b) {
+    const vl_arena_ptr nodeA = *(const vl_arena_ptr *) a;
+    const vl_arena_ptr nodeB = *(const vl_arena_ptr *) b;
     return (nodeA > nodeB) - (nodeB > nodeA);
 }
 
-void vlArenaInit(vl_arena* arena, vl_memsize_t initialSize){
+void vlArenaInit(vl_arena *arena, vl_memsize_t initialSize) {
     vl_arena_node initNode;
     initNode.offset = 0;
     initNode.size = initialSize;
@@ -26,23 +26,23 @@ void vlArenaInit(vl_arena* arena, vl_memsize_t initialSize){
     arena->data = vlMemAlloc(initialSize);
 }
 
-void vlArenaFree(vl_arena* arena){
+void vlArenaFree(vl_arena *arena) {
     vlSetFree(&arena->freeSet);
     vlMemFree(arena->data);
 }
 
-vl_arena* vlArenaNew(vl_memsize_t initialSize){
-    vl_arena* arena = malloc(sizeof(vl_arena));
+vl_arena *vlArenaNew(vl_memsize_t initialSize) {
+    vl_arena *arena = malloc(sizeof(vl_arena));
     vlArenaInit(arena, initialSize);
     return arena;
 }
 
-void vlArenaDelete(vl_arena* arena){
+void vlArenaDelete(vl_arena *arena) {
     vlArenaFree(arena);
     free(arena);
 }
 
-void vlArenaClear(vl_arena* arena){
+void vlArenaClear(vl_arena *arena) {
     vlSetClear(&arena->freeSet);
 
     vl_arena_node initNode;
@@ -52,10 +52,10 @@ void vlArenaClear(vl_arena* arena){
     vlSetInsert(&arena->freeSet, &initNode);
 }
 
-vl_arena* vlArenaClone(const vl_arena* src, vl_arena* dest){
+vl_arena *vlArenaClone(const vl_arena *src, vl_arena *dest) {
     const vl_memsize_t cloneMemSize = vlMemSize(src->data);
 
-    if(dest == NULL)
+    if (dest == NULL)
         dest = vlArenaNew(cloneMemSize);
     else
         dest->data = vlMemRealloc(dest->data, cloneMemSize);
@@ -80,14 +80,14 @@ vl_arena* vlArenaClone(const vl_arena* src, vl_arena* dest){
  *
  * \private
  */
-void vl_HeapCoalesce(vl_arena* arena, vl_set_iter rightIter){
+void vl_HeapCoalesce(vl_arena *arena, vl_set_iter rightIter) {
 
     //scan right along adjacent blocks of memory
-    vl_arena_node* rightNode = (vl_arena_node*)vlSetSample(&arena->freeSet, rightIter);
+    vl_arena_node *rightNode = (vl_arena_node *) vlSetSample(&arena->freeSet, rightIter);
     vl_set_iter tempIter = vlSetNext(&arena->freeSet, rightIter);
-    while(tempIter != VL_SET_ITER_INVALID){
-        vl_arena_node* node = (vl_arena_node*)vlSetSample(&arena->freeSet, tempIter);
-        if(rightNode->offset + rightNode->size != node->offset)
+    while (tempIter != VL_SET_ITER_INVALID) {
+        vl_arena_node *node = (vl_arena_node *) vlSetSample(&arena->freeSet, tempIter);
+        if (rightNode->offset + rightNode->size != node->offset)
             break;
 
         rightNode = node;
@@ -97,9 +97,9 @@ void vl_HeapCoalesce(vl_arena* arena, vl_set_iter rightIter){
 
     //then iteratively collapse each node to the left, removing adjacent blocks on the right
     vl_set_iter leftIter = vlSetPrev(&arena->freeSet, rightIter);
-    while(leftIter != VL_SET_ITER_INVALID){
-        vl_arena_node* leftNode = (vl_arena_node*)vlSetSample(&arena->freeSet, leftIter);
-        if(leftNode->offset + leftNode->size != rightNode->offset)
+    while (leftIter != VL_SET_ITER_INVALID) {
+        vl_arena_node *leftNode = (vl_arena_node *) vlSetSample(&arena->freeSet, leftIter);
+        if (leftNode->offset + leftNode->size != rightNode->offset)
             break;
 
         leftNode->size += rightNode->size;
@@ -111,16 +111,16 @@ void vl_HeapCoalesce(vl_arena* arena, vl_set_iter rightIter){
     }
 }
 
-void vlArenaReserve(vl_arena* arena, vl_memsize_t numBytes){
-    const vl_memsize_t freeMem  = vlArenaTotalFree(arena);
+void vlArenaReserve(vl_arena *arena, vl_memsize_t numBytes) {
+    const vl_memsize_t freeMem = vlArenaTotalFree(arena);
     const vl_memsize_t initSize = vlMemSize(arena->data);
     numBytes -= numBytes <= freeMem ? 0 : freeMem;
 
     vl_memsize_t newSize = initSize;
-    while(newSize <= numBytes + initSize)
+    while (newSize <= numBytes + initSize)
         newSize *= 2;
 
-    if(newSize != initSize)
+    if (newSize != initSize)
         arena->data = vlMemRealloc(arena->data, newSize);
 
     const vl_memsize_t growth = vlMemSize(arena->data) - initSize;
@@ -132,25 +132,25 @@ void vlArenaReserve(vl_arena* arena, vl_memsize_t numBytes){
     vl_HeapCoalesce(arena, vlSetInsert(&arena->freeSet, &newNode));
 }
 
-vl_arena_ptr vlArenaMemAlloc(vl_arena* arena, vl_memsize_t size){
-    if(size == 0)
+vl_arena_ptr vlArenaMemAlloc(vl_arena *arena, vl_memsize_t size) {
+    if (size == 0)
         return 0;
 
     vl_set_iter freeIter = vlSetFront(&arena->freeSet);
     size += sizeof(vl_memsize_t);//size of block is prepended...
 
-    while(freeIter != VL_SET_ITER_INVALID){
-        vl_arena_node* arenaNode = (vl_arena_node*)vlSetSample(&arena->freeSet, freeIter);
+    while (freeIter != VL_SET_ITER_INVALID) {
+        vl_arena_node *arenaNode = (vl_arena_node *) vlSetSample(&arena->freeSet, freeIter);
 
         //perfect match in size. just remove the free item from the set, and return.
-        if(arenaNode->size == size){
+        if (arenaNode->size == size) {
             const vl_arena_ptr ptr = arenaNode->offset;
             vlSetRemove(&arena->freeSet, freeIter);
-            *(vl_memsize_t*)(arena->data + ptr) = size;
+            *(vl_memsize_t *) (arena->data + ptr) = size;
             return ptr + sizeof(vl_memsize_t);
         }
 
-        if(arenaNode->size > size){
+        if (arenaNode->size > size) {
             //we can claim a piece of this.
             //slice it off the end of the block, and modify the node record size.
             //this avoids having to modify any arena node offsets,
@@ -159,7 +159,7 @@ vl_arena_ptr vlArenaMemAlloc(vl_arena* arena, vl_memsize_t size){
             //in reverse order of what a programmer might otherwise expect.
             arenaNode->size -= size;
             const vl_arena_ptr ptr = arenaNode->offset + arenaNode->size;
-            *(vl_memsize_t*)(arena->data + ptr) = size;
+            *(vl_memsize_t *) (arena->data + ptr) = size;
             return ptr + sizeof(vl_memsize_t);
         }
 
@@ -170,38 +170,38 @@ vl_arena_ptr vlArenaMemAlloc(vl_arena* arena, vl_memsize_t size){
     const vl_memsize_t initSize = vlMemSize(arena->data);
 
     vl_memsize_t newSize = initSize;
-    while(newSize <= size + initSize)
+    while (newSize <= size + initSize)
         newSize *= 2;
 
-    if(newSize != initSize)
+    if (newSize != initSize)
         arena->data = vlMemRealloc(arena->data, newSize);
 
     const vl_memsize_t growth = vlMemSize(arena->data) - initSize;
 
     //the newest node has an offset of the previous size,
     //and a size of how much the data memory grew, sans the size of data we need.
-        //"the missile knows where it is..." yeah, this comment isn't very clear.
+    //"the missile knows where it is..." yeah, this comment isn't very clear.
     vl_arena_node newNode;
     newNode.offset = initSize;
     newNode.size = growth - size;
 
     vl_HeapCoalesce(arena, vlSetInsert(&arena->freeSet, &newNode));
 
-    vl_memsize_t* sizePtr = (vl_memsize_t*)(arena->data + (newNode.offset + newNode.size));
+    vl_memsize_t *sizePtr = (vl_memsize_t *) (arena->data + (newNode.offset + newNode.size));
     *sizePtr = size;
 
-    return (vl_uintptr_t)(sizePtr + 1) - (vl_uintptr_t)arena->data;
+    return (vl_uintptr_t) (sizePtr + 1) - (vl_uintptr_t) arena->data;
 }
 
-vl_arena_ptr vlArenaMemRealloc(vl_arena* arena, vl_arena_ptr ptr, vl_memsize_t size){
+vl_arena_ptr vlArenaMemRealloc(vl_arena *arena, vl_arena_ptr ptr, vl_memsize_t size) {
     ptr -= sizeof(vl_memsize_t);
     size += sizeof(vl_memsize_t);
-    const vl_memsize_t origSize = *(vl_memsize_t*)(arena->data + ptr);
-    if(size == origSize)
+    const vl_memsize_t origSize = *(vl_memsize_t *) (arena->data + ptr);
+    if (size == origSize)
         return ptr;
 
     //if we're shrinking it...
-    if(origSize > size){
+    if (origSize > size) {
         //simply shrink the size and merge a new free block with the size difference.
         vl_arena_node newNode;
         newNode.offset = ptr + size;
@@ -209,7 +209,7 @@ vl_arena_ptr vlArenaMemRealloc(vl_arena* arena, vl_arena_ptr ptr, vl_memsize_t s
 
         vl_HeapCoalesce(arena, vlSetInsert(&arena->freeSet, &newNode));
 
-        *(vl_memsize_t*)(arena->data + ptr) = size;
+        *(vl_memsize_t *) (arena->data + ptr) = size;
         return ptr + sizeof(vl_memsize_t);
     }
 
@@ -219,15 +219,15 @@ vl_arena_ptr vlArenaMemRealloc(vl_arena* arena, vl_arena_ptr ptr, vl_memsize_t s
     const vl_arena_ptr searchOffset = ptr + origSize;
 
     vl_set_iter rightIter = vlSetFind(&arena->freeSet, &searchOffset);
-    if(rightIter != VL_SET_ITER_INVALID){
-        vl_arena_node rightNode = *(vl_arena_node*)vlSetSample(&arena->freeSet, rightIter);
-        if(rightNode.size + origSize >= size){
+    if (rightIter != VL_SET_ITER_INVALID) {
+        vl_arena_node rightNode = *(vl_arena_node *) vlSetSample(&arena->freeSet, rightIter);
+        if (rightNode.size + origSize >= size) {
             //we will take some memory from the free block on the right--
             //and, if we don't use the entire free block, modify
             //its offset and size then re-insert it.
             vlSetRemove(&arena->freeSet, rightIter);
 
-            if(rightNode.size + origSize != size){
+            if (rightNode.size + origSize != size) {
                 rightNode.offset = ptr + size;
                 rightNode.size = (origSize + rightNode.size) - size;
                 //don't need to merge here-- we're taking a node that essentially
@@ -236,7 +236,7 @@ vl_arena_ptr vlArenaMemRealloc(vl_arena* arena, vl_arena_ptr ptr, vl_memsize_t s
                 vlSetInsert(&arena->freeSet, &rightNode);
             }
 
-            *(vl_memsize_t*)(arena->data + ptr) = size;
+            *(vl_memsize_t *) (arena->data + ptr) = size;
             return ptr + sizeof(vl_memsize_t);
         }
     }
@@ -250,55 +250,55 @@ vl_arena_ptr vlArenaMemRealloc(vl_arena* arena, vl_arena_ptr ptr, vl_memsize_t s
     return result;
 }
 
-void vlArenaMemFree(vl_arena* arena, vl_arena_ptr ptr){
+void vlArenaMemFree(vl_arena *arena, vl_arena_ptr ptr) {
     ptr -= sizeof(vl_memsize_t);
 
     vl_arena_node newNode;
-    newNode.size = *(vl_memsize_t*)(arena->data + ptr);
+    newNode.size = *(vl_memsize_t *) (arena->data + ptr);
     newNode.offset = ptr;
 
     vl_HeapCoalesce(arena, vlSetInsert(&arena->freeSet, &newNode));
 }
 
-vl_arena_ptr vlArenaMemPrepend(vl_arena* arena, vl_arena_ptr dstPtr, const void* src, vl_memsize_t length){
+vl_arena_ptr vlArenaMemPrepend(vl_arena *arena, vl_arena_ptr dstPtr, const void *src, vl_memsize_t length) {
     vl_arena_ptr srcOffset = 0;
-    const vl_uintptr_t srcIntPtr = (vl_uintptr_t)src;
-    const vl_uintptr_t arenaOriginIntPtr = (vl_uintptr_t)(arena->data);
+    const vl_uintptr_t srcIntPtr = (vl_uintptr_t) src;
+    const vl_uintptr_t arenaOriginIntPtr = (vl_uintptr_t) (arena->data);
     const vl_memsize_t originalSize = vlArenaMemSize(arena, dstPtr);
 
-    if(srcIntPtr >= arenaOriginIntPtr && srcIntPtr < (arenaOriginIntPtr + vlMemSize(arena->data))){
+    if (srcIntPtr >= arenaOriginIntPtr && srcIntPtr < (arenaOriginIntPtr + vlMemSize(arena->data))) {
         //src pointer may be located in the arena.
         //this can break if the prepend operation resizes the underlying memory.
-        srcOffset = (vl_arena_ptr)(srcIntPtr - arenaOriginIntPtr) + length; //add length due to offsetting the origin
+        srcOffset = (vl_arena_ptr) (srcIntPtr - arenaOriginIntPtr) + length; //add length due to offsetting the origin
     }
 
     dstPtr = vlArenaMemRealloc(arena, dstPtr, length + originalSize);
 
-    if(srcOffset > 0)
+    if (srcOffset > 0)
         src = vlArenaMemSample(arena, srcOffset);
 
-    vl_transient* dst = vlArenaMemSample(arena, dstPtr);
+    vl_transient *dst = vlArenaMemSample(arena, dstPtr);
     memmove(dst + length, dst, originalSize);
     memcpy(dst, src, length);
 
     return dstPtr;
 }
 
-vl_arena_ptr vlArenaMemAppend(vl_arena* arena, vl_arena_ptr dstPtr, const void* src, vl_memsize_t length){
+vl_arena_ptr vlArenaMemAppend(vl_arena *arena, vl_arena_ptr dstPtr, const void *src, vl_memsize_t length) {
     vl_arena_ptr srcOffset = 0;
-    const vl_uintptr_t srcIntPtr = (vl_uintptr_t)src;
-    const vl_uintptr_t arenaOriginIntPtr = (vl_uintptr_t)(arena->data);
+    const vl_uintptr_t srcIntPtr = (vl_uintptr_t) src;
+    const vl_uintptr_t arenaOriginIntPtr = (vl_uintptr_t) (arena->data);
     const vl_memsize_t originalSize = vlArenaMemSize(arena, dstPtr);
 
-    if(srcIntPtr >= arenaOriginIntPtr && srcIntPtr < (arenaOriginIntPtr + vlMemSize(arena->data))){
+    if (srcIntPtr >= arenaOriginIntPtr && srcIntPtr < (arenaOriginIntPtr + vlMemSize(arena->data))) {
         //src pointer may be located in the arena.
         //this can break if the prepend operation resizes the underlying memory.
-        srcOffset = (vl_arena_ptr)(srcIntPtr - arenaOriginIntPtr);
+        srcOffset = (vl_arena_ptr) (srcIntPtr - arenaOriginIntPtr);
     }
 
     dstPtr = vlArenaMemRealloc(arena, dstPtr, length + originalSize);
 
-    if(srcOffset > 0)
+    if (srcOffset > 0)
         src = vlArenaMemSample(arena, srcOffset);
 
     memcpy(vlArenaMemSample(arena, dstPtr) + originalSize, src, length);
@@ -306,22 +306,22 @@ vl_arena_ptr vlArenaMemAppend(vl_arena* arena, vl_arena_ptr dstPtr, const void* 
     return dstPtr;
 }
 
-vl_transient* vlArenaMemSample(vl_arena* arena, vl_arena_ptr ptr){
+vl_transient *vlArenaMemSample(vl_arena *arena, vl_arena_ptr ptr) {
     return arena->data + ptr;
 }
 
-vl_memsize_t vlArenaMemSize(vl_arena* arena, vl_arena_ptr ptr){
-    return *(vl_memsize_t*)(arena->data + (ptr - sizeof(vl_memsize_t))) - sizeof(vl_memsize_t);
+vl_memsize_t vlArenaMemSize(vl_arena *arena, vl_arena_ptr ptr) {
+    return *(vl_memsize_t *) (arena->data + (ptr - sizeof(vl_memsize_t))) - sizeof(vl_memsize_t);
 }
 
-vl_memsize_t vlArenaTotalCapacity(vl_arena* arena){
+vl_memsize_t vlArenaTotalCapacity(vl_arena *arena) {
     return vlMemSize(arena->data);
 }
 
-vl_memsize_t vlArenaTotalFree(vl_arena* arena){
+vl_memsize_t vlArenaTotalFree(vl_arena *arena) {
     vl_memsize_t sum = 0;
-    VL_SET_FOREACH(&arena->freeSet, iter){
-        const vl_arena_node* node = (const vl_arena_node*)vlSetSample(&arena->freeSet, iter);
+    VL_SET_FOREACH(&arena->freeSet, iter) {
+        const vl_arena_node *node = (const vl_arena_node *) vlSetSample(&arena->freeSet, iter);
         sum += node->size;
     }
     return sum;

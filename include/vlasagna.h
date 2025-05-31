@@ -31,8 +31,7 @@
 #include "vl/vl_buffer.h"
 #include "vl/vl_hashtable.h"
 #include "vl/vl_arena.h"
-#include "vl/vl_linear_pool.h"
-#include "vl/vl_fixed_pool.h"
+#include "vl/vl_pool.h"
 #include "vl/vl_linked_list.h"
 #include "vl/vl_set.h"
 #include "vl/vl_stack.h"
@@ -47,6 +46,8 @@
 #include "vl/vl_atomic_ptr.h"
 #include "vl/vl_thread.h"
 #include "vl/vl_mutex.h"
+#include "vl/vl_srwlock.h"
+#include "vl/vl_semaphore.h"
 #include "vl/vl_async_pool.h"
 #include "vl/vl_async_queue.h"
 

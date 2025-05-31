@@ -19,7 +19,7 @@ typedef vl_hash_iter vl_msgpack_iter;
 /**
  * \brief All MessagePack Types
  */
-typedef enum vl_msgpack_type_{
+typedef enum vl_msgpack_type_ {
     /**
      * \brief MessagePack type equivalent to NIL. Has no data associated with it.
      */
@@ -89,10 +89,10 @@ typedef enum vl_msgpack_type_{
  *
  * \sa https://github.com/msgpack/msgpack/blob/master/spec.md
  */
-typedef struct vl_msgpack_{
-    vl_hashtable        nodes;      //hierarchy
-    vl_arena            values;     //data
-    vl_msgpack_iter     root;       //root node
+typedef struct vl_msgpack_ {
+    vl_hashtable nodes;      //hierarchy
+    vl_arena values;     //data
+    vl_msgpack_iter root;       //root node
 } vl_msgpack;
 
 /**
@@ -101,7 +101,7 @@ typedef struct vl_msgpack_{
  * \sa vlMsgPackInit
  * \param pack pointer to DOM
  */
-void                vlMsgPackInit(vl_msgpack* pack);
+VL_API void vlMsgPackInit(vl_msgpack *pack);
 
 /**
  * \brief Frees the specified MessagePack DOM.
@@ -110,7 +110,7 @@ void                vlMsgPackInit(vl_msgpack* pack);
  *
  * \param pack pointer to DOM
  */
-void                vlMsgPackFree(vl_msgpack* pack);
+VL_API void vlMsgPackFree(vl_msgpack *pack);
 
 /**
  * \brief Allocates and initializes a MessagePack DOM.
@@ -120,7 +120,7 @@ void                vlMsgPackFree(vl_msgpack* pack);
  * \sa vlMsgPackDelete
  * \return pointer to DOM
  */
-vl_msgpack*         vlMsgPackNew();
+VL_API vl_msgpack *vlMsgPackNew();
 
 /**
  * \brief Deletes the specified MessagePack DOM.
@@ -130,7 +130,7 @@ vl_msgpack*         vlMsgPackNew();
  * \sa vlMsgPackNew
  * \param pack pointer to DOM
  */
-void                vlMsgPackDelete(vl_msgpack* pack);
+VL_API void vlMsgPackDelete(vl_msgpack *pack);
 
 /**
  * \brief Clears the MessagePack DOM, resetting it for reuse.
@@ -141,7 +141,7 @@ void                vlMsgPackDelete(vl_msgpack* pack);
  *
  * \param pack The MessagePack DOM instance to clear.
  */
-void vlMsgPackClear(vl_msgpack* pack);
+VL_API void vlMsgPackClear(vl_msgpack *pack);
 
 
 /**
@@ -159,7 +159,7 @@ void vlMsgPackClear(vl_msgpack* pack);
  * \param dest destination DOM pointer
  * \return pointer to the MessagePack that was copied to or created.
  */
-vl_msgpack*         vlMsgPackClone(vl_msgpack* src, vl_msgpack* dest);
+VL_API vl_msgpack *vlMsgPackClone(vl_msgpack *src, vl_msgpack *dest);
 
 /**
  * \brief Retrieves the parent node of a given node in the MessagePack DOM.
@@ -168,7 +168,7 @@ vl_msgpack*         vlMsgPackClone(vl_msgpack* src, vl_msgpack* dest);
  * \param iter The iterator pointing to the current node.
  * \return An iterator to the parent node, or an invalid iterator if the node has no parent.
  */
-vl_msgpack_iter vlMsgPackParent(vl_msgpack* pack, vl_msgpack_iter iter);
+VL_API vl_msgpack_iter vlMsgPackParent(vl_msgpack *pack, vl_msgpack_iter iter);
 
 /**
  * \brief Retrieves the total number of children of a given node.
@@ -177,7 +177,7 @@ vl_msgpack_iter vlMsgPackParent(vl_msgpack* pack, vl_msgpack_iter iter);
  * \param iter The iterator pointing to the current node.
  * \return The number of child nodes.
  */
-vl_dsidx_t vlMsgPackTotalChildren(vl_msgpack* pack, vl_msgpack_iter iter);
+VL_API vl_dsidx_t vlMsgPackTotalChildren(vl_msgpack *pack, vl_msgpack_iter iter);
 
 /**
  * \brief Retrieves the first child of a given node.
@@ -186,7 +186,7 @@ vl_dsidx_t vlMsgPackTotalChildren(vl_msgpack* pack, vl_msgpack_iter iter);
  * \param iter The iterator pointing to the current node.
  * \return An iterator to the first child node, or an invalid iterator if there are no children.
  */
-vl_msgpack_iter vlMsgPackFirstChild(vl_msgpack* pack, vl_msgpack_iter iter);
+VL_API vl_msgpack_iter vlMsgPackFirstChild(vl_msgpack *pack, vl_msgpack_iter iter);
 
 /**
  * \brief Retrieves the next sibling of a given node.
@@ -195,7 +195,7 @@ vl_msgpack_iter vlMsgPackFirstChild(vl_msgpack* pack, vl_msgpack_iter iter);
  * \param iter The iterator pointing to the current node.
  * \return An iterator to the next sibling node, or an invalid iterator if there is no next sibling.
  */
-vl_msgpack_iter vlMsgPackNextSibling(vl_msgpack* pack, vl_msgpack_iter iter);
+VL_API vl_msgpack_iter vlMsgPackNextSibling(vl_msgpack *pack, vl_msgpack_iter iter);
 
 /**
  * \brief Retrieves the previous sibling of a given node.
@@ -204,7 +204,7 @@ vl_msgpack_iter vlMsgPackNextSibling(vl_msgpack* pack, vl_msgpack_iter iter);
  * \param iter The iterator pointing to the current node.
  * \return An iterator to the previous sibling node, or an invalid iterator if there is no previous sibling.
  */
-vl_msgpack_iter vlMsgPackPrevSibling(vl_msgpack* pack, vl_msgpack_iter iter);
+VL_API vl_msgpack_iter vlMsgPackPrevSibling(vl_msgpack *pack, vl_msgpack_iter iter);
 
 /**
  * \brief Retrieves the type of a given node in the MessagePack DOM.
@@ -213,7 +213,7 @@ vl_msgpack_iter vlMsgPackPrevSibling(vl_msgpack* pack, vl_msgpack_iter iter);
  * \param iter The iterator pointing to the current node.
  * \return The MessagePack type of the node.
  */
-vl_msgpack_type vlMsgPackType(vl_msgpack* pack, vl_msgpack_iter iter);
+VL_API vl_msgpack_type vlMsgPackType(vl_msgpack *pack, vl_msgpack_iter iter);
 
 /**
  * \brief Retrieves the extension type of a MessagePack EXT node.
@@ -222,7 +222,7 @@ vl_msgpack_type vlMsgPackType(vl_msgpack* pack, vl_msgpack_iter iter);
  * \param iter The iterator pointing to the current node.
  * \return The extension type value, or an undefined result if the node is not an EXT type.
  */
-vl_int8_t vlMsgPackExtType(vl_msgpack* pack, vl_msgpack_iter iter);
+VL_API vl_int8_t vlMsgPackExtType(vl_msgpack *pack, vl_msgpack_iter iter);
 
 /**
  * \brief Inserts a new element into the MessagePack DOM with an extended type.
@@ -241,7 +241,7 @@ vl_int8_t vlMsgPackExtType(vl_msgpack* pack, vl_msgpack_iter iter);
  * \param dataLen  Length of the value.
  * \return An iterator to the newly inserted element.
  */
-vl_msgpack_iter vlMsgPackInsertExt(
+VL_API vl_msgpack_iter vlMsgPackInsertExt(
         vl_msgpack *pack,
         vl_msgpack_type type,
         vl_int8_t subType,
@@ -288,7 +288,7 @@ static inline vl_msgpack_iter vlMsgPackInsert(
  * \param pack  The MessagePack DOM instance.
  * \param iter  Iterator pointing to the element to be removed.
  */
-void vlMsgPackRemove(vl_msgpack *pack, vl_msgpack_iter iter);
+VL_API void vlMsgPackRemove(vl_msgpack *pack, vl_msgpack_iter iter);
 
 /**
  * \brief Finds a child element by key.
@@ -301,7 +301,7 @@ void vlMsgPackRemove(vl_msgpack *pack, vl_msgpack_iter iter);
  * \param keyLen  Length of the key.
  * \return An iterator to the matching child or an invalid iterator if not found.
  */
-vl_msgpack_iter vlMsgPackFindChild(
+VL_API vl_msgpack_iter vlMsgPackFindChild(
         vl_msgpack *pack,
         vl_msgpack_iter parent,
         const void *key,
@@ -339,7 +339,7 @@ static inline vl_msgpack_iter vlMsgPackFindChildNamed(
  * \param idx    The zero-based index of the child.
  * \return An iterator to the indexed child or an invalid iterator if out of bounds.
  */
-vl_msgpack_iter vlMsgPackFindChildIndexed(
+VL_API vl_msgpack_iter vlMsgPackFindChildIndexed(
         vl_msgpack *pack,
         vl_msgpack_iter iter,
         vl_dsidx_t idx
@@ -357,7 +357,7 @@ vl_msgpack_iter vlMsgPackFindChildIndexed(
  * \param size  Pointer to receive the key size (optional, can be NULL).
  * \return A transient pointer to the key data.
  */
-const vl_transient *vlMsgPackSampleKey(
+VL_API const vl_transient *vlMsgPackSampleKey(
         vl_msgpack *pack,
         vl_msgpack_iter iter,
         vl_memsize_t *size
@@ -391,7 +391,7 @@ static inline vl_dsidx_t vlMsgPackSampleKeyIndex(
  * \param size  Pointer to receive the value size (optional, can be NULL).
  * \return A transient pointer to the value data.
  */
-vl_transient *vlMsgPackSampleValue(
+VL_API vl_transient *vlMsgPackSampleValue(
         vl_msgpack *pack,
         vl_msgpack_iter iter,
         vl_memsize_t *size
@@ -422,7 +422,7 @@ vl_transient *vlMsgPackSampleValue(
  * \param key    The name (key) of the new map.
  * \return An iterator to the newly inserted map.
  */
-static inline vl_msgpack_iter vlMsgPackSetMapNamed(vl_msgpack* pack, vl_msgpack_iter parent, const char* key){
+static inline vl_msgpack_iter vlMsgPackSetMapNamed(vl_msgpack *pack, vl_msgpack_iter parent, const char *key) {
     return vlMsgPackInsert(pack, VL_MSGPACK_MAP, parent, key, strlen(key), NULL, 0);
 }
 
@@ -438,7 +438,7 @@ static inline vl_msgpack_iter vlMsgPackSetMapNamed(vl_msgpack* pack, vl_msgpack_
  * \param idx    The index of the new map.
  * \return An iterator to the newly inserted map.
  */
-static inline vl_msgpack_iter vlMsgPackSetMapIndexed(vl_msgpack* pack, vl_msgpack_iter parent, vl_dsidx_t idx){
+static inline vl_msgpack_iter vlMsgPackSetMapIndexed(vl_msgpack *pack, vl_msgpack_iter parent, vl_dsidx_t idx) {
     return vlMsgPackInsert(pack, VL_MSGPACK_MAP, parent, &idx, sizeof(vl_dsidx_t), NULL, 0);
 }
 
@@ -455,7 +455,8 @@ static inline vl_msgpack_iter vlMsgPackSetMapIndexed(vl_msgpack* pack, vl_msgpac
  * \param key     The name (key) of the new array.
  * \return An iterator to the newly inserted array.
  */
-static inline vl_msgpack_iter vlMsgPackSetArrayNamed(vl_msgpack* pack, vl_msgpack_iter parent, vl_dsidx_t arrayLen, const char* key){
+static inline vl_msgpack_iter
+vlMsgPackSetArrayNamed(vl_msgpack *pack, vl_msgpack_iter parent, vl_dsidx_t arrayLen, const char *key) {
     return vlMsgPackInsert(pack, VL_MSGPACK_ARRAY, parent, key, strlen(key), &arrayLen, sizeof(vl_dsidx_t));
 }
 
@@ -472,7 +473,8 @@ static inline vl_msgpack_iter vlMsgPackSetArrayNamed(vl_msgpack* pack, vl_msgpac
  * \param idx     The index of the new array.
  * \return An iterator to the newly inserted array.
  */
-static inline vl_msgpack_iter vlMsgPackSetArrayIndexed(vl_msgpack* pack, vl_msgpack_iter parent, vl_dsidx_t arrayLen, vl_dsidx_t idx){
+static inline vl_msgpack_iter
+vlMsgPackSetArrayIndexed(vl_msgpack *pack, vl_msgpack_iter parent, vl_dsidx_t arrayLen, vl_dsidx_t idx) {
     return vlMsgPackInsert(pack, VL_MSGPACK_ARRAY, parent, &idx, sizeof(vl_dsidx_t), &arrayLen, sizeof(vl_dsidx_t));
 }
 
@@ -489,7 +491,8 @@ static inline vl_msgpack_iter vlMsgPackSetArrayIndexed(vl_msgpack* pack, vl_msgp
  * \param key    The name (key) of the new boolean value.
  * \return An iterator to the newly inserted boolean value.
  */
-static inline vl_msgpack_iter vlMsgPackSetBoolNamed(vl_msgpack* pack, vl_msgpack_iter parent, vl_bool_t value, const char* key){
+static inline vl_msgpack_iter
+vlMsgPackSetBoolNamed(vl_msgpack *pack, vl_msgpack_iter parent, vl_bool_t value, const char *key) {
     return vlMsgPackInsert(pack, VL_MSGPACK_BOOL, parent, key, strlen(key), &value, sizeof(vl_bool_t));
 }
 
@@ -506,7 +509,8 @@ static inline vl_msgpack_iter vlMsgPackSetBoolNamed(vl_msgpack* pack, vl_msgpack
  * \param idx    The index of the new boolean value.
  * \return An iterator to the newly inserted boolean value.
  */
-static inline vl_msgpack_iter vlMsgPackSetBoolIndexed(vl_msgpack* pack, vl_msgpack_iter parent, vl_bool_t value, vl_dsidx_t idx){
+static inline vl_msgpack_iter
+vlMsgPackSetBoolIndexed(vl_msgpack *pack, vl_msgpack_iter parent, vl_bool_t value, vl_dsidx_t idx) {
     return vlMsgPackInsert(pack, VL_MSGPACK_BOOL, parent, &idx, sizeof(vl_dsidx_t), &value, sizeof(vl_bool_t));
 }
 
@@ -523,7 +527,8 @@ static inline vl_msgpack_iter vlMsgPackSetBoolIndexed(vl_msgpack* pack, vl_msgpa
  * \param key    The name (key) of the new integer value.
  * \return An iterator to the newly inserted integer value.
  */
-static inline vl_msgpack_iter vlMsgPackSetIntNamed(vl_msgpack* pack, vl_msgpack_iter parent, vl_ilarge_t value, const char* key){
+static inline vl_msgpack_iter
+vlMsgPackSetIntNamed(vl_msgpack *pack, vl_msgpack_iter parent, vl_ilarge_t value, const char *key) {
     return vlMsgPackInsert(pack, VL_MSGPACK_INT, parent, key, strlen(key), &value, sizeof(vl_ilarge_t));
 }
 
@@ -540,9 +545,11 @@ static inline vl_msgpack_iter vlMsgPackSetIntNamed(vl_msgpack* pack, vl_msgpack_
  * \param idx    The index of the new integer value.
  * \return An iterator to the newly inserted integer value.
  */
-static inline vl_msgpack_iter vlMsgPackSetIntIndexed(vl_msgpack* pack, vl_msgpack_iter parent, vl_ilarge_t value, vl_dsidx_t idx){
+static inline vl_msgpack_iter
+vlMsgPackSetIntIndexed(vl_msgpack *pack, vl_msgpack_iter parent, vl_ilarge_t value, vl_dsidx_t idx) {
     return vlMsgPackInsert(pack, VL_MSGPACK_INT, parent, &idx, sizeof(vl_dsidx_t), &value, sizeof(vl_ilarge_t));
 }
+
 /**
  * \brief Sets a named unsigned integer value under a parent node.
  *
@@ -556,7 +563,8 @@ static inline vl_msgpack_iter vlMsgPackSetIntIndexed(vl_msgpack* pack, vl_msgpac
  * \param key    The name (key) of the new unsigned integer value.
  * \return An iterator to the newly inserted unsigned integer value.
  */
-static inline vl_msgpack_iter vlMsgPackSetUIntNamed(vl_msgpack* pack, vl_msgpack_iter parent, vl_ularge_t value, const char* key){
+static inline vl_msgpack_iter
+vlMsgPackSetUIntNamed(vl_msgpack *pack, vl_msgpack_iter parent, vl_ularge_t value, const char *key) {
     return vlMsgPackInsert(pack, VL_MSGPACK_UINT, parent, key, strlen(key), &value, sizeof(vl_ularge_t));
 }
 
@@ -573,7 +581,8 @@ static inline vl_msgpack_iter vlMsgPackSetUIntNamed(vl_msgpack* pack, vl_msgpack
  * \param idx    The index of the new unsigned integer value.
  * \return An iterator to the newly inserted unsigned integer value.
  */
-static inline vl_msgpack_iter vlMsgPackSetUIntIndexed(vl_msgpack* pack, vl_msgpack_iter parent, vl_ularge_t value, vl_dsidx_t idx){
+static inline vl_msgpack_iter
+vlMsgPackSetUIntIndexed(vl_msgpack *pack, vl_msgpack_iter parent, vl_ularge_t value, vl_dsidx_t idx) {
     return vlMsgPackInsert(pack, VL_MSGPACK_UINT, parent, &idx, sizeof(vl_dsidx_t), &value, sizeof(vl_ularge_t));
 }
 
@@ -590,7 +599,8 @@ static inline vl_msgpack_iter vlMsgPackSetUIntIndexed(vl_msgpack* pack, vl_msgpa
  * \param key    The name (key) of the new 32-bit float value.
  * \return An iterator to the newly inserted 32-bit float value.
  */
-static inline vl_msgpack_iter vlMsgPackSetFloat32Named(vl_msgpack* pack, vl_msgpack_iter parent, vl_float32_t value, const char* key){
+static inline vl_msgpack_iter
+vlMsgPackSetFloat32Named(vl_msgpack *pack, vl_msgpack_iter parent, vl_float32_t value, const char *key) {
     return vlMsgPackInsert(pack, VL_MSGPACK_FLOAT32, parent, key, strlen(key), &value, sizeof(vl_float32_t));
 }
 
@@ -607,7 +617,8 @@ static inline vl_msgpack_iter vlMsgPackSetFloat32Named(vl_msgpack* pack, vl_msgp
  * \param idx    The index of the new 32-bit float value.
  * \return An iterator to the newly inserted 32-bit float value.
  */
-static inline vl_msgpack_iter vlMsgPackSetFloat32Indexed(vl_msgpack* pack, vl_msgpack_iter parent, vl_float32_t value, vl_dsidx_t idx){
+static inline vl_msgpack_iter
+vlMsgPackSetFloat32Indexed(vl_msgpack *pack, vl_msgpack_iter parent, vl_float32_t value, vl_dsidx_t idx) {
     return vlMsgPackInsert(pack, VL_MSGPACK_FLOAT32, parent, &idx, sizeof(vl_dsidx_t), &value, sizeof(vl_float32_t));
 }
 
@@ -624,7 +635,8 @@ static inline vl_msgpack_iter vlMsgPackSetFloat32Indexed(vl_msgpack* pack, vl_ms
  * \param key    The name (key) of the new 64-bit float value.
  * \return An iterator to the newly inserted 64-bit float value.
  */
-static inline vl_msgpack_iter vlMsgPackSetFloat64Named(vl_msgpack* pack, vl_msgpack_iter parent, vl_float64_t value, const char* key){
+static inline vl_msgpack_iter
+vlMsgPackSetFloat64Named(vl_msgpack *pack, vl_msgpack_iter parent, vl_float64_t value, const char *key) {
     return vlMsgPackInsert(pack, VL_MSGPACK_FLOAT64, parent, key, strlen(key), &value, sizeof(vl_float64_t));
 }
 
@@ -641,7 +653,8 @@ static inline vl_msgpack_iter vlMsgPackSetFloat64Named(vl_msgpack* pack, vl_msgp
  * \param idx    The index of the new 64-bit float value.
  * \return An iterator to the newly inserted 64-bit float value.
  */
-static inline vl_msgpack_iter vlMsgPackSetFloat64Indexed(vl_msgpack* pack, vl_msgpack_iter parent, vl_float64_t value, vl_dsidx_t idx){
+static inline vl_msgpack_iter
+vlMsgPackSetFloat64Indexed(vl_msgpack *pack, vl_msgpack_iter parent, vl_float64_t value, vl_dsidx_t idx) {
     return vlMsgPackInsert(pack, VL_MSGPACK_FLOAT64, parent, &idx, sizeof(vl_dsidx_t), &value, sizeof(vl_float64_t));
 }
 
@@ -658,7 +671,8 @@ static inline vl_msgpack_iter vlMsgPackSetFloat64Indexed(vl_msgpack* pack, vl_ms
  * \param key    The name (key) of the new string value.
  * \return An iterator to the newly inserted string value.
  */
-static inline vl_msgpack_iter vlMsgPackSetStringNamed(vl_msgpack* pack, vl_msgpack_iter parent, const char* value, const char* key){
+static inline vl_msgpack_iter
+vlMsgPackSetStringNamed(vl_msgpack *pack, vl_msgpack_iter parent, const char *value, const char *key) {
     return vlMsgPackInsert(pack, VL_MSGPACK_STRING, parent, key, strlen(key), value, strlen(value));
 }
 
@@ -675,7 +689,8 @@ static inline vl_msgpack_iter vlMsgPackSetStringNamed(vl_msgpack* pack, vl_msgpa
  * \param idx    The index of the new string value.
  * \return An iterator to the newly inserted string value.
  */
-static inline vl_msgpack_iter vlMsgPackSetStringIndexed(vl_msgpack* pack, vl_msgpack_iter parent, const char* value, vl_dsidx_t idx){
+static inline vl_msgpack_iter
+vlMsgPackSetStringIndexed(vl_msgpack *pack, vl_msgpack_iter parent, const char *value, vl_dsidx_t idx) {
     return vlMsgPackInsert(pack, VL_MSGPACK_STRING, parent, &idx, sizeof(vl_dsidx_t), value, strlen(value));
 }
 
@@ -693,7 +708,9 @@ static inline vl_msgpack_iter vlMsgPackSetStringIndexed(vl_msgpack* pack, vl_msg
  * \param key    The name (key) of the new binary value.
  * \return An iterator to the newly inserted binary value.
  */
-static inline vl_msgpack_iter vlMsgPackSetBinaryNamed(vl_msgpack* pack, vl_msgpack_iter parent, const void* value, vl_memsize_t valLen, const char* key){
+static inline vl_msgpack_iter
+vlMsgPackSetBinaryNamed(vl_msgpack *pack, vl_msgpack_iter parent, const void *value, vl_memsize_t valLen,
+                        const char *key) {
     return vlMsgPackInsert(pack, VL_MSGPACK_BINARY, parent, key, strlen(key), value, valLen);
 }
 
@@ -711,7 +728,9 @@ static inline vl_msgpack_iter vlMsgPackSetBinaryNamed(vl_msgpack* pack, vl_msgpa
  * \param idx    The index of the new binary value.
  * \return An iterator to the newly inserted binary value.
  */
-static inline vl_msgpack_iter vlMsgPackSetBinaryIndexed(vl_msgpack* pack, vl_msgpack_iter parent, const void* value, vl_memsize_t valLen, vl_dsidx_t idx){
+static inline vl_msgpack_iter
+vlMsgPackSetBinaryIndexed(vl_msgpack *pack, vl_msgpack_iter parent, const void *value, vl_memsize_t valLen,
+                          vl_dsidx_t idx) {
     return vlMsgPackInsert(pack, VL_MSGPACK_BINARY, parent, &idx, sizeof(vl_dsidx_t), value, valLen);
 }
 
@@ -727,13 +746,13 @@ static inline vl_msgpack_iter vlMsgPackSetBinaryIndexed(vl_msgpack* pack, vl_msg
  * \param defaultValue  The default value to return if the iterator is invalid or type mismatch.
  * \return The boolean value stored in the element or the default value.
  */
-static inline vl_bool_t vlMsgPackGetBool(vl_msgpack* pack, vl_msgpack_iter iter, vl_bool_t defaultValue){
-    if(iter == VL_MSGPACK_ITER_INVALID)
+static inline vl_bool_t vlMsgPackGetBool(vl_msgpack *pack, vl_msgpack_iter iter, vl_bool_t defaultValue) {
+    if (iter == VL_MSGPACK_ITER_INVALID)
         return defaultValue;
-    if((vlMsgPackType(pack, iter) != VL_MSGPACK_BOOL))
+    if ((vlMsgPackType(pack, iter) != VL_MSGPACK_BOOL))
         return defaultValue;
 
-    return *((const vl_bool_t*) vlMsgPackSampleValue(pack, iter, NULL));
+    return *((const vl_bool_t *) vlMsgPackSampleValue(pack, iter, NULL));
 }
 
 /**
@@ -748,13 +767,13 @@ static inline vl_bool_t vlMsgPackGetBool(vl_msgpack* pack, vl_msgpack_iter iter,
  * \param defaultValue  The default value to return if the iterator is invalid or type mismatch.
  * \return The signed integer value stored in the element or the default value.
  */
-static inline vl_ilarge_t vlMsgPackGetInt(vl_msgpack* pack, vl_msgpack_iter iter, vl_ilarge_t defaultValue){
-    if(iter == VL_MSGPACK_ITER_INVALID)
+static inline vl_ilarge_t vlMsgPackGetInt(vl_msgpack *pack, vl_msgpack_iter iter, vl_ilarge_t defaultValue) {
+    if (iter == VL_MSGPACK_ITER_INVALID)
         return defaultValue;
-    if((vlMsgPackType(pack, iter) != VL_MSGPACK_INT))
+    if ((vlMsgPackType(pack, iter) != VL_MSGPACK_INT))
         return defaultValue;
 
-    return *((const vl_ilarge_t*) vlMsgPackSampleValue(pack, iter, NULL));
+    return *((const vl_ilarge_t *) vlMsgPackSampleValue(pack, iter, NULL));
 }
 
 /**
@@ -769,13 +788,13 @@ static inline vl_ilarge_t vlMsgPackGetInt(vl_msgpack* pack, vl_msgpack_iter iter
  * \param defaultValue  The default value to return if the iterator is invalid or type mismatch.
  * \return The unsigned integer value stored in the element or the default value.
  */
-static inline vl_ilarge_t vlMsgPackGetUInt(vl_msgpack* pack, vl_msgpack_iter iter, vl_ularge_t defaultValue){
-    if(iter == VL_MSGPACK_ITER_INVALID)
+static inline vl_ilarge_t vlMsgPackGetUInt(vl_msgpack *pack, vl_msgpack_iter iter, vl_ularge_t defaultValue) {
+    if (iter == VL_MSGPACK_ITER_INVALID)
         return defaultValue;
-    if((vlMsgPackType(pack, iter) != VL_MSGPACK_UINT))
+    if ((vlMsgPackType(pack, iter) != VL_MSGPACK_UINT))
         return defaultValue;
 
-    return *((const vl_ularge_t*) vlMsgPackSampleValue(pack, iter, NULL));
+    return *((const vl_ularge_t *) vlMsgPackSampleValue(pack, iter, NULL));
 }
 
 /**
@@ -790,13 +809,13 @@ static inline vl_ilarge_t vlMsgPackGetUInt(vl_msgpack* pack, vl_msgpack_iter ite
  * \param defaultValue  The default value to return if the iterator is invalid or type mismatch.
  * \return The 32-bit floating point value stored in the element or the default value.
  */
-static inline vl_float32_t vlMsgPackGetFloat32(vl_msgpack* pack, vl_msgpack_iter iter, vl_float32_t defaultValue){
-    if(iter == VL_MSGPACK_ITER_INVALID)
+static inline vl_float32_t vlMsgPackGetFloat32(vl_msgpack *pack, vl_msgpack_iter iter, vl_float32_t defaultValue) {
+    if (iter == VL_MSGPACK_ITER_INVALID)
         return defaultValue;
-    if(vlMsgPackType(pack, iter) != VL_MSGPACK_FLOAT32)
+    if (vlMsgPackType(pack, iter) != VL_MSGPACK_FLOAT32)
         return defaultValue;
 
-    return *((const vl_float32_t*) vlMsgPackSampleValue(pack, iter, NULL));
+    return *((const vl_float32_t *) vlMsgPackSampleValue(pack, iter, NULL));
 }
 
 /**
@@ -811,13 +830,13 @@ static inline vl_float32_t vlMsgPackGetFloat32(vl_msgpack* pack, vl_msgpack_iter
  * \param defaultValue  The default value to return if the iterator is invalid or type mismatch.
  * \return The 64-bit floating point value stored in the element or the default value.
  */
-static inline vl_float64_t vlMsgPackGetFloat64(vl_msgpack* pack, vl_msgpack_iter iter, vl_float64_t defaultValue){
-    if(iter == VL_MSGPACK_ITER_INVALID)
+static inline vl_float64_t vlMsgPackGetFloat64(vl_msgpack *pack, vl_msgpack_iter iter, vl_float64_t defaultValue) {
+    if (iter == VL_MSGPACK_ITER_INVALID)
         return defaultValue;
-    if(vlMsgPackType(pack, iter) != VL_MSGPACK_FLOAT64)
+    if (vlMsgPackType(pack, iter) != VL_MSGPACK_FLOAT64)
         return defaultValue;
 
-    return *((const vl_float64_t*) vlMsgPackSampleValue(pack, iter, NULL));
+    return *((const vl_float64_t *) vlMsgPackSampleValue(pack, iter, NULL));
 }
 
 #endif //VL_MSGPACK_H

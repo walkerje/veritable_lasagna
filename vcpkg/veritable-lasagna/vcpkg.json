@@ -1,0 +1,26 @@
+{
+  "name": "veritable-lasagna",
+  "version": "0.13.9",
+  "description": "A Data Structures & Algorithms Library for C",
+  "homepage": "https://github.com/walkerje/veritable_lasagna",
+  "license": "MIT",
+  "dependencies": [
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ],
+  "features": {
+    "test": {
+      "description": "Build tests",
+      "dependencies": [
+        "gtest"
+      ]
+    }
+  },
+  "default-features": ["test"]
+}

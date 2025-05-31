@@ -8,18 +8,22 @@
  *
  * Using extra state, a tagged pointer helps to distinguish atomic changes to memory
  * to eliminate the ABA problem. The pointer tag is a counter that is incremented with write operation.
- * The tag occupies as many bytes as the native system pointer type.
+ * The tag occupies as many bytes as the native system pointer type, resulting in an 128-bit atomic type.
+ * On many conventional modern platforms (x86_64, ARM64, etc) this is a well-supported
+ * use case supported by modern compilers.
  *
+ * \see https://ibraheem.ca/posts/128-bit-atomics/
  * \see https://en.wikipedia.org/wiki/ABA_problem
- *
- * This structure may depend on 128-bit Compare-and-swap on modern platforms to achieve proper atomicity.
- * (Double-width compare-and-swap, aka DWCAS, hardware instruction or similar). Depending on the platform and compiler,
- * it may require an implicit lock.
  */
 typedef struct vl_tagged_ptr {
     vl_uintptr_t ptr;
-    vl_ularge_t  tag;
+    vl_ularge_t tag;
 } vl_tagged_ptr;
+
+/**
+ * \brief Atomic pointers must be aligned by their size when dynamically allocated.
+ */
+#define VL_ATOMIC_PTR_ALIGN sizeof(vl_tagged_ptr)
 
 /**
  * \brief Atomic variant of vl_tagged_ptr.
@@ -35,9 +39,7 @@ typedef VL_ATOMIC vl_tagged_ptr vl_atomic_ptr;
  * tag = 0;
  * \endcode
  */
-extern const vl_tagged_ptr VL_TAGPTR_NULL;
-
-#define vlAtomicPtrInit(atPtr, valPtr) vlAtomicInit((atPtr), valPtr);
+VL_API extern const vl_tagged_ptr VL_TAGPTR_NULL;
 
 /**
  * \brief Atomically stores a new pointer with an incremented tag.
@@ -49,10 +51,10 @@ extern const vl_tagged_ptr VL_TAGPTR_NULL;
  *
  * \sa vl_tagged_ptr, vlAtomicPtrCompareExchangeStrong, vlAtomicPtrCompareExchangeWeak
  */
-static inline void vlAtomicPtrStore(vl_atomic_ptr* atomicPtr, void* ptr){
+static inline void vlAtomicPtrStore(vl_atomic_ptr *atomicPtr, void *ptr) {
     vl_tagged_ptr pV = vlAtomicLoad(atomicPtr);
 
-    pV.ptr = (vl_uintptr_t)ptr;
+    pV.ptr = (vl_uintptr_t) ptr;
     pV.tag++;
 
     vlAtomicStore(atomicPtr, pV);
@@ -73,11 +75,13 @@ static inline void vlAtomicPtrStore(vl_atomic_ptr* atomicPtr, void* ptr){
  *
  * \sa vlAtomicPtrCompareExchangeWeakExplicit
  */
-static inline vl_bool_t vlAtomicPtrCompareExchangeStrongExplicit(vl_atomic_ptr* atPtr, vl_tagged_ptr* expected, const void* newValue, vl_memory_order_t trueOrder, vl_memory_order_t falseOrder){
-   vl_tagged_ptr result = *expected;
-   result.ptr = (vl_uintptr_t)newValue;
-   result.tag++;
-   return vlAtomicCompareExchangeStrongExplicit(atPtr, expected, result, trueOrder, falseOrder);
+static inline vl_bool_t
+vlAtomicPtrCompareExchangeStrongExplicit(vl_atomic_ptr *atPtr, vl_tagged_ptr *expected, const void *newValue,
+                                         vl_memory_order_t trueOrder, vl_memory_order_t falseOrder) {
+    vl_tagged_ptr result = *expected;
+    result.ptr = (vl_uintptr_t) newValue;
+    result.tag++;
+    return vlAtomicCompareExchangeStrongExplicit(atPtr, expected, result, trueOrder, falseOrder);
 }
 
 /**
@@ -95,9 +99,11 @@ static inline vl_bool_t vlAtomicPtrCompareExchangeStrongExplicit(vl_atomic_ptr* 
  *
  * \sa vlAtomicPtrCompareExchangeStrongExplicit
  */
-static inline vl_bool_t vlAtomicPtrCompareExchangeWeakExplicit(vl_atomic_ptr* atPtr, vl_tagged_ptr* expected, const void* newValue, vl_memory_order_t trueOrder, vl_memory_order_t falseOrder){
+static inline vl_bool_t
+vlAtomicPtrCompareExchangeWeakExplicit(vl_atomic_ptr *atPtr, vl_tagged_ptr *expected, const void *newValue,
+                                       vl_memory_order_t trueOrder, vl_memory_order_t falseOrder) {
     vl_tagged_ptr result = *expected;
-    result.ptr = (vl_uintptr_t)newValue;
+    result.ptr = (vl_uintptr_t) newValue;
     result.tag++;
     return vlAtomicCompareExchangeWeakExplicit(atPtr, expected, result, trueOrder, falseOrder);
 }

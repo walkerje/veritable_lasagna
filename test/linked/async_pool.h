@@ -5,7 +5,7 @@
 #define VL_TEST_ASYNC_POOL_H
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 #include <vl/vl_numtypes.h>
@@ -19,7 +19,8 @@ vl_bool_t vlTestAsyncPoolMPMC();
 //Ensure all internal counters are reset and allow for re-use.
 vl_bool_t vlTestAsyncPoolClearAndReuse();
 
-
+//Ensure pool elements are properly aligned.
+vl_bool_t vlTestAsyncPoolAlign();
 
 #ifdef __cplusplus
 }

@@ -1,11 +1,10 @@
 #ifndef VL_LIST_H
 #define VL_LIST_H
 
-#include "vl_fixed_pool.h"
+#include "vl_pool.h"
 #include "vl_compare.h"
-#include "vl_memory.h"
 
-#define VL_LIST_ITER_INVALID VL_FIXEDPOOL_INVALID_IDX
+#define VL_LIST_ITER_INVALID VL_POOL_INVALID_IDX
 
 /**
  * This is a simple macro for iterating a list.
@@ -26,29 +25,36 @@
 /**
  * \brief List iterator type. Represents a location within a vl_linked_list.
  */
-typedef vl_fixedpool_idx vl_list_iter;
+typedef vl_pool_idx vl_list_iter;
 
 /**
- * \brief A doubly-linked list.
+ * \brief A doubly-linked list with pool-based memory management
  *
- * The vl_linked_list structure represents a doubly linked list with elements of a fixed size.
- * This is implemented on top of vl_fixedpool, which is used to manage underlying memory.
- * Due to using a pool, allocation should not occur frequently due to the larger pool
- * of memory which is sliced into smaller pieces for individual nodes.
+ * A doubly-linked list implementation that uses a fixed-size memory pool for efficient
+ * node allocation and deallocation. Each node contains both the element data and
+ * bidirectional links to adjacent nodes.
  *
- * The vl_list_iter are simply vl_fixedpool indices, and thus,
- * surrounding iterators are not invalidated when removing or inserting elements.
+ * Key features:
+ * - Memory efficient: Uses pool allocation to minimize fragmentation
+ * - Constant-time operations: O(1) for insertions and deletions at known positions
+ * - Bidirectional traversal: Supports both forward and backward iteration
+ * - Cache-friendly: Nodes are allocated in contiguous memory blocks
  *
- * Pointers to list elements may never be invalidated due to using a fixed pool.
+ * Memory management:
+ * - Nodes are allocated from an internal vl_pool
+ * - The pool pre-allocates memory in larger blocks
+ * - Deleted nodes are recycled for future allocations
+ * - No per-operation dynamic allocation after initial pool setup
  *
- * \sa vl_fixedpool
+ * \sa vl_pool, vl_list_iter
  */
-typedef struct{
-    vl_fixedpool        nodePool;
-    vl_memsize_t        elementSize;
-    vl_list_iter        head;
-    vl_list_iter        tail;
-    vl_dsidx_t          length;
+
+typedef struct {
+    vl_pool nodePool;
+    vl_uint16_t elementSize;
+    vl_list_iter head;
+    vl_list_iter tail;
+    vl_dsidx_t length;
 } vl_linked_list;
 
 /**
@@ -61,7 +67,7 @@ typedef struct{
  * \param elementSize size of a single list element, in bytes.
  * \par Complexity of O(1) constant.
  */
-void            vlListInit(vl_linked_list* list, vl_memsize_t elementSize);
+VL_API void vlListInit(vl_linked_list *list, vl_uint16_t elementSize);
 
 #ifndef vlListFree
 
@@ -74,7 +80,7 @@ void            vlListInit(vl_linked_list* list, vl_memsize_t elementSize);
  * \param list pointer
  * \par Complexity of O(1) constant.
  */
-#define vlListFree(listPtr) vlFixedPoolFree(&((listPtr)->nodePool))
+#define vlListFree(listPtr) vlPoolFree(&((listPtr)->nodePool))
 
 #endif
 
@@ -84,7 +90,7 @@ void            vlListInit(vl_linked_list* list, vl_memsize_t elementSize);
  * \par Complexity of O(1) constant.
  * \return pointer to created list
  */
-vl_linked_list* vlListNew(vl_memsize_t elementSize);
+VL_API vl_linked_list *vlListNew(vl_uint16_t elementSize);
 
 /**
  * \brief Deletes the specified list instance.
@@ -95,7 +101,7 @@ vl_linked_list* vlListNew(vl_memsize_t elementSize);
  * \param list pointer
  * \par Complexity of O(1) constant.
  */
-void            vlListDelete(vl_linked_list* list);
+VL_API void vlListDelete(vl_linked_list *list);
 
 /**
  * \brief Adds a new element to the front of the list.
@@ -107,7 +113,7 @@ void            vlListDelete(vl_linked_list* list);
  * \par Complexity of O(1) constant.
  * \return iterator referring to added element
  */
-vl_list_iter    vlListPushFront(vl_linked_list* list, const void* elem);
+VL_API vl_list_iter vlListPushFront(vl_linked_list *list, const void *elem);
 
 /**
  * \brief Removes whatever element is at the front of the list.
@@ -117,7 +123,7 @@ vl_list_iter    vlListPushFront(vl_linked_list* list, const void* elem);
  * \param list pointer
  * \par Complexity of O(1) constant.
  */
-void            vlListPopFront(vl_linked_list* list);
+VL_API void vlListPopFront(vl_linked_list *list);
 
 /**
  * \brief Adds a new element to the end of the list.
@@ -129,7 +135,7 @@ void            vlListPopFront(vl_linked_list* list);
  * \par Complexity of O(1) constant.
  * \return iterator referring to added element
  */
-vl_list_iter    vlListPushBack(vl_linked_list* list, const void* elem);
+VL_API vl_list_iter vlListPushBack(vl_linked_list *list, const void *elem);
 
 /**
  * \brief Removes whatever element is at the end of the list.
@@ -139,7 +145,7 @@ vl_list_iter    vlListPushBack(vl_linked_list* list, const void* elem);
  * \param list pointer
  * \par Complexity of O(1) constant.
  */
-void            vlListPopBack(vl_linked_list* list);
+VL_API void vlListPopBack(vl_linked_list *list);
 
 /**
  * \brief Inserts an element immediately after the specified target.
@@ -152,7 +158,7 @@ void            vlListPopBack(vl_linked_list* list);
  * \par Complexity of O(1) constant.
  * \return iterator to inserted element.
  */
-vl_list_iter    vlListInsertAfter(vl_linked_list* list, vl_list_iter target, const void* elem);
+VL_API vl_list_iter vlListInsertAfter(vl_linked_list *list, vl_list_iter target, const void *elem);
 
 /**
  * \brief Inserts an element immediately before the specified target
@@ -165,7 +171,7 @@ vl_list_iter    vlListInsertAfter(vl_linked_list* list, vl_list_iter target, con
  * \par Complexity of O(1) constant.
  * \return iterator to inserted element.
  */
-vl_list_iter    vlListInsertBefore(vl_linked_list* list, vl_list_iter target, const void* elem);
+VL_API vl_list_iter vlListInsertBefore(vl_linked_list *list, vl_list_iter target, const void *elem);
 
 #ifndef vlListSize
 /**
@@ -216,7 +222,7 @@ vl_list_iter    vlListInsertBefore(vl_linked_list* list, vl_list_iter target, co
  * \param dest
  * \return pointer to list that was copied to or created.
  */
-vl_linked_list* vlListClone(const vl_linked_list* src, vl_linked_list* dest);
+VL_API vl_linked_list *vlListClone(const vl_linked_list *src, vl_linked_list *dest);
 
 /**
  * \brief Copies a range of elements from one list to another.
@@ -237,7 +243,7 @@ vl_linked_list* vlListClone(const vl_linked_list* src, vl_linked_list* dest);
  * \par Complexity of O(n) linear.
  * \return number of elements copied
  */
-int             vlListCopy(vl_linked_list* src, vl_list_iter begin, vl_list_iter end, vl_linked_list* dest, vl_list_iter after);
+VL_API int vlListCopy(vl_linked_list *src, vl_list_iter begin, vl_list_iter end, vl_linked_list *dest, vl_list_iter after);
 
 /**
  * \brief Sorts the specified list in-place using the given comparator.
@@ -252,7 +258,7 @@ int             vlListCopy(vl_linked_list* src, vl_list_iter begin, vl_list_iter
  * \param cmp comparator function
  * \par Complexity of O(n log(n)).
  */
-void            vlListSort(vl_linked_list* src, vl_compare_function cmp);
+VL_API void vlListSort(vl_linked_list *src, vl_compare_function cmp);
 
 /**
  * \brief Performs an iterative search on the specified list.
@@ -266,7 +272,7 @@ void            vlListSort(vl_linked_list* src, vl_compare_function cmp);
  * \par Complexity of O(n) linear.
  * \return iterator to found element, or VL_LIST_ITER_INVALID on failure.
  */
-vl_list_iter    vlListFind(vl_linked_list* src, const void* element);
+VL_API vl_list_iter vlListFind(vl_linked_list *src, const void *element);
 
 /**
  * \brief Removes the specified element from the list.
@@ -277,7 +283,7 @@ vl_list_iter    vlListFind(vl_linked_list* src, const void* element);
  * \param iter node iterator.
  * \par Complexity of O(1) constant.
  */
-void            vlListRemove(vl_linked_list* list, vl_list_iter iter);
+VL_API void vlListRemove(vl_linked_list *list, vl_list_iter iter);
 
 /**
  * \brief Returns next adjacent iterator, or VL_LIST_ITER_INVALID if no such element exists.
@@ -288,7 +294,7 @@ void            vlListRemove(vl_linked_list* list, vl_list_iter iter);
  * \par Complexity of O(1) constant.
  * \return next iterator, or VL_LIST_ITER_INVALID.
  */
-vl_list_iter    vlListNext(vl_linked_list* list, vl_list_iter iter);
+VL_API vl_list_iter vlListNext(vl_linked_list *list, vl_list_iter iter);
 
 /**
  * \brief Returns the previous adjacent iterator, or VL_LIST_ITER_INVALID if no such element exists.
@@ -299,7 +305,7 @@ vl_list_iter    vlListNext(vl_linked_list* list, vl_list_iter iter);
  * \par Complexity of O(1) constant.
  * \return previous iterator, or VL_LIST_ITER_INVALID.
  */
-vl_list_iter    vlListPrev(vl_linked_list* list, vl_list_iter iter);
+VL_API vl_list_iter vlListPrev(vl_linked_list *list, vl_list_iter iter);
 
 /**
  * \brief Returns a pointer to the element data for the specified iterator.
@@ -309,6 +315,6 @@ vl_list_iter    vlListPrev(vl_linked_list* list, vl_list_iter iter);
  * \par Complexity of O(1) constant.
  * \return pointer to element data.
  */
-vl_transient*     vlListSample(vl_linked_list* list, vl_list_iter iter);
+VL_API void *vlListSample(vl_linked_list *list, vl_list_iter iter);
 
 #endif //VL_LIST_H

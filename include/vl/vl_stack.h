@@ -18,21 +18,21 @@ typedef vl_dsoffs_t vl_stack_offset;
  * This structure also allows for sampling properties low in the stack, if an appropriate offset is given.
  * Many stack data structure implementations prohibit this, however there are notable applications for this kind of use.
  */
-typedef struct{
-    vl_dsidx_t      depth;
-    vl_uintptr_t    headOffset;
-    vl_buffer       buffer;
+typedef struct {
+    vl_dsidx_t depth;
+    vl_uintptr_t headOffset;
+    vl_buffer buffer;
 } vl_stack;
 
 /**
  * Initializes the underlying memory of an existing vl_stack pointer.
  * The stack allocator should be freed with vlStackFree.
  *
- * @param stack stack pointer
+ * \param stack stack pointer
  * \sa vlStackFree
  * \par Complexity of O(1) constant.
  */
-void            vlStackInit(vl_stack* stack);
+VL_API void vlStackInit(vl_stack *stack);
 
 /**
  * \brief Frees the specified stack instance's allocation.
@@ -43,7 +43,7 @@ void            vlStackInit(vl_stack* stack);
  * \param stack pointer
  * \par Complexity of O(1) constant.
  */
-void            vlStackFree(vl_stack* stack);
+VL_API void vlStackFree(vl_stack *stack);
 
 /**
  * \brief Allocates on the heap, initializes, and returns a stack allocator instance.
@@ -51,7 +51,7 @@ void            vlStackFree(vl_stack* stack);
  * \par Complexity of O(1) constant.
  * \return stack allocator pointer located on the heap.
  */
-vl_stack*       vlStackNew();
+VL_API vl_stack *vlStackNew();
 
 /**
  * \brief Deletes the specified stack.
@@ -60,7 +60,7 @@ vl_stack*       vlStackNew();
  * \param stack pointer
  * \par Complexity of O(1) constant.
  */
-void            vlStackDelete(vl_stack* stack);
+VL_API void vlStackDelete(vl_stack *stack);
 
 /**
  * \brief Resets the specified stack allocator, allowing it to be used as if it had just been initialized.
@@ -70,7 +70,7 @@ void            vlStackDelete(vl_stack* stack);
  * \param stack pointer
  * \par Complexity of O(1) constant.
  */
-void            vlStackReset(vl_stack* stack);
+VL_API void vlStackReset(vl_stack *stack);
 
 /**
  * \brief Reserves a new block of memory at the top of the stack, returning its offset.
@@ -88,7 +88,7 @@ void            vlStackReset(vl_stack* stack);
  * \par Complexity of O(1) constant.
  * \return offset of the pushed stack level.
  */
-vl_stack_offset vlStackPush(vl_stack* stack, vl_memsize_t size);
+VL_API vl_stack_offset vlStackPush(vl_stack *stack, vl_memsize_t size);
 
 /**
  * \brief Reserves and assigns new block of memory at the top of the stack, returning its offset.
@@ -107,7 +107,7 @@ vl_stack_offset vlStackPush(vl_stack* stack, vl_memsize_t size);
  * \par Complexity of O(1) constant.
  * \return offset of the pushed stack level.
  */
-vl_stack_offset vlStackPushValue(vl_stack* stack, const void* data, vl_memsize_t size);
+VL_API vl_stack_offset vlStackPushValue(vl_stack *stack, const void *data, vl_memsize_t size);
 
 /**
  * \brief Returns a pointer to the top level of the stack.
@@ -118,7 +118,7 @@ vl_stack_offset vlStackPushValue(vl_stack* stack, const void* data, vl_memsize_t
  * \par Complexity of O(1) constant.
  * \return pointer to the top level of the stack.
  */
-vl_transient*           vlStackPeek(vl_stack* stack);
+VL_API vl_transient *vlStackPeek(vl_stack *stack);
 
 /**
  * \brief Returns the size of the top level of the stack, in bytes.
@@ -129,7 +129,7 @@ vl_transient*           vlStackPeek(vl_stack* stack);
  * \par Complexity of O(1) constant.
  * \return size of the top level of the stack, in bytes.
  */
-vl_memsize_t          vlStackPeekSize(vl_stack* stack);
+VL_API vl_memsize_t vlStackPeekSize(vl_stack *stack);
 
 /**
  * \brief Samples the stack at the specified offset.
@@ -141,7 +141,7 @@ vl_memsize_t          vlStackPeekSize(vl_stack* stack);
  * \par Complexity of O(1) constant.
  * \return pointer to memory managed by the stack allocator.
  */
-vl_transient*           vlStackSample(vl_stack* stack, vl_stack_offset offset);
+VL_API vl_transient *vlStackSample(vl_stack *stack, vl_stack_offset offset);
 
 #ifndef vlStackSize
 
@@ -174,7 +174,7 @@ vl_transient*           vlStackSample(vl_stack* stack, vl_stack_offset offset);
  * \par Complexity of O(1) constant.
  * \return size of the specified level of the stack, in bytes.
  */
-vl_memsize_t            vlStackSampleSize(vl_stack* stack, vl_stack_offset offset);
+VL_API vl_memsize_t vlStackSampleSize(vl_stack *stack, vl_stack_offset offset);
 
 /**
  * \brief Pops the top level of the stack, allowing it to be overwritten in the future.
@@ -182,6 +182,6 @@ vl_memsize_t            vlStackSampleSize(vl_stack* stack, vl_stack_offset offse
  * \param stack
  * \par Complexity of O(1) constant.
  */
-void                    vlStackPop(vl_stack* stack);
+VL_API void vlStackPop(vl_stack *stack);
 
 #endif //VL_STACK_H

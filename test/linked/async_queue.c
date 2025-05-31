@@ -10,17 +10,17 @@
 #define CONSUMER_COUNT 4
 
 typedef struct {
-    vl_async_queue* queue;
+    vl_async_queue *queue;
     int start;
     int count;
-    vl_bool_t* results; // per-thread success results
+    vl_bool_t *results; // per-thread success results
     int index;
 } producer_args;
 
 typedef struct {
-    vl_async_queue* queue;
+    vl_async_queue *queue;
     int totalCount;
-    int* consumedCount;
+    int *consumedCount;
     vl_mutex mutex;
 } consumer_args;
 
@@ -56,8 +56,8 @@ vl_bool_t vlAsyncQueueTest() {
 }
 
 // Producer thread function
-static void producer_thread(void* arg) {
-    producer_args* args = (producer_args*)arg;
+static void producer_thread(void *arg) {
+    producer_args *args = (producer_args *) arg;
     for (int i = 0; i < args->count; ++i) {
         int val = args->start + i;
         vlAsyncQueuePushBack(args->queue, &val);
@@ -67,16 +67,16 @@ static void producer_thread(void* arg) {
 }
 
 // Consumer thread function
-static void consumer_thread(void* arg) {
-    consumer_args* args = (consumer_args*)arg;
+static void consumer_thread(void *arg) {
+    consumer_args *args = (consumer_args *) arg;
     int val = 0;
     while (1) {
         if (*args->consumedCount >= args->totalCount)
             break;
         else if (vlAsyncQueuePopFront(args->queue, &val)) {
-            vlMutexObtainExclusive(args->mutex);
+            vlMutexObtain(args->mutex);
             (*args->consumedCount)++;
-            vlMutexReleaseExclusive(args->mutex);
+            vlMutexRelease(args->mutex);
         } else {
             vlThreadYield(); // queue empty, yield and try again
         }

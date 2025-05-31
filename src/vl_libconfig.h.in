@@ -24,8 +24,24 @@
  * of async primitives and filesystem handling.
  */
 
+
+#ifdef _WIN32
+#    ifdef VL_BUILDING_SHARED
+#        define VL_API __declspec(dllexport)
+#    elif defined VL_USING_SHARED
+#        define VL_API __declspec(dllimport)
+#    else
+#       define VL_API
+#    endif
+#else
+#    define VL_API
+#endif
+
+
 #cmakedefine VL_THREADS_WIN32
 #cmakedefine VL_THREADS_PTHREAD
+
+
 
 /***********************************************************************************
  * System Endianness

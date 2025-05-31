@@ -5,11 +5,11 @@
 /**
  * \private
  */
-typedef struct{
+typedef struct {
     pthread_t threadHandle;
 
-    pthread_cond_t      timeoutCondition;
-    pthread_mutex_t     timeoutConditionMutex;
+    pthread_cond_t timeoutCondition;
+    pthread_mutex_t timeoutConditionMutex;
 } vl_posix_thread;
 
 /**
@@ -20,30 +20,30 @@ vl_posix_thread mainThread;
 /**
  * \brief Thread local pointer to the metadata of the current thread.
  */
-VL_THREAD_LOCAL vl_posix_thread* currentThread = NULL;
+VL_THREAD_LOCAL vl_posix_thread *currentThread = NULL;
 
 /**
  * \private
  */
-typedef struct{
-    vl_posix_thread* meta;
+typedef struct {
+    vl_posix_thread *meta;
 
-    vl_thread_proc  threadProc;
-    void*           userArg;
+    vl_thread_proc threadProc;
+    void *userArg;
 } vl_thread_args;
 
-void* vl_ThreadBootstrap(void* arg) {
-    vl_posix_thread* meta;
+void *vl_ThreadBootstrap(void *arg) {
+    vl_posix_thread *meta;
     vl_thread_proc proc;
-    void* userArg;
+    void *userArg;
 
 
     {
-        vl_thread_args* threadArgs = (vl_thread_args*)(arg);
+        vl_thread_args *threadArgs = (vl_thread_args *) (arg);
 
-        meta        = threadArgs->meta;
-        proc        = threadArgs->threadProc;
-        userArg     = threadArgs->userArg;
+        meta = threadArgs->meta;
+        proc = threadArgs->threadProc;
+        userArg = threadArgs->userArg;
 
         free(threadArgs);
     }
@@ -61,16 +61,16 @@ void* vl_ThreadBootstrap(void* arg) {
     return NULL;
 }
 
-vl_thread vlThreadNew(vl_thread_proc threadProc, void* userArg){
+vl_thread vlThreadNew(vl_thread_proc threadProc, void *userArg) {
     vlThreadCurrent();
 
-    vl_thread_args* args = malloc(sizeof(vl_thread_args));
+    vl_thread_args *args = malloc(sizeof(vl_thread_args));
 
     if (args == NULL) {
         return (vl_thread) NULL;  // Failed to allocate arguments
     }
 
-    vl_posix_thread* meta = malloc(sizeof(vl_posix_thread));
+    vl_posix_thread *meta = malloc(sizeof(vl_posix_thread));
     if (meta == NULL) {
         free(args);
         return (vl_thread) NULL;  // Failed to allocate arguments
@@ -83,7 +83,7 @@ vl_thread vlThreadNew(vl_thread_proc threadProc, void* userArg){
     pthread_mutex_init(&meta->timeoutConditionMutex, NULL);
     pthread_cond_init(&meta->timeoutCondition, NULL);
 
-    if(pthread_create(&meta->threadHandle, NULL, vl_ThreadBootstrap, args) != 0){
+    if (pthread_create(&meta->threadHandle, NULL, vl_ThreadBootstrap, args) != 0) {
         free(args);
         free(meta);
         return 0;
@@ -92,33 +92,33 @@ vl_thread vlThreadNew(vl_thread_proc threadProc, void* userArg){
     return (vl_thread) meta;
 }
 
-void        vlThreadDelete(vl_thread thread){
-    if(thread == 0 || thread == ((vl_uintptr_t)&mainThread))
+void vlThreadDelete(vl_thread thread) {
+    if (thread == 0 || thread == ((vl_uintptr_t) &mainThread))
         return;
 
-    vl_posix_thread* meta = (vl_posix_thread*) thread;
+    vl_posix_thread *meta = (vl_posix_thread *) thread;
 
     pthread_mutex_destroy(&meta->timeoutConditionMutex);
     pthread_cond_destroy(&meta->timeoutCondition);
-    free((vl_posix_thread*) thread);
+    free((vl_posix_thread *) thread);
 }
 
-vl_bool_t   vlThreadJoin(vl_thread thread){
-    if(thread == 0 || thread == ((vl_uintptr_t)&mainThread))
+vl_bool_t vlThreadJoin(vl_thread thread) {
+    if (thread == 0 || thread == ((vl_uintptr_t) &mainThread))
         return VL_FALSE;
 
-    int result = pthread_join(((vl_posix_thread*)thread)->threadHandle, NULL);
+    int result = pthread_join(((vl_posix_thread *) thread)->threadHandle, NULL);
     if (result == 0) {
         return VL_TRUE; // Finished execution.
     }
     return VL_FALSE; // Error or failure to join
 }
 
-vl_bool_t   vlThreadJoinTimeout(vl_thread thread, vl_uint_t milliseconds){
-    if(thread == 0 || thread == ((vl_uintptr_t)&mainThread))
+vl_bool_t vlThreadJoinTimeout(vl_thread thread, vl_uint_t milliseconds) {
+    if (thread == 0 || thread == ((vl_uintptr_t) &mainThread))
         return VL_FALSE;
 
-    vl_posix_thread* meta = (vl_posix_thread*) thread;
+    vl_posix_thread *meta = (vl_posix_thread *) thread;
     vl_int_t result;
 
     // Lock the mutex to protect the condition variable
@@ -153,8 +153,8 @@ vl_bool_t   vlThreadJoinTimeout(vl_thread thread, vl_uint_t milliseconds){
     return VL_FALSE;
 }
 
-vl_thread   vlThreadCurrent(){
-    switch((vl_uintptr_t)currentThread){
+vl_thread vlThreadCurrent() {
+    switch ((vl_uintptr_t) currentThread) {
         case 0:
             currentThread = &mainThread;
             currentThread->threadHandle = pthread_self();
@@ -164,17 +164,17 @@ vl_thread   vlThreadCurrent(){
     }
 }
 
-vl_bool_t        vlThreadYield(){
+vl_bool_t vlThreadYield() {
     return sched_yield() == 0;
 }
 
-void vlThreadSleep(vl_ularge_t milliseconds){
+void vlThreadSleep(vl_ularge_t milliseconds) {
     usleep(milliseconds * 1000);
 }
 
-void vlThreadSleepNano(vl_ularge_t nanoseconds){
+void vlThreadSleepNano(vl_ularge_t nanoseconds) {
     const vl_ularge_t busy_threshold = 10000; // 10,000 ns = 10 µs
-    if(nanoseconds < busy_threshold){
+    if (nanoseconds < busy_threshold) {
         struct timespec start, current;
         clock_gettime(CLOCK_MONOTONIC, &start);
 
@@ -196,6 +196,6 @@ void vlThreadSleepNano(vl_ularge_t nanoseconds){
     nanosleep(&request, NULL);
 }
 
-void vlThreadExit(){
+void vlThreadExit() {
     pthread_exit(NULL);
 }

@@ -4,6 +4,6 @@ extern "C" {
 #include "linked/atomic.h"
 }
 
-TEST(atomic, counter){
+TEST(atomic, counter) {
     EXPECT_TRUE(vlTestAtomicCounter());
 }

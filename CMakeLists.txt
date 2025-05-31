@@ -1,29 +1,15 @@
 cmake_minimum_required(VERSION 3.22.1)
-include(CMakeDependentOption)
-include(CMakePackageConfigHelpers)
-include(CheckTypeSize)
 
 # Versioning
 set(VL_VERSION_MAJOR 0)
-set(VL_VERSION_MINOR 12)
-set(VL_VERSION_PATCH 4)
+set(VL_VERSION_MINOR 13)
+set(VL_VERSION_PATCH 9)
 set(VL_VERSION ${VL_VERSION_MAJOR}.${VL_VERSION_MINOR}.${VL_VERSION_PATCH})
-
-# Configuration options
-option(VL_BUILD_SHARED      "On/Off. If true, configure to build the shared library."       OFF)
-option(CMAKE_EXPORT_PACKAGE_REGISTRY "Export build directory (enables external use without install or subdirectory)." OFF)
-
-# These two options are specifically NON MSVC because Visual Studio has its own dedicated project structure, which makes
-# copying the shared compile result somewhere else entirely unnecessary.
-cmake_dependent_option(VL_SHARED_COPY "On/Off. If true, shared libraries are copied to the root project binary directory after building."
-                        OFF "NOT MSVC AND NOT PROJECT_IS_TOP_LEVEL"     ON)
-cmake_dependent_option(VL_SHARED_TESTS "On/Off. If true, shared libraries are copied to the test binary directory after building."
-                        OFF "NOT MSVC AND PROJECT_IS_TOP_LEVEL"         ON)
 
 # Some relative variables.
 set(VL_PROJECT_PATH ${CMAKE_CURRENT_LIST_DIR})
-set(VL_CONFIG_HEADER_INCLUDE "${CMAKE_BINARY_DIR}/config/include")
-set(VL_CONFIG_HEADER_PATH "${VL_CONFIG_HEADER_INCLUDE}/vl")
+set(VL_CONFIG_HEADER_INCLUDE "${CMAKE_BINARY_DIR}/config/include/")
+set(VL_CONFIG_HEADER_PATH "${VL_CONFIG_HEADER_INCLUDE}vl")
 string(LENGTH ${VL_PROJECT_PATH} VL_PROJECT_PATH_LEN)
 math(EXPR VL_PROJECT_PATH_LEN "${VL_PROJECT_PATH_LEN} + 1")# +1 to omit path separator
 
@@ -33,6 +19,10 @@ project(veritable_lasagna VERSION ${VL_VERSION}
         HOMEPAGE_URL "https://bitshiftmountain.com")
 
 set(CMAKE_C_STANDARD            11)
+
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+include(CheckTypeSize)
 
 # Primitive type resolution.
 # This section is dense and awkward.
@@ -191,7 +181,7 @@ if(NOT MSVC)
 endif ()
 
 if(MSVC)
-    set(VL_COMPILE_OPTIONS "${VL_COMPILE_OPTIONS} /experimental:c11atomics")
+    set(VL_COMPILE_OPTIONS ${VL_COMPILE_OPTIONS} /experimental:c11atomics)
 endif ()
 
 # Macro definitions.
@@ -220,100 +210,66 @@ message(STATUS "Gathering sources...")
 add_subdirectory(src)
 
 set(VL_INCLUDE          "${CMAKE_CURRENT_LIST_DIR}/include/" "${VL_CONFIG_HEADER_INCLUDE}")
-set(VL_OBJECT_TARGET    vlasagna_object)
-set(VL_STATIC_TARGET    vlasagna)
-set(VL_LIBRARY          ${VL_STATIC_TARGET})
-set(VL_INSTALL_TARGETS  ${VL_STATIC_TARGET})
+set(VL_CORE_TARGET      Core)
+set(VL_INSTALL_TARGETS  ${VL_CORE_TARGET})
 
-add_library(${VL_OBJECT_TARGET} OBJECT ${VL_SOURCES})
-target_include_directories  (${VL_OBJECT_TARGET} PRIVATE include/vl ${VL_CONFIG_HEADER_PATH} ${VL_CONFIG_HEADER_INCLUDE})
-set_property                (TARGET ${VL_OBJECT_TARGET} PROPERTY POSITION_INDEPENDENT_CODE ON)
-target_compile_options(${VL_OBJECT_TARGET} PUBLIC "${VL_COMPILE_OPTIONS}")
-target_link_libraries(${VL_OBJECT_TARGET} PUBLIC "${VL_SYSTEM_LIBS}")
+add_library                 (${VL_CORE_TARGET} ${VL_SOURCES})
 
-add_library(${VL_STATIC_TARGET} STATIC $<TARGET_OBJECTS:${VL_OBJECT_TARGET}>)
-target_include_directories(${VL_STATIC_TARGET} PRIVATE include/vl ${VL_CONFIG_HEADER_PATH} ${VL_CONFIG_HEADER_INCLUDE})
-set_target_properties(${VL_STATIC_TARGET} PROPERTIES OUTPUT_NAME "${VL_STATIC_TARGET}" DEBUG_POSTFIX "d")
-add_dependencies(${VL_STATIC_TARGET} ${VL_OBJECT_TARGET})
-target_link_libraries(${VL_STATIC_TARGET} PUBLIC "${VL_SYSTEM_LIBS}")
+target_include_directories  (${VL_CORE_TARGET} PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/vl>
+        $<INSTALL_INTERFACE:include/vl>
+        PRIVATE
+        ${VL_CONFIG_HEADER_PATH} ${VL_CONFIG_HEADER_INCLUDE})
 
-target_compile_options(${VL_STATIC_TARGET} PUBLIC "${VL_COMPILE_OPTIONS}")
+set_target_properties       (${VL_CORE_TARGET} PROPERTIES OUTPUT_NAME "vl_core" DEBUG_POSTFIX "d")
+target_compile_options      (${VL_CORE_TARGET} PUBLIC "${VL_COMPILE_OPTIONS}")
+target_link_libraries       (${VL_CORE_TARGET} PUBLIC "${VL_SYSTEM_LIBS}")
 
-if(VL_BUILD_SHARED)
-    set(VL_SHARED_TARGET vlasagna_shared)
-    set(VL_INSTALL_TARGETS ${VL_INSTALL_TARGETS} ${VL_SHARED_TARGET})
+add_library(VLasagna::Core ALIAS  ${VL_CORE_TARGET})
 
-    add_library(${VL_SHARED_TARGET} SHARED $<TARGET_OBJECTS:${VL_OBJECT_TARGET}>)
-    target_include_directories(${VL_SHARED_TARGET} PRIVATE include/vl ${VL_CONFIG_HEADER_PATH} ${VL_CONFIG_HEADER_INCLUDE})
-    set_target_properties(${VL_SHARED_TARGET} PROPERTIES OUTPUT_NAME "${VL_STATIC_TARGET}" DEBUG_POSTFIX "d")
-    target_compile_options(${VL_SHARED_TARGET} PUBLIC "${VL_COMPILE_OPTIONS}")
-    target_link_libraries(${VL_SHARED_TARGET} PUBLIC "${VL_SYSTEM_LIBS}")
-    add_dependencies(${VL_SHARED_TARGET} ${VL_OBJECT_TARGET})
+if(BUILD_SHARED_LIBS)
+    target_compile_definitions(${VL_CORE_TARGET}
+            PRIVATE VL_BUILDING_SHARED
+            INTERFACE VL_USING_SHARED
+    )
 
-    if(MSVC)
-        # MSVC seems to need both the static and shared libraries for linking...
-        add_dependencies(${VL_SHARED_TARGET} ${VL_STATIC_TARGET})
-    elseif(_WIN32)
-        # If not building with MSVC, but still WIN32 (MinGW/Clang/etc), copy to the binary directory.
-        set(VL_SHARED_COPY_DIR ${CMAKE_BINARY_DIR})
-    else()
-        # Otherwise, copy to the 'lib' directory in the build tree.
-        set(VL_SHARED_COPY_DIR ${CMAKE_BINARY_DIR}/lib/)
-    endif ()
+    set_target_properties(${VL_CORE_TARGET} PROPERTIES
+            C_VISIBILITY_PRESET hidden
+            VISIBILITY_INLINES_HIDDEN ON
+            POSITION_INDEPENDENT_CODE ON
+    )
+endif()
 
-    set(VL_LIBRARY_SHARED ${VL_SHARED_TARGET})
-endif ()
 
 export(TARGETS ${VL_INSTALL_TARGETS} NAMESPACE VLasagna:: FILE VLasagnaTargets.cmake)
 
-# If this list is not top-level, this project was included as a subdirectory into another project.
-if(NOT PROJECT_IS_TOP_LEVEL)
-    set(VL_INCLUDE "${VL_INCLUDE}" PARENT_SCOPE)
-    set(VL_LIBRARY "${VL_LIBRARY}" PARENT_SCOPE)
-
-    if(${VL_BUILD_SHARED})
-        set(VL_LIBRARY_SHARED ${VL_LIBRARY_SHARED} PARENT_SCOPE)
-
-        if(${VL_SHARED_COPY} AND NOT MSVC)
-            # If the shared copy flag is on, copy the shared library to the binary root.
-            add_custom_command(TARGET ${VL_LIBRARY_SHARED} POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    $<TARGET_FILE_NAME:${VL_LIBRARY_SHARED}>
-                    ${VL_SHARED_COPY_DIR})
-        endif()
-    endif()
-else()
+if(BUILD_TESTING)
     add_subdirectory(test)
+endif ()
 
-    if(${VL_SHARED_TESTS} AND ${VL_SHARED_COPY} AND NOT MSVC)
-        add_custom_command(TARGET ${VL_LIBRARY_SHARED} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                $<TARGET_FILE_NAME:${VL_LIBRARY_SHARED}>
-                ${VL_TEST_BINARY_DIR})
-    endif ()
+install(TARGETS ${VL_INSTALL_TARGETS} EXPORT VLasagnaTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-    install(TARGETS ${VL_INSTALL_TARGETS} EXPORT VLasagnaTargets
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-    install(DIRECTORY ${VL_INCLUDE} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(DIRECTORY ${VL_INCLUDE} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-    install(EXPORT VLasagnaTargets
-            FILE VLasagnaTargets.cmake
-            NAMESPACE VLasagna::
-            DESTINATION lib/cmake/vlasagna
-    )
+install(EXPORT VLasagnaTargets
+        FILE VLasagnaTargets.cmake
+        NAMESPACE VLasagna::
+        DESTINATION lib/cmake/vlasagna
+)
 
-    write_basic_package_version_file(
-            VLasagnaConfigVersion.cmake
-            VERSION ${VL_VERSION}
-            COMPATIBILITY AnyNewerVersion
-    )
+write_basic_package_version_file(
+        VLasagnaConfigVersion.cmake
+        VERSION ${VL_VERSION}
+        COMPATIBILITY AnyNewerVersion
+)
 
-    configure_package_config_file(VLasagnaConfig.cmake.in VLasagnaConfig.cmake INSTALL_DESTINATION lib/cmake/VLasagna)
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/VLasagnaConfig.cmake"
-            "${CMAKE_CURRENT_BINARY_DIR}/VLasagnaConfigVersion.cmake"
-            DESTINATION lib/cmake/VLasagna
-    )
+configure_package_config_file(VLasagnaConfig.cmake.in VLasagnaConfig.cmake INSTALL_DESTINATION lib/cmake/VLasagna)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/VLasagnaConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/VLasagnaConfigVersion.cmake"
+        DESTINATION lib/cmake/VLasagna
+)
 
-    export(PACKAGE VLasagna)
-endif()
+export(PACKAGE VLasagna)

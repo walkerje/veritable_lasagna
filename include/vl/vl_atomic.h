@@ -25,68 +25,68 @@
 #define VL_ATOMIC _Atomic
 #define VL_ATOMIC_TYPEDEF(x) typedef VL_ATOMIC x
 
-VL_ATOMIC_TYPEDEF(vl_bool_t)        vl_atomic_bool_t;
+VL_ATOMIC_TYPEDEF(vl_bool_t) vl_atomic_bool_t;
 
-VL_ATOMIC_TYPEDEF(vl_int_t)         vl_atomic_int_t;
-VL_ATOMIC_TYPEDEF(vl_uint_t)        vl_atomic_uint_t;
+VL_ATOMIC_TYPEDEF(vl_int_t) vl_atomic_int_t;
+VL_ATOMIC_TYPEDEF(vl_uint_t) vl_atomic_uint_t;
 
-VL_ATOMIC_TYPEDEF(vl_intptr_t)      vl_atomic_intptr_t;
-VL_ATOMIC_TYPEDEF(vl_uintptr_t)     vl_atomic_uintptr_t;
+VL_ATOMIC_TYPEDEF(vl_intptr_t) vl_atomic_intptr_t;
+VL_ATOMIC_TYPEDEF(vl_uintptr_t) vl_atomic_uintptr_t;
 
-VL_ATOMIC_TYPEDEF(vl_ularge_t)      vl_atomic_ularge_t;
-VL_ATOMIC_TYPEDEF(vl_usmall_t)      vl_atomic_usmall_t;
-VL_ATOMIC_TYPEDEF(vl_ilarge_t)      vl_atomic_ilarge_t;
-VL_ATOMIC_TYPEDEF(vl_ismall_t)      vl_atomic_ismall_t;
+VL_ATOMIC_TYPEDEF(vl_ularge_t) vl_atomic_ularge_t;
+VL_ATOMIC_TYPEDEF(vl_usmall_t) vl_atomic_usmall_t;
+VL_ATOMIC_TYPEDEF(vl_ilarge_t) vl_atomic_ilarge_t;
+VL_ATOMIC_TYPEDEF(vl_ismall_t) vl_atomic_ismall_t;
 
 #ifdef VL_U8_T
 #define VL_ATOMIC_U8_T           vl_atomic_uint8_t
 
-VL_ATOMIC_TYPEDEF(vl_uint8_t)       VL_ATOMIC_U8_T;
+VL_ATOMIC_TYPEDEF(vl_uint8_t)VL_ATOMIC_U8_T;
 #endif
 
 #ifdef VL_U16_T
 #define VL_ATOMIC_U16_T          vl_atomic_uint16_t
 
-VL_ATOMIC_TYPEDEF(vl_uint16_t)      VL_ATOMIC_U16_T;
+VL_ATOMIC_TYPEDEF(vl_uint16_t)VL_ATOMIC_U16_T;
 #endif
 
 #ifdef VL_U32_T
 #define VL_ATOMIC_U32_T          vl_atomic_uint32_t
 
-VL_ATOMIC_TYPEDEF(vl_uint32_t)      VL_ATOMIC_U32_T;
+VL_ATOMIC_TYPEDEF(vl_uint32_t)VL_ATOMIC_U32_T;
 #endif
 
 #ifdef VL_U64_T
 #define VL_ATOMIC_U64_T          vl_atomic_uint64_t
 
-VL_ATOMIC_TYPEDEF(vl_uint64_t)      VL_ATOMIC_U64_T;
+VL_ATOMIC_TYPEDEF(vl_uint64_t)VL_ATOMIC_U64_T;
 #endif
 
 #ifdef VL_I8_T
 #define VL_ATOMIC_I8_T            vl_atomic_int8_t
 
-VL_ATOMIC_TYPEDEF(vl_int8_t)        VL_ATOMIC_I8_T;
+VL_ATOMIC_TYPEDEF(vl_int8_t)VL_ATOMIC_I8_T;
 #endif
 
 #ifdef VL_I16_T
 #define VL_ATOMIC_I16_T           vl_atomic_int16_t
 
-VL_ATOMIC_TYPEDEF(vl_int16_t)       VL_ATOMIC_I16_T;
+VL_ATOMIC_TYPEDEF(vl_int16_t)VL_ATOMIC_I16_T;
 #endif
 
 #ifdef VL_I32_T
 #define VL_ATOMIC_I32_T           vl_atomic_int32_t
 
-VL_ATOMIC_TYPEDEF(vl_int32_t)       VL_ATOMIC_I32_T;
+VL_ATOMIC_TYPEDEF(vl_int32_t)VL_ATOMIC_I32_T;
 #endif
 
 #ifdef VL_I64_T
 #define VL_ATOMIC_I64_T           vl_atomic_int64_t
 
-VL_ATOMIC_TYPEDEF(vl_int64_t)       VL_ATOMIC_I64_T;
+VL_ATOMIC_TYPEDEF(vl_int64_t)VL_ATOMIC_I64_T;
 #endif
 
-VL_ATOMIC_TYPEDEF(atomic_flag)          vl_atomic_flag_t;
+VL_ATOMIC_TYPEDEF(atomic_flag) vl_atomic_flag_t;
 
 
 /**
@@ -95,7 +95,7 @@ VL_ATOMIC_TYPEDEF(atomic_flag)          vl_atomic_flag_t;
  * Documentation of different orders taken from the following webpage:
  * https://en.cppreference.com/w/c/atomic/memory_order
  */
-typedef enum VL_MEMORY_ORDER{
+typedef enum VL_MEMORY_ORDER {
     /**
      * Relaxed operation: there are no synchronization or ordering constraints imposed
      * on other reads or writes, only this operation's atomicity is guaranteed.

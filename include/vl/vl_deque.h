@@ -1,7 +1,7 @@
 #ifndef VL_DEQUE_H
 #define VL_DEQUE_H
 
-#include "vl_linear_pool.h"
+#include "vl_pool.h"
 
 /**
  * \brief Double-ended queue.
@@ -15,11 +15,12 @@
  * storing pointers, iterators, or offsets in the queue is a perfectly valid approach.
  * \sa vl_queue
  */
-typedef struct{
-    vl_linearpool         nodes;          //pool nodes
-    vl_memsize_t    elementSize;    //size of a single element, in bytes.
-    vl_linearpool_idx     head;           //first element
-    vl_linearpool_idx     tail;           //last element
+typedef struct {
+    vl_pool nodes;                 //pool nodes
+    vl_dsidx_t totalElements;           //total elements in the deque
+    vl_uint16_t elementSize;            //size of a single element, in bytes.
+    vl_pool_idx head;              //first element
+    vl_pool_idx tail;              //last element
 } vl_deque;
 
 /**
@@ -32,7 +33,7 @@ typedef struct{
  * \param elementSize size of each element, in bytes.
  * \par Complexity O(1) constant.
  */
-void vlDequeInit(vl_deque* deq, vl_memsize_t elementSize);
+VL_API void vlDequeInit(vl_deque *deq, vl_uint16_t elementSize);
 
 /**
  * \brief Frees the specified instance of vl_deque.
@@ -42,7 +43,7 @@ void vlDequeInit(vl_deque* deq, vl_memsize_t elementSize);
  * \sa vlDequeInit
  * \param deq pointer
  */
-void vlDequeFree(vl_deque* deq);
+VL_API void vlDequeFree(vl_deque *deq);
 
 /**
  * \brief Allocates, initializes, and returns an instance of vl_deque.
@@ -55,7 +56,7 @@ void vlDequeFree(vl_deque* deq);
  * \par Complexity O(1) constant.
  * \return deque pointer
  */
-vl_deque* vlDequeNew(vl_memsize_t elementSize);
+VL_API vl_deque *vlDequeNew(vl_uint16_t elementSize);
 
 /**
  * \brief De-initializes and deletes the specified instance of vl_deque.
@@ -65,7 +66,7 @@ vl_deque* vlDequeNew(vl_memsize_t elementSize);
  * \param deq pointer
  * \par Complexity O(1) constant.
  */
-void vlDequeDelete(vl_deque* deq);
+VL_API void vlDequeDelete(vl_deque *deq);
 
 /**
  * \brief Clears the specified deque.
@@ -76,7 +77,7 @@ void vlDequeDelete(vl_deque* deq);
  * \param deq pointer
  * \par Complexity O(1) constant.
  */
-void vlDequeClear(vl_deque* deq);
+VL_API void vlDequeClear(vl_deque *deq);
 
 /**
  * \brief Reserves space for n-many elements in the underlying buffer of the specified deque.
@@ -87,7 +88,7 @@ void vlDequeClear(vl_deque* deq);
  * \param deque pointer
  * \param n total number of elements to reserve space for.
  */
-void vlDequeReserve(vl_deque* deque, vl_memsize_t n);
+VL_API void vlDequeReserve(vl_deque *deque, vl_dsidx_t n);
 
 /**
  * \brief Clones the specified deque to another.
@@ -104,7 +105,7 @@ void vlDequeReserve(vl_deque* deque, vl_memsize_t n);
  * \param dest pointer
  * \return pointer to deque that was copied to or created.
  */
-vl_deque* vlDequeClone(const vl_deque* src, vl_deque* dest);
+VL_API vl_deque *vlDequeClone(const vl_deque *src, vl_deque *dest);
 
 /**
  * \brief Returns the total number of elements
@@ -112,7 +113,9 @@ vl_deque* vlDequeClone(const vl_deque* src, vl_deque* dest);
  * \par Complexity O(1) constant.
  * \return total number of elements in the deque.
  */
-vl_memsize_t vlDequeSize(vl_deque* deq);
+static inline vl_dsidx_t vlDequeSize(vl_deque *deq) {
+    return deq->totalElements;
+}
 
 /**
  * \brief Adds and copies an element to the front of the deque.
@@ -120,7 +123,7 @@ vl_memsize_t vlDequeSize(vl_deque* deq);
  * \param val element data pointer
  * \par Complexity O(1) constant.
  */
-void vlDequePushFront(vl_deque* deq, const void* val);
+VL_API void vlDequePushFront(vl_deque *deq, const void *val);
 
 /**
  * \brief Copies and removes an element from the front of the deque.
@@ -132,7 +135,7 @@ void vlDequePushFront(vl_deque* deq, const void* val);
  * \par Complexity O(1) constant.
  * \return 1 if success, 0 if failed
  */
-int vlDequePopFront(vl_deque* deq, void* val);
+VL_API int vlDequePopFront(vl_deque *deq, void *val);
 
 /**
  * \brief Adds and copies an en element to the end of the deque.
@@ -140,7 +143,7 @@ int vlDequePopFront(vl_deque* deq, void* val);
  * \param val element data pointer
  * \par Complexity O(1) constant.
  */
-void vlDequePushBack(vl_deque* deq, const void* val);
+VL_API void vlDequePushBack(vl_deque *deq, const void *val);
 
 /**
  * \brief Copies and removes an element from the end of the deque.
@@ -151,6 +154,6 @@ void vlDequePushBack(vl_deque* deq, const void* val);
  * \param val pointer where the element will be copied to.
  * \return 1 if success, 0 if failed.
  */
-int vlDequePopBack(vl_deque* deq, void* val);
+VL_API int vlDequePopBack(vl_deque *deq, void *val);
 
 #endif //VL_DEQUE_H

@@ -35,7 +35,7 @@ typedef vl_ularge_t vl_rand;
  * \par Complexity of O(1) constant.
  * \return random state/seed.
  */
-vl_rand     vlRandInit();
+VL_API vl_rand vlRandInit();
 
 /**
  * \brief Returns the "next" 64-bit integer.
@@ -46,7 +46,7 @@ vl_rand     vlRandInit();
  * \param rand pointer to random state
  * \return unsigned 64-bit integer
  */
-vl_rand     vlRandNext(vl_rand* rand);
+VL_API vl_rand vlRandNext(vl_rand *rand);
 
 /**
  * \brief Fills the specified region of memory with random bytes.
@@ -59,7 +59,7 @@ vl_rand     vlRandNext(vl_rand* rand);
  * \param len total number of bytes to fill.
  * \par Complexity of O(n) linear.
  */
-void vlRandFill(vl_rand* rand, void* mem, vl_ularge_t len);
+VL_API void vlRandFill(vl_rand *rand, void *mem, vl_ularge_t len);
 
 #ifdef VL_U8_T
 /**
@@ -185,6 +185,7 @@ void vlRandFill(vl_rand* rand, void* mem, vl_ularge_t len);
 #endif
 
 #ifdef VL_I8_T
+
 /**
  * \brief Generate a random 8-bit integer.
  *
@@ -194,7 +195,7 @@ void vlRandFill(vl_rand* rand, void* mem, vl_ularge_t len);
  * \par Complexity of O(1) constant.
  * \return random integer
  */
-vl_int8_t      vlRandInt8      (vl_rand* rand);
+VL_API vl_int8_t vlRandInt8(vl_rand *rand);
 
 #ifdef VL_U64_T
 /**
@@ -223,6 +224,7 @@ vl_int8_t      vlRandInt8      (vl_rand* rand);
 #endif
 
 #ifdef VL_I16_T
+
 /**
  * \brief Generate a random 16-bit integer.
  *
@@ -231,7 +233,7 @@ vl_int8_t      vlRandInt8      (vl_rand* rand);
  * \par randPtr pointer to random state
  * \return random integer
  */
-vl_int16_t     vlRandInt16     (vl_rand* rand);
+VL_API vl_int16_t vlRandInt16(vl_rand *rand);
 
 #ifdef VL_U64_T
 /**
@@ -261,6 +263,7 @@ vl_int16_t     vlRandInt16     (vl_rand* rand);
 #endif
 
 #ifdef VL_I32_T
+
 /**
  * \brief Generate a random 32-bit integer.
  *
@@ -269,7 +272,7 @@ vl_int16_t     vlRandInt16     (vl_rand* rand);
  * \par randPtr pointer to random state
  * \return random integer
  */
-vl_int32_t     vlRandInt32     (vl_rand* rand);
+VL_API vl_int32_t vlRandInt32(vl_rand *rand);
 
 #ifdef VL_I64_T
 /**
@@ -298,6 +301,7 @@ vl_int32_t     vlRandInt32     (vl_rand* rand);
 #endif
 
 #ifdef VL_I64_T
+
 /**
  * \brief Generate a random 64-bit integer.
  *
@@ -307,7 +311,8 @@ vl_int32_t     vlRandInt32     (vl_rand* rand);
  * \par Complexity of O(1) constant.
  * \return random integer
  */
-vl_int64_t     vlRandInt64     (vl_rand* rand);
+VL_API vl_int64_t vlRandInt64(vl_rand *rand);
+
 #endif
 
 /**
@@ -319,7 +324,7 @@ vl_int64_t     vlRandInt64     (vl_rand* rand);
  * \par Complexity of O(1) constant.
  * \return random float
  */
-vl_float32_t  vlRandF       (vl_rand* randPtr);
+VL_API vl_float32_t vlRandF(vl_rand *randPtr);
 
 /**
  * \brief Generates two random floats.
@@ -330,7 +335,7 @@ vl_float32_t  vlRandF       (vl_rand* randPtr);
  * \param resultPtr where the result will be stored
  * \par Complexity of O(1) constant.
  */
-void          vlRandFx2     (vl_rand* randPtr, vl_float32_t* resultPtr);
+VL_API void vlRandFx2(vl_rand *randPtr, vl_float32_t *resultPtr);
 
 /**
  * \brief Generates four random floats.
@@ -354,6 +359,6 @@ void          vlRandFx2     (vl_rand* randPtr, vl_float32_t* resultPtr);
  * \par Complexity of O(1) constant.
  * \return random double.
  */
-vl_float64_t  vlRandD    (vl_rand* randPtr);
+VL_API vl_float64_t vlRandD(vl_rand *randPtr);
 
 #endif //VL_RAND_H

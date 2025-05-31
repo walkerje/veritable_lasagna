@@ -5,7 +5,7 @@
 #ifndef VL_TEST_ASYNC_QUEUE_H
 #define VL_TEST_ASYNC_QUEUE_H
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 #include <vl/vl_numtypes.h>
@@ -25,12 +25,11 @@ vl_bool_t vlTestAsyncPoolClearAndReuse();
 #endif //VL_TEST_ASYNC_QUEUE_H
 
 
-
 #ifndef VL_TEST_ASYNC_POOL_H
 #define VL_TEST_ASYNC_POOL_H
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 #include <vl/vl_numtypes.h>

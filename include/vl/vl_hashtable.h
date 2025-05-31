@@ -42,21 +42,21 @@ typedef vl_arena_ptr vl_hash_iter;
  * This table does not waste time by iterating over empty space.
  * \sa vl_arena
  */
-typedef struct{
-    vl_memory*              table;          //holds mapping from hash values to collision list heads in the arena
-    vl_arena                data;           //holds the node key/value data
-    vl_hash_function        hashFunc;       //hash function; hashes keys
+typedef struct {
+    vl_memory *table;          //holds mapping from hash values to collision list heads in the arena
+    vl_arena data;           //holds the node key/value data
+    vl_hash_function hashFunc;       //hash function; hashes keys
 
-    vl_dsidx_t              totalElements;  //total number of mapped elements
+    vl_dsidx_t totalElements;  //total number of mapped elements
 } vl_hashtable;
 
 /**
  * \brief Hashtable element header. Not very space efficient.
  * \private
  */
-typedef struct{
-    vl_memsize_t  keySize;
-    vl_memsize_t  valSize;
+typedef struct {
+    vl_memsize_t keySize;
+    vl_memsize_t valSize;
     vl_hash keyHash;
     vl_arena_ptr next;
 } vl_hashtable_header;
@@ -72,7 +72,7 @@ typedef struct{
  * \param hashFunc hash function pointer
  * \par Complexity O(1) constant.
  */
-void            vlHashTableInit(vl_hashtable* table, vl_hash_function hashFunc);
+VL_API void vlHashTableInit(vl_hashtable *table, vl_hash_function hashFunc);
 
 /**
  * \brief Frees the specified table.
@@ -83,7 +83,7 @@ void            vlHashTableInit(vl_hashtable* table, vl_hash_function hashFunc);
  * \param table pointer
  * \par Complexity O(1) constant.
  */
-void            vlHashTableFree(vl_hashtable* table);
+VL_API void vlHashTableFree(vl_hashtable *table);
 
 /**
  * \brief Allocates on the heap, initializes, and returns a new hash table.
@@ -96,7 +96,7 @@ void            vlHashTableFree(vl_hashtable* table);
  * \par Complexity O(1) constant.
  * \return hashtable pointer.
  */
-vl_hashtable*   vlHashTableNew(vl_hash_function func);
+VL_API vl_hashtable *vlHashTableNew(vl_hash_function func);
 
 /**
  * Deallocates and deinitializes the specified table.
@@ -105,7 +105,7 @@ vl_hashtable*   vlHashTableNew(vl_hash_function func);
  * \param table pointer
  * \par Complexity O(1) constant.
  */
-void            vlHashTableDelete(vl_hashtable* table);
+VL_API void vlHashTableDelete(vl_hashtable *table);
 
 /**
  * \brief Claims a chunk of memory associated with the specified key.
@@ -118,7 +118,7 @@ void            vlHashTableDelete(vl_hashtable* table);
  * \par Complexity O(1) constant.
  * \return iterator to inserted element.
  */
-vl_hash_iter    vlHashTableInsert(vl_hashtable* table, const void* key, vl_memsize_t keySize, vl_memsize_t dataSize);
+VL_API vl_hash_iter vlHashTableInsert(vl_hashtable *table, const void *key, vl_memsize_t keySize, vl_memsize_t dataSize);
 
 /**
  * Removes the element represented by the specified key.
@@ -127,7 +127,7 @@ vl_hash_iter    vlHashTableInsert(vl_hashtable* table, const void* key, vl_memsi
  * \param keyLen length of key data, in bytes.
  * \par Complexity O(1) constant.
  */
-void            vlHashTableRemoveKey(vl_hashtable* table, const void* key, vl_memsize_t keyLen);
+VL_API void vlHashTableRemoveKey(vl_hashtable *table, const void *key, vl_memsize_t keyLen);
 
 /**
  * Removes the hash element represented by the specified iterator.
@@ -135,7 +135,7 @@ void            vlHashTableRemoveKey(vl_hashtable* table, const void* key, vl_me
  * \param iter
  * \par Complexity of O(1) constant.
  */
-void            vlHashTableRemoveIter(vl_hashtable* table, vl_hash_iter iter);
+VL_API void vlHashTableRemoveIter(vl_hashtable *table, vl_hash_iter iter);
 
 /**
  * \brief Clears the specified hash table so it can be used as if it was just created.
@@ -146,7 +146,7 @@ void            vlHashTableRemoveIter(vl_hashtable* table, vl_hash_iter iter);
  * \param table pointer
  * \par Complexity of O(1) constant.
  */
-void            vlHashTableClear(vl_hashtable* table);
+VL_API void vlHashTableClear(vl_hashtable *table);
 
 
 /**
@@ -164,7 +164,7 @@ void            vlHashTableClear(vl_hashtable* table);
  * \param dest pointer
  * \return pointer to table that was copied to or created.
  */
-vl_hashtable*   vlHashTableClone(const vl_hashtable* table, vl_hashtable* dest);
+VL_API vl_hashtable *vlHashTableClone(const vl_hashtable *table, vl_hashtable *dest);
 
 /**
  * \brief Copies a single element of a hashtable from one table to another.
@@ -179,7 +179,7 @@ vl_hashtable*   vlHashTableClone(const vl_hashtable* table, vl_hashtable* dest);
  * \param dest pointer
  * \return iterator to element inserted into dest table, or VL_HASHTABLE_ITER_INVALID.
  */
-vl_hash_iter vlHashTableCopyElement(vl_hashtable* src, vl_hash_iter iter, vl_hashtable* dest);
+VL_API vl_hash_iter vlHashTableCopyElement(vl_hashtable *src, vl_hash_iter iter, vl_hashtable *dest);
 
 /**
  * \brief Copies the entirety of one hashtable to another.
@@ -192,7 +192,7 @@ vl_hash_iter vlHashTableCopyElement(vl_hashtable* src, vl_hash_iter iter, vl_has
  * \param dest pointer
  * \return total number of elements copied
  */
-int             vlHashTableCopy(vl_hashtable* src, vl_hashtable* dest);
+VL_API int vlHashTableCopy(vl_hashtable *src, vl_hashtable *dest);
 
 /**
  * \brief Reserves memory in the hashtable before requiring it.
@@ -207,7 +207,7 @@ int             vlHashTableCopy(vl_hashtable* src, vl_hashtable* dest);
  * \param heapSize total bytes to reserve for element and key data
  * \par Complexity of O(1) constant.
  */
-void            vlHashTableReserve(vl_hashtable* table, vl_memsize_t buckets, vl_memsize_t heapSize);
+VL_API void vlHashTableReserve(vl_hashtable *table, vl_memsize_t buckets, vl_memsize_t heapSize);
 
 /**
  * Searches the hashtable for an element with the specified key.
@@ -217,7 +217,7 @@ void            vlHashTableReserve(vl_hashtable* table, vl_memsize_t buckets, vl
  * \par Complexity of O(1) constant.
  * \return found element, or VL_HASHTABLE_ITER_INVALID on failure.
  */
-vl_hash_iter    vlHashTableFind(vl_hashtable* table, const void* key, vl_memsize_t keySize);
+VL_API vl_hash_iter vlHashTableFind(vl_hashtable *table, const void *key, vl_memsize_t keySize);
 
 /**
  * Samples the key of the key-value pair indicated by the specified iterator.
@@ -227,7 +227,7 @@ vl_hash_iter    vlHashTableFind(vl_hashtable* table, const void* key, vl_memsize
  * \par Complexity of O(1) constant.
  * \return read-only pointer to key
  */
-const vl_transient*     vlHashTableSampleKey(vl_hashtable* table, vl_hash_iter iter, /*out*/vl_memsize_t* size);
+VL_API const vl_transient *vlHashTableSampleKey(vl_hashtable *table, vl_hash_iter iter, /*out*/vl_memsize_t *size);
 
 /**
  * Samples the value of the key-value pair indicated by the specified iterator.
@@ -237,7 +237,7 @@ const vl_transient*     vlHashTableSampleKey(vl_hashtable* table, vl_hash_iter i
  * \par Complexity of O(1) constant.
  * \return read-write pointer to value
  */
-vl_transient*           vlHashTableSampleValue(vl_hashtable* table, vl_hash_iter iter, /*out*/vl_memsize_t* size);
+VL_API vl_transient *vlHashTableSampleValue(vl_hashtable *table, vl_hash_iter iter, /*out*/vl_memsize_t *size);
 
 /**
  * Returns the "first" iterator for the specified table.
@@ -245,7 +245,7 @@ vl_transient*           vlHashTableSampleValue(vl_hashtable* table, vl_hash_iter
  * \par Complexity of O(1) constant.
  * \return iterator to some "first" element, or VL_HASHTABLE_ITER_INVALID if none exists.
  */
-vl_hash_iter    vlHashTableFront(vl_hashtable* table);
+VL_API vl_hash_iter vlHashTableFront(vl_hashtable *table);
 
 /**
  * Returns the "next" iterator relative to the specified iterator.
@@ -254,7 +254,7 @@ vl_hash_iter    vlHashTableFront(vl_hashtable* table);
  * \par Complexity of O(1) constant.
  * \return iterator to some "next" element, or VL_HASHTABLE_ITER_INVALID if none exists.
  */
-vl_hash_iter    vlHashTableNext(vl_hashtable* table, vl_hash_iter iter);
+VL_API vl_hash_iter vlHashTableNext(vl_hashtable *table, vl_hash_iter iter);
 
 //notice "back" and "prev" functions are omitted here.
 //considering there is no well-defined order that should be expected from this structure,

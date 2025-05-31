@@ -27,10 +27,10 @@ typedef struct {
      */
     vl_dsoffs_t offset;
 
-   /**
-     * \brief Actual allocation managed by the buffer.
-     */
-    vl_memory* data;
+    /**
+      * \brief Actual allocation managed by the buffer.
+      */
+    vl_memory *data;
 } vl_buffer;
 
 /**
@@ -39,7 +39,7 @@ typedef struct {
  * \par Complexity O(1) constant
  * \return pointer to buffer.
  */
-vl_buffer*  vlBufferNew(void);
+VL_API vl_buffer *vlBufferNew(void);
 
 /**
  * \brief Allocates a new buffer, and initializes it with a capacity of N bytes.
@@ -48,7 +48,7 @@ vl_buffer*  vlBufferNew(void);
  * \param initialCapacity initial capacity N
  * \return pointer to buffer.
  */
-vl_buffer*  vlBufferNewSz(vl_memsize_t initialCapacity);
+VL_API vl_buffer *vlBufferNewSz(vl_memsize_t initialCapacity);
 
 #ifndef vlBufferInit
 /**
@@ -75,7 +75,7 @@ vl_buffer*  vlBufferNewSz(vl_memsize_t initialCapacity);
  * \param initialCapacity total number of initial bytes the buffer will have the capacity to hold.
  * \par Complexity O(1) constant
  */
-void        vlBufferInitSz(vl_buffer* buffer, vl_memsize_t initialCapacity);
+VL_API void vlBufferInitSz(vl_buffer *buffer, vl_memsize_t initialCapacity);
 
 /**
  * \brief Resets the state of the specified buffer, setting the offset integer to zero.
@@ -83,7 +83,7 @@ void        vlBufferInitSz(vl_buffer* buffer, vl_memsize_t initialCapacity);
  * \par Complexity O(1) constant
  * \param buffer struct pointer
  */
-void        vlBufferReset(vl_buffer* buffer);
+VL_API void vlBufferReset(vl_buffer *buffer);
 
 /**
  * \brief Resets the state of the specified buffer, setting the offset integer to zero.
@@ -92,7 +92,7 @@ void        vlBufferReset(vl_buffer* buffer);
  * \param buffer struct pointer
  * \param newCapacity new capacity, in bytes
  */
-void        vlBufferResetSz(vl_buffer* buffer, vl_memsize_t newCapacity);
+VL_API void vlBufferResetSz(vl_buffer *buffer, vl_memsize_t newCapacity);
 
 /**
  * \brief Sets the entirety of the buffer to zero.
@@ -100,14 +100,14 @@ void        vlBufferResetSz(vl_buffer* buffer, vl_memsize_t newCapacity);
  * \par Complexity O(n) where n = buffer capacity
  * \param buffer struct pointer
  */
-void        vlBufferClear(vl_buffer* buffer);
+VL_API void vlBufferClear(vl_buffer *buffer);
 
 /**
  * \brief Resizes the specified buffer to hold a capacity equal to the current size.
  * \par Complexity O(n) where n = new buffer capacity
  * \param buffer struct pointer
  */
-void        vlBufferShrinkToFit(vl_buffer* buffer);
+VL_API void vlBufferShrinkToFit(vl_buffer *buffer);
 
 /**
  * \brief Clones the source buffer to the destination buffer.
@@ -130,7 +130,7 @@ void        vlBufferShrinkToFit(vl_buffer* buffer);
  * \par Complexity O(n) where n = buffer capacity.
  * \return 'dest' buffer, or buffer created via vlBufferNew.
  */
-vl_buffer*  vlBufferClone(const vl_buffer* src, vl_buffer* dest);
+VL_API vl_buffer *vlBufferClone(const vl_buffer *src, vl_buffer *dest);
 
 /**
  * \brief Copies a series of bytes from one buffer to another.
@@ -147,7 +147,7 @@ vl_buffer*  vlBufferClone(const vl_buffer* src, vl_buffer* dest);
  * \par Complexity O(n) where n = len
  * \return total number of bytes copied from src to dest.
  */
-vl_memsize_t        vlBufferCopy(vl_buffer* src, vl_buffer* dest, vl_memsize_t len);
+VL_API vl_memsize_t vlBufferCopy(vl_buffer *src, vl_buffer *dest, vl_memsize_t len);
 
 /**
  * \brief Performs a copy from the specified source pointer into the buffer.
@@ -160,7 +160,7 @@ vl_memsize_t        vlBufferCopy(vl_buffer* src, vl_buffer* dest, vl_memsize_t l
  * \param src pointer to the memory that will be copied from
  * \return the offset at which the bytes were written into the buffer.
  */
-vl_memsize_t   vlBufferWrite(vl_buffer* buffer, vl_memsize_t size, const void* src);
+VL_API vl_memsize_t vlBufferWrite(vl_buffer *buffer, vl_memsize_t size, const void *src);
 
 /**
  * \brief Copies bytes from the buffer to the specified destination.
@@ -172,7 +172,7 @@ vl_memsize_t   vlBufferWrite(vl_buffer* buffer, vl_memsize_t size, const void* s
  * \param dest pointer to the memory that will be copied to
  * \return actual number of bytes copied
  */
-vl_memsize_t      vlBufferRead(vl_buffer* buffer, vl_memsize_t size, void* dest);
+VL_API vl_memsize_t vlBufferRead(vl_buffer *buffer, vl_memsize_t size, void *dest);
 
 /**
  * \brief Sets the buffer offset relative to the beginning of the allocation.
@@ -180,7 +180,7 @@ vl_memsize_t      vlBufferRead(vl_buffer* buffer, vl_memsize_t size, void* dest)
  * \param buffer struct pointer
  * \param offset total number of bytes, positive, to seek forward.
  */
-void        vlBufferSeek(vl_buffer* buffer, vl_uintptr_t offset);
+VL_API void vlBufferSeek(vl_buffer *buffer, vl_uintptr_t offset);
 
 /**
  * \brief Seeks the internal offset relative to the current offset.
@@ -189,7 +189,7 @@ void        vlBufferSeek(vl_buffer* buffer, vl_uintptr_t offset);
  * \param buffer struct pointer
  * \param offset total number of bytes, positive or negative, to seek.
  */
-void        vlBufferSeekRelative(vl_buffer* buffer, vl_intptr_t offset);
+VL_API void vlBufferSeekRelative(vl_buffer *buffer, vl_intptr_t offset);
 
 /**
  * \brief Seeks the internal offset to the beginning of the buffer.
@@ -197,7 +197,7 @@ void        vlBufferSeekRelative(vl_buffer* buffer, vl_intptr_t offset);
  * \par Complexity O(1) constant
  * \param buffer struct pointer
  */
-void        vlBufferSeekBegin(vl_buffer* buffer);
+VL_API void vlBufferSeekBegin(vl_buffer *buffer);
 
 /**
  * \brief Seeks the internal offset to the end of the buffer.
@@ -206,7 +206,7 @@ void        vlBufferSeekBegin(vl_buffer* buffer);
  * \sa vlBufferEnd
  * \param buffer struct pointer
  */
-void        vlBufferSeekEnd(vl_buffer* buffer);
+VL_API void vlBufferSeekEnd(vl_buffer *buffer);
 
 /**
  * \brief Returns a pointer to the beginning of the buffer allocation
@@ -214,7 +214,7 @@ void        vlBufferSeekEnd(vl_buffer* buffer);
  * \param buffer struct pointer
  * \return pointer to the first byte of the allocation
  */
-vl_transient*       vlBufferBegin(vl_buffer* buffer);
+VL_API vl_transient *vlBufferBegin(vl_buffer *buffer);
 
 /**
  * \brief Returns a pointer to the end of the buffer allocation
@@ -222,7 +222,7 @@ vl_transient*       vlBufferBegin(vl_buffer* buffer);
  * \param buffer struct pointer
  * \return pointer to one past the last byte of the allocation
  */
-vl_transient*       vlBufferEnd(vl_buffer* buffer);
+VL_API vl_transient *vlBufferEnd(vl_buffer *buffer);
 
 /**
  * \brief Frees the specified buffer.
@@ -234,7 +234,7 @@ vl_transient*       vlBufferEnd(vl_buffer* buffer);
  * \param buffer struct pointer
  * \par Complexity O(1) constant.
  */
-void        vlBufferFree(vl_buffer* buffer);
+VL_API void vlBufferFree(vl_buffer *buffer);
 
 /**
  * \brief Deletes the specified buffer.
@@ -246,6 +246,6 @@ void        vlBufferFree(vl_buffer* buffer);
  * \param buffer struct pointer
  * \par Complexity O(1) constant.
  */
-void        vlBufferDelete(vl_buffer* buffer);
+VL_API void vlBufferDelete(vl_buffer *buffer);
 
 #endif //VL_BUFFER_H

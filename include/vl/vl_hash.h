@@ -16,7 +16,7 @@ typedef vl_ularge_t vl_hash;
  * \param data      read-only pointer to the data that will be hashed
  * \param dataSize  length of the data, in bytes. Usually this can be ignored unless the data is variable in length.
  */
-typedef vl_hash (*vl_hash_function)(const void* data, vl_memsize_t dataSize);
+typedef vl_hash (*vl_hash_function)(const void *data, vl_memsize_t dataSize);
 
 #define VL_HASH_STRING  vlHashString
 #define VL_HASH_BYTES   vlHashString
@@ -50,7 +50,7 @@ typedef vl_hash (*vl_hash_function)(const void* data, vl_memsize_t dataSize);
  * \param dataSize  length of the data, in bytes. Usually this can be ignored unless the data is variable in length.
  * \return corresponding hash code.
  */
-vl_hash vlHashString                        (const void* data, vl_memsize_t dataSize);
+VL_API vl_hash vlHashString(const void *data, vl_memsize_t dataSize);
 
 /**
  * \brief Generates a hash code for the 8-bit sequence at the specified address.
@@ -61,7 +61,7 @@ vl_hash vlHashString                        (const void* data, vl_memsize_t data
  * \param data pointer
  * \return hash code
  */
-vl_hash vlHash8     (const void* data, vl_memsize_t);
+VL_API vl_hash vlHash8(const void *data, vl_memsize_t);
 
 /**
  * \brief Generates a hash code for the 16-bit sequence at the specified address.
@@ -70,7 +70,7 @@ vl_hash vlHash8     (const void* data, vl_memsize_t);
  * \param data pointer
  * \return hash code
  */
-vl_hash vlHash16    (const void* data, vl_memsize_t);
+VL_API vl_hash vlHash16(const void *data, vl_memsize_t);
 
 /**
  * \brief Generates a hash code for the 32-bit sequence at the specified address.
@@ -81,7 +81,7 @@ vl_hash vlHash16    (const void* data, vl_memsize_t);
  * \param data pointer
  * \return hash code
  */
-vl_hash vlHash32    (const void* data, vl_memsize_t);
+VL_API vl_hash vlHash32(const void *data, vl_memsize_t);
 
 /**
  * \brief Generates a hash code for the 64-bit sequence at the specified address.
@@ -91,7 +91,7 @@ vl_hash vlHash32    (const void* data, vl_memsize_t);
  * \param data pointer
  * \return hash code
  */
-vl_hash vlHash64    (const void* data, vl_memsize_t);
+VL_API vl_hash vlHash64(const void *data, vl_memsize_t);
 
 #ifndef vlHashCombine
 /**

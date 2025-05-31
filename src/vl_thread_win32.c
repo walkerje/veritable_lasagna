@@ -17,27 +17,27 @@ VL_THREAD_LOCAL HANDLE currentThread = NULL;
 /**
  * \private
  */
-typedef struct{
+typedef struct {
     HANDLE threadHandle;
 
-    vl_thread_proc  threadProc;
-    void*           userArg;
+    vl_thread_proc threadProc;
+    void *userArg;
 } vl_thread_args;
 
 /**
  * \private
  */
-unsigned __stdcall vl_ThreadBootstrap(void* arg){
+unsigned __stdcall vl_ThreadBootstrap(void *arg) {
     HANDLE threadHandle;
     vl_thread_proc proc;
-    void* userArg;
+    void *userArg;
 
     {
-        vl_thread_args* threadArgs = (vl_thread_args*)(arg);
+        vl_thread_args *threadArgs = (vl_thread_args *) (arg);
 
-        threadHandle    = threadArgs->threadHandle;
-        proc            = threadArgs->threadProc;
-        userArg         = threadArgs->userArg;
+        threadHandle = threadArgs->threadHandle;
+        proc = threadArgs->threadProc;
+        userArg = threadArgs->userArg;
 
         free(threadArgs);
     }
@@ -50,10 +50,10 @@ unsigned __stdcall vl_ThreadBootstrap(void* arg){
     return 0;
 }
 
-vl_thread vlThreadNew(vl_thread_proc threadProc, void* userArg) {
+vl_thread vlThreadNew(vl_thread_proc threadProc, void *userArg) {
     vlThreadCurrent();
 
-    vl_thread_args* args = malloc(sizeof(vl_thread_args));
+    vl_thread_args *args = malloc(sizeof(vl_thread_args));
 
     if (args == NULL) {
         return 0;  // Failed to allocate arguments
@@ -69,46 +69,46 @@ vl_thread vlThreadNew(vl_thread_proc threadProc, void* userArg) {
         return 0;
     }
 
-    args->threadHandle = (HANDLE)threadHandle;
+    args->threadHandle = (HANDLE) threadHandle;
     ResumeThread(args->threadHandle);
 
-    return (vl_thread)threadHandle;  // Return thread handle
+    return (vl_thread) threadHandle;  // Return thread handle
 }
 
-void vlThreadDelete(vl_thread thread){
-    if(thread == 0 || thread == ((vl_uintptr_t)&mainThread))
+void vlThreadDelete(vl_thread thread) {
+    if (thread == 0 || thread == ((vl_uintptr_t) &mainThread))
         return;
     CloseHandle((HANDLE) thread);
 }
 
-vl_bool_t vlThreadJoin(vl_thread thread){
-    if(thread == 0 || thread == ((vl_uintptr_t)&mainThread))
+vl_bool_t vlThreadJoin(vl_thread thread) {
+    if (thread == 0 || thread == ((vl_uintptr_t) &mainThread))
         return VL_FALSE;
     HANDLE handle = (HANDLE) thread;
     const DWORD status = WaitForSingleObject(handle, INFINITE);
 
-    if(status == WAIT_OBJECT_0){
+    if (status == WAIT_OBJECT_0) {
         return VL_TRUE;//Finished execution.
     }
 
     return VL_FALSE;//Timed out or failed to wait.
 }
 
-vl_bool_t vlThreadJoinTimeout(vl_thread thread, vl_uint_t milliseconds){
-    if(thread == 0 || thread == ((vl_uintptr_t)&mainThread))
+vl_bool_t vlThreadJoinTimeout(vl_thread thread, vl_uint_t milliseconds) {
+    if (thread == 0 || thread == ((vl_uintptr_t) &mainThread))
         return VL_FALSE;
     HANDLE handle = (HANDLE) thread;
     const DWORD status = WaitForSingleObject(handle, milliseconds);
 
-    if(status == WAIT_OBJECT_0){
+    if (status == WAIT_OBJECT_0) {
         return VL_TRUE;//Finished execution.
     }
 
     return VL_FALSE;//Timed out or failed to wait.
 }
 
-vl_thread vlThreadCurrent(){
-    switch((vl_uintptr_t)currentThread){
+vl_thread vlThreadCurrent() {
+    switch ((vl_uintptr_t) currentThread) {
         case 0:
             mainThread = GetCurrentThread();
             currentThread = &mainThread;
@@ -117,17 +117,17 @@ vl_thread vlThreadCurrent(){
     }
 }
 
-vl_bool_t vlThreadYield(){
+vl_bool_t vlThreadYield() {
     return SwitchToThread();
 }
 
-void vlThreadSleep(vl_ularge_t milliseconds){
+void vlThreadSleep(vl_ularge_t milliseconds) {
     Sleep(milliseconds);
 }
 
-void vlThreadSleepNano(vl_ularge_t nanoseconds){
+void vlThreadSleepNano(vl_ularge_t nanoseconds) {
     const vl_ularge_t busy_threshold = 10000; // 10,000 ns = 10 µs
-    if(nanoseconds <= busy_threshold){// 10 µs
+    if (nanoseconds <= busy_threshold) {// 10 µs
         //Very small sleep. Spin using QueryPerformance API.
         LARGE_INTEGER freq, start, now;
         QueryPerformanceFrequency(&freq);
@@ -140,7 +140,7 @@ void vlThreadSleepNano(vl_ularge_t nanoseconds){
             QueryPerformanceCounter(&now);
             elapsed_ticks = now.QuadPart - start.QuadPart;
         } while (elapsed_ticks < wait_ticks);
-    }else{
+    } else {
         //Larger delay. Use the WaitableTimer API.
         HANDLE timer = CreateWaitableTimer(NULL, TRUE, NULL);
 
@@ -154,6 +154,6 @@ void vlThreadSleepNano(vl_ularge_t nanoseconds){
     }
 }
 
-void vlThreadExit(){
+void vlThreadExit() {
     ExitThread(0);
 }
