@@ -1,10 +1,21 @@
 cmake_minimum_required(VERSION 3.22.1)
 
+include(cmake/InstallHooks.cmake)
+
 # Versioning
-set(VL_VERSION_MAJOR 0)
-set(VL_VERSION_MINOR 13)
-set(VL_VERSION_PATCH 9)
-set(VL_VERSION ${VL_VERSION_MAJOR}.${VL_VERSION_MINOR}.${VL_VERSION_PATCH})
+
+# Read metadata from vcpkg.json
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json" VL_VCPKG_JSON_CONTENTS)
+string(JSON VL_VCPKG_VERSION GET ${VL_VCPKG_JSON_CONTENTS} version)
+string(JSON VL_VCPKG_DESCRIPTION GET ${VL_VCPKG_JSON_CONTENTS} description)
+string(JSON VL_VCPKG_HOMEPAGE GET ${VL_VCPKG_JSON_CONTENTS} homepage)
+
+# Parse version components
+string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)" VERSION_MATCHES ${VL_VCPKG_VERSION})
+set(VL_VERSION_MAJOR ${CMAKE_MATCH_1})
+set(VL_VERSION_MINOR ${CMAKE_MATCH_2})
+set(VL_VERSION_PATCH ${CMAKE_MATCH_3})
+set(VL_VERSION ${VL_VCPKG_VERSION})
 
 # Some relative variables.
 set(VL_PROJECT_PATH ${CMAKE_CURRENT_LIST_DIR})
@@ -15,9 +26,8 @@ math(EXPR VL_PROJECT_PATH_LEN "${VL_PROJECT_PATH_LEN} + 1")# +1 to omit path sep
 
 project(veritable_lasagna VERSION ${VL_VERSION}
         LANGUAGES C
-        DESCRIPTION "Data structures and algorithms."
-        HOMEPAGE_URL "https://bitshiftmountain.com")
-
+        DESCRIPTION "${VL_VCPKG_DESCRIPTION}"
+        HOMEPAGE_URL "${VL_VCPKG_HOMEPAGE}")
 
 set(CMAKE_C_STANDARD            11)
 

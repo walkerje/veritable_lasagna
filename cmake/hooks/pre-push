@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+# Store the current directory
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+# Update README and vcpkg overlay
+cmake -P "${REPO_ROOT}/cmake/update_readme.cmake"
+
+# Check for changes in both README and vcpkg overlay
+if git diff --quiet README.md "./vcpkg/veritable-lasagna/vcpkg.json"; then
+    # No changes
+    exit 0
+else
+    echo "Version bump applied."
+    git add README.md "./vcpkg/veritable-lasagna/vcpkg.json"
+    git commit -m "docs: version bump"
+fi
