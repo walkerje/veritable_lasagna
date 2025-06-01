@@ -5,7 +5,7 @@ set -e
 REPO_ROOT=$(git rev-parse --show-toplevel)
 
 # Update README and vcpkg overlay
-cmake -P "${REPO_ROOT}/cmake/update_readme.cmake"
+cmake -P "${REPO_ROOT}/cmake/VersionBump.cmake"
 
 # Check for changes in both README and vcpkg overlay
 if git diff --quiet README.md "./vcpkg/veritable-lasagna/vcpkg.json"; then
