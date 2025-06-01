@@ -1,8 +1,8 @@
 ![Veritable Lasagna](docs/image/vl_logo.svg)
 
-# Veritable Lasagna (v0.13.9)
+# Veritable Lasagna (v0.13.10)
 
-> A cross-platform C11 library for memory allocators, data structures, and algorithms
+> A Data Structures & Algorithms Library for C
 
 ![Written in C11](https://img.shields.io/badge/C11-gray?style=for-the-badge&logo=C&logoColor=orange&labelColor=black)
 [![Built with CMake](https://img.shields.io/badge/Built%20with%20CMake-gray?style=for-the-badge&logo=CMake&logoColor=orange&labelColor=black)](https://cmake.org/)
@@ -49,7 +49,7 @@ Veritable Lasagna provides a robust set of components:
 
 This roadmap outlines what is needed for Veritable Lasagna to be considered feature-complete. After v1.0.0, new features will be released in minor versions, while major releases will introduce significant architectural changes.
 
-> **Note:** ABI compatibility is not guaranteed until version 1.0.0 is reached.
+> A Data Structures & Algorithms Library for C
 
 All features must be cross-platform and include comprehensive test suites.
 
@@ -400,4 +400,4 @@ The generated documentation will be available in the `docs/html` directory. Open
 
 Veritable Lasagna is available under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-[Back to Top](#veritable-lasagna-v0139)
+[Back to Top](#veritable-lasagna-v0.13.10)

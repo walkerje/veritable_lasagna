@@ -1,6 +1,6 @@
 {
   "name": "veritable-lasagna",
-  "version": "0.13.9",
+  "version": "0.13.10",
   "description": "A Data Structures & Algorithms Library for C",
   "homepage": "https://github.com/walkerje/veritable_lasagna",
   "license": "MIT",
@@ -14,6 +14,7 @@
       "host": true
     }
   ],
+
   "features": {
     "test": {
       "description": "Build tests",
@@ -21,6 +22,5 @@
         "gtest"
       ]
     }
-  },
-  "default-features": ["test"]
+  }
 }
