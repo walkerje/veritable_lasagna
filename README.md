@@ -252,8 +252,18 @@ vcpkg install --overlay-ports=.\veritable_lasagna\vcpkg veritable-lasagna
 
 ### Bash (Linux/MSYS/Cygwin/etc) (See [install.sh](install.sh) first!)
 ```shell
-wget -O - https://raw.githubusercontent.com/walkerje/veritable_lasagna/refs/heads/main/install.sh | bash
+wget -O - https://raw.githubusercontent.com/walkerje/veritable_lasagna/main/install.sh | bash -s -- --all
 ```
+
+- Available options:
+  - `--build-type=TYPE` : Set build type(s): Debug and/or Release (use semicolon for multiple)
+  - `--all` : Build and install both Debug and Release configurations
+  - `--no-sudo` : Don't use sudo for installation
+  - `--help` : Show help message
+
+Note: The installation path is determined by your CMake configuration.
+To see the install location, run:
+
 
 You can reference the installation in your project by using `find_package` in your own
 `CMakeLists.txt`.
@@ -369,6 +379,24 @@ cd test && ctest
 ```
 
 The test results will show you which tests passed and failed, helping ensure the library works correctly on your system.
+
+### Testing & Coverage Build Options (GNU/Clang)
+| Option               | Description                        | Default | Purpose                                                                                                                               |
+|----------------------|------------------------------------|---------|---------------------------------------------------------------------------------------------------------------------------------------|
+| `VL_ENABLE_COVERAGE` | Enables code coverage reporting    | `OFF`   | Generates coverage reports showing which lines of code are executed during tests. Requires [`gcovr`](https://github.com/gcovr/gcovr). |
+| `VL_ENABLE_ASAN`     | Enables AddressSanitizer           | `OFF`   | Detects memory errors like buffer overflows, use-after-free, memory leaks                                                             |
+| `VL_ENABLE_UBSAN`    | Enables UndefinedBehaviorSanitizer | `OFF`   | Detects undefined behavior like integer overflow, null pointer dereference                                                            |
+| `VL_ENABLE_TSAN`     | Enables ThreadSanitizer            | `OFF`   | Detects data races and other threading issues                                                                                         |
+
+Usage example:
+``` bash
+cmake -DBUILD_TESTING=ON -DVL_ENABLE_ASAN=ON -DVL_ENABLE_COVERAGE=ON
+```
+Note:
+- These options are only available with GCC and Clang compilers
+- Only one sanitizer should be enabled at a time (ASAN, TSAN, or UBSAN)
+- Coverage reporting works best with Debug builds
+- When using sanitizers, it's recommended to build in Debug mode for better error reporting
 
 ## Generating Documentation
 
