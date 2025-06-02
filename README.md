@@ -262,7 +262,6 @@ wget -O - https://raw.githubusercontent.com/walkerje/veritable_lasagna/main/inst
   - `--help` : Show help message
 
 Note: The installation path is determined by your CMake configuration.
-To see the install location, run:
 
 
 You can reference the installation in your project by using `find_package` in your own
