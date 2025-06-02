@@ -5,7 +5,13 @@ set -e  # Exit on error
 # Default values
 INSTALL_DIR="/tmp/vl_install_$$"  # Using $$ (PID) for uniqueness
 BUILD_TYPES=""  # Empty means default (Release)
-SUDO_CMD=""
+
+# Determine if sudo is available and should be used by default
+if command -v sudo >/dev/null 2>&1; then
+    SUDO_CMD="sudo"
+else
+    SUDO_CMD=""
+fi
 
 # Function to clean up on exit
 cleanup() {
@@ -55,9 +61,15 @@ trap 'error_handler ${LINENO}' ERR
 trap cleanup EXIT
 
 # Print banner
-echo "==============================================="
-echo "Veritable Lasagna Installer"
-echo "==============================================="
+echo "========================================================================="
+echo "*  ██    ██ ██       █████  ███████  █████   ██████  ███    ██  █████   *"
+echo "*  ██    ██ ██      ██   ██ ██      ██   ██ ██       ████   ██ ██   ██  *"
+echo "*  ██    ██ ██      ███████ ███████ ███████ ██   ███ ██ ██  ██ ███████  *"
+echo "*   ██  ██  ██      ██   ██      ██ ██   ██ ██    ██ ██  ██ ██ ██   ██  *"
+echo "*    ████   ███████ ██   ██ ███████ ██   ██  ██████  ██   ████ ██   ██  *"
+echo "* ---------- https://github.com/walkerje/veritable_lasagna -----------  *"
+echo "========================================================================="
+echo "=======================Veritable Lasagna Installer======================="
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -99,18 +111,10 @@ if [ -z "$BUILD_TYPES" ]; then
     BUILD_TYPES="Release"
 fi
 
-# Check if sudo is needed (only if we can detect the install path)
+# Add warning if no sudo and not explicitly disabled
 if [ -z "$SUDO_CMD" ]; then
-    # Try to get CMake's install prefix
-    CMAKE_INSTALL_PREFIX=$(cmake -N -L 2>/dev/null | grep CMAKE_INSTALL_PREFIX | cut -d '=' -f2 || echo "")
-    if [ -n "$CMAKE_INSTALL_PREFIX" ] && [ ! -w "$CMAKE_INSTALL_PREFIX" ]; then
-        if command -v sudo >/dev/null 2>&1; then
-            SUDO_CMD="sudo"
-        else
-            echo "Error: Installation requires root privileges, but sudo is not available"
-            exit 1
-        fi
-    fi
+    echo "Warning: Installing without sudo privileges. If installation fails with permission errors,"
+    echo "run the installer again without the --no-sudo flag."
 fi
 
 # Check requirements
