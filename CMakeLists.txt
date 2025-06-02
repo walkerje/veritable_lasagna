@@ -1,7 +1,15 @@
 cmake_minimum_required(VERSION 3.22.1)
 
 # Project: Veritable Lasagna - A Data Structures & Algorithms Library for C
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+
+# If in a git repo, add a hook to .git that helps propagate version changes
+find_package(Git QUIET)
+if(Git_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+    include(cmake/InstallHooks.cmake)
+else()
+    message(STATUS "Git not found or not a Git repository - skipping hook installation")
+endif()
 
 # Read metadata from vcpkg.json to ensure version consistency
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json" VL_VCPKG_JSON_CONTENTS)
@@ -9,8 +17,6 @@ string(JSON VL_VCPKG_VERSION GET ${VL_VCPKG_JSON_CONTENTS} version)
 string(JSON VL_VCPKG_DESCRIPTION GET ${VL_VCPKG_JSON_CONTENTS} description)
 string(JSON VL_VCPKG_HOMEPAGE GET ${VL_VCPKG_JSON_CONTENTS} homepage)
 
-# Installs a git hook to .git that automatically propagates version changes
-include(cmake/InstallHooks.cmake)
 
 # Parse version components
 string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)" VERSION_MATCHES ${VL_VCPKG_VERSION})

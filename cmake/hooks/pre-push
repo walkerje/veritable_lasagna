@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Ensure root vcpkg version matches vcpkg overlay version.
+# If not, propagate version updates across relevant files using a CMake script.
+
+current_version=$(grep '"version":' vcpkg.json | sed 's/.*"version": "\([^"]*\)".*/\1/')
+
+vcpkg_manifest="./vcpkg/veritable-lasagna/vcpkg.json"
+manifest_version=$(grep '"version":' "$vcpkg_manifest" | sed 's/.*"version": "\([^"]*\)".*/\1/')
+
+# Compare versions
+if [ "$current_version" != "$manifest_version" ]; then
+    echo "⚠️  Version mismatch detected!"
+    echo "   Project version: $current_version"
+    echo "   Package version: $manifest_version"
+    echo "❌ Please run 'cmake -P ./cmake/VersionBump.cmake' to update version references"
+    exit 1
+fi
+
+exit 0
