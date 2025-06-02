@@ -14,5 +14,4 @@ if git diff --quiet README.md "./vcpkg/veritable-lasagna/vcpkg.json"; then
 else
     echo "Version bump applied."
     git add README.md "./vcpkg/veritable-lasagna/vcpkg.json"
-    git commit -m "docs: version bump"
 fi
