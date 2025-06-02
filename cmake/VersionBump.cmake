@@ -16,11 +16,14 @@ if(EXISTS "${VCPKG_OVERLAY_JSON}")
     endif()
 endif()
 
+set(FILES_CHANGED FALSE)
+
 # Update vcpkg overlay if needed
 if(NEEDS_VCPKG_UPDATE)
     file(MAKE_DIRECTORY "${VCPKG_OVERLAY_PATH}")
     file(COPY "${CMAKE_SOURCE_DIR}/vcpkg.json" DESTINATION "${VCPKG_OVERLAY_PATH}")
     message(STATUS "Updated vcpkg overlay with new version ${VERSION}")
+    set(FILES_CHANGED TRUE)
 endif()
 
 # Read existing README
@@ -48,4 +51,21 @@ string(REGEX REPLACE
 if(NOT "${README_CONTENTS}" STREQUAL "${README_NEW}")
     file(WRITE "${CMAKE_SOURCE_DIR}/README.md" "${README_NEW}")
     message(STATUS "README.md updated with new metadata")
+    set(FILES_CHANGED TRUE)
+endif()
+
+# If any files were changed, create a commit
+if(FILES_CHANGED)
+    find_package(Git QUIET)
+    if(Git_FOUND)
+        execute_process(
+                COMMAND ${GIT_EXECUTABLE} add "${VCPKG_OVERLAY_JSON}" "${CMAKE_SOURCE_DIR}/README.md"
+                WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        )
+        execute_process(
+                COMMAND ${GIT_EXECUTABLE} commit -m "chore: sync version references to ${VERSION}"
+                WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        )
+        message(STATUS "Created version sync commit for v${VERSION}")
+    endif()
 endif()
