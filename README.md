@@ -1,6 +1,6 @@
 ![Veritable Lasagna](docs/image/vl_logo.svg)
 
-# Veritable Lasagna (v0.13.10)
+# Veritable Lasagna (v0.13.11)
 
 > A Data Structures & Algorithms Library for C
 
@@ -428,4 +428,4 @@ The generated documentation will be available in the `docs/html` directory. Open
 
 Veritable Lasagna is available under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-[Back to Top](#veritable-lasagna-v0.13.10)
+[Back to Top](#veritable-lasagna-v0.13.11)
