@@ -9,7 +9,7 @@
  * Provides a lightweight counting semaphore implementation that can be used
  * for signaling between threads and managing access to a pool of resources.
  */
-typedef vl_uintptr_t vl_semaphore;
+typedef struct vl_semaphore_* vl_semaphore;
 
 /**
  * \brief Creates a new semaphore with the specified initial count

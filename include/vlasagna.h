@@ -48,6 +48,7 @@
 #include "vl/vl_mutex.h"
 #include "vl/vl_srwlock.h"
 #include "vl/vl_semaphore.h"
+#include "vl/vl_condition.h"
 #include "vl/vl_async_pool.h"
 #include "vl/vl_async_queue.h"
 

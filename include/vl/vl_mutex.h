@@ -7,7 +7,7 @@
 #define VL_MUTEX_NULL 0
 #endif
 
-typedef vl_uintptr_t vl_mutex;
+typedef struct vl_mutex_* vl_mutex;
 
 /**
  * \brief Creates a new instance of a mutex.

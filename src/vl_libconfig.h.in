@@ -41,6 +41,8 @@
 #cmakedefine VL_THREADS_WIN32
 #cmakedefine VL_THREADS_PTHREAD
 
+#cmakedefine VL_DYNLIB_WIN32
+#cmakedefine VL_DYNLIB_POSIX
 
 
 /***********************************************************************************

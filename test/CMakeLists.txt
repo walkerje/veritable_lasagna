@@ -14,6 +14,8 @@ FetchContent_Declare(
 
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+set(CMAKE_CXX_STANDARD 17)
+
 FetchContent_MakeAvailable(googletest)
 
 # These tests will compile just fine as C++ with C linkage, and can be tested "straight forward".

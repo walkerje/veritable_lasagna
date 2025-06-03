@@ -25,27 +25,44 @@
 typedef vl_arena_ptr vl_hash_iter;
 
 /**
- * \brief A dynamically-sized hash table.
+ * \brief A dynamically-sized hash table with variable-sized keys and values.
  *
- * The vl_hashtable structure represents a HashTable/Hashmap/Unordered map.
- * It is implemented on top of a vl_arena, which holds the underlying node data.
- * A vl_memory* allocation is used to hold mappings between hash nodes and
- * their respective vl_arena_ptr values into the virtual arena allocator.
+ * A generic hash table implementation that supports:
+ * - Variable-sized keys and values
+ * - Custom hash functions
+ * - Efficient iteration (only visits occupied entries)
+ * - Automatic growth when load factor exceeds threshold
  *
- * This hashtable resolves collisions through separate chaining.
+ * Implementation details:
+ * - Uses separate chaining for collision resolution
+ * - Built on arena allocator for efficient memory management
+ * - Non-stable pointers: element addresses may change on insertion/resize
+ * - Growth factor: doubles capacity when load factor exceeds VL_HASHTABLE_RESIZE_FACTOR
  *
- * The structure retains a counter that represents the total number of elements it contains.
- * Should the total number of elements become larger or equal to the
- * size of the table * VL_HASHTABLE_RESIZE_FACTOR, the table grows in size by doubling its capacity.
- * The table and collision chains will then be rebuilt according to this new size with a complexity of O(n).
+ * Performance characteristics:
+ * - Find/Insert/Delete: O(1) average case
+ * - Iteration: O(n) where n is number of elements
+ * - Growth: O(n) when resizing is triggered
+ * - Memory: O(n + m) where n is number of elements and m is number of buckets
  *
- * This table does not waste time by iterating over empty space.
- * \sa vl_arena
+ * Memory considerations:
+ * - Elements are stored contiguously in arena memory
+ * - No memory is wasted on empty bucket iteration
+ * - Each element has overhead for key size, value size, and chain pointer
+ *
+ * Usage notes:
+ * - Do not store pointers to elements long-term as they may become invalid
+ * - Use iterators returned by operations to track elements
+ * - Always check iterator validity before use
+ *
+ * \sa vl_arena For details about the underlying memory management
+ * \sa VL_HASHTABLE_RESIZE_FACTOR For load factor threshold configuration
  */
+
 typedef struct {
-    vl_memory *table;          //holds mapping from hash values to collision list heads in the arena
-    vl_arena data;           //holds the node key/value data
-    vl_hash_function hashFunc;       //hash function; hashes keys
+    vl_memory *table;               //holds mapping from hash values to collision list heads in the arena
+    vl_arena data;                  //holds the node key/value data
+    vl_hash_function hashFunc;      //hash function; hashes keys
 
     vl_dsidx_t totalElements;  //total number of mapped elements
 } vl_hashtable;
@@ -55,10 +72,10 @@ typedef struct {
  * \private
  */
 typedef struct {
-    vl_memsize_t keySize;
-    vl_memsize_t valSize;
-    vl_hash keyHash;
-    vl_arena_ptr next;
+    vl_uint16_t     keySize;
+    vl_uint16_t     valSize;
+    vl_hash         keyHash;
+    vl_arena_ptr    next;
 } vl_hashtable_header;
 
 /**

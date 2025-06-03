@@ -11,7 +11,7 @@
 #define VL_THREAD_NULL 0
 #endif
 
-typedef vl_uintptr_t vl_thread;
+typedef struct vl_thread_* vl_thread;
 
 typedef void (*vl_thread_proc)(void *usr);
 

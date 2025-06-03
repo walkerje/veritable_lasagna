@@ -8,11 +8,11 @@
 
 #ifdef VL_THREADS_WIN32
 
-#include "vl_mutex_win32.c"
+#include "platform/win32/vl_mutex_win32.c"
 
 #elif defined VL_THREADS_PTHREAD
 
-#include "vl_mutex_pthread.c"
+#include "platform/posix/vl_mutex_pthread.c"
 
 #else
 #error Failed to configure vl_mutex implementation.

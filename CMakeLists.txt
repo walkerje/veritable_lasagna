@@ -40,8 +40,10 @@ project(veritable_lasagna
         HOMEPAGE_URL "${VL_VCPKG_HOMEPAGE}")
 
 # Include required CMake modules
-include(GNUInstallDirs)            # Standard installation directories
-include(CMakePackageConfigHelpers) # Package config file generation
+include(GNUInstallDirs)             # Standard installation directories
+include(CMakePackageConfigHelpers)  # Package config file generation
+include(CheckIncludeFile)           # Compilation header checking
+include(CheckLibraryExists)         # Compilation library checking
 include(cmake/PrimitiveTypes.cmake) # Platform-specific type definitions
 
 # Set build type macro for configuration
@@ -83,6 +85,19 @@ if(MSVC)
 else()
     set(VL_SYSTEM_LIBS ${VL_SYSTEM_LIBS} atomic)
 endif()
+
+check_include_file(dlfcn.h VL_DYNLIB_POSIX)
+
+if(VL_DYNLIB_POSIX)
+    check_library_exists(dl dlopen "" VL_DYNLIB_POSIX_DLIB)
+
+    if(VL_DYNLIB_POSIX_DLIB)
+        set(VL_SYSTEM_LIBS ${VL_SYSTEM_LIBS} ${CMAKE_DL_LIBS})
+    endif ()
+else()
+    set(VL_DYNLIB_WIN32 1)
+endif ()
+
 
 # -------------------------------------------------------------------------------
 # Helper Macros

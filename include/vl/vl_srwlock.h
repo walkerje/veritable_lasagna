@@ -32,7 +32,7 @@
  * \note Improper use of read-write locks can lead to writer starvation or deadlocks.
  *       Always release locks in the reverse order they were acquired.
  */
-typedef vl_uintptr_t vl_srwlock;
+typedef struct vl_srwlock_* vl_srwlock;
 
 /**
  * \brief Creates a new instance of a lock.

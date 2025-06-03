@@ -4,7 +4,7 @@
 #include "vl_numtypes.h"
 #include "vl_mutex.h"
 
-typedef vl_uintptr_t vl_condition;
+typedef struct vl_condition_* vl_condition;
 
 /**
  * \brief Creates and initializes a new condition variable.
