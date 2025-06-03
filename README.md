@@ -49,9 +49,9 @@ Veritable Lasagna provides a robust set of components:
 
 This roadmap outlines what is needed for Veritable Lasagna to be considered feature-complete. After v1.0.0, new features will be released in minor versions, while major releases will introduce significant architectural changes.
 
-> A Data Structures & Algorithms Library for C
+* Note: ABI Compatibility between minor version changes is not guaranteed until reaching v1.0.0.
 
-All features must be cross-platform and include comprehensive test suites.
+All features must be cross-platform between POSIX and WIN32 systems.
 
 ### Memory Management
 - ✅ Memory blocks with metadata (`vl_memory`)
