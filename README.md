@@ -1,6 +1,6 @@
 ![Veritable Lasagna](docs/image/vl_logo.svg)
 
-# Veritable Lasagna (v0.13.14)
+# Veritable Lasagna (v0.14.1)
 
 > A Data Structures & Algorithms Library for C
 
@@ -97,7 +97,7 @@ All features must be cross-platform and include comprehensive test suites.
 - ❌ Path handling
 
 ### Other
-- ❌ Runtime Dynamic Library Handling
+- ✅ Runtime Dynamic Library Handling `vl_dynlib`
 
 ## Code Samples
 
@@ -427,4 +427,4 @@ The generated documentation will be available in the `docs/html` directory. Open
 
 Veritable Lasagna is available under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-[Back to Top](#veritable-lasagna-v0.13.14)
+[Back to Top](#veritable-lasagna-v0.14.1)
