@@ -10,7 +10,7 @@
 
 #include "platform/win32/vl_dynlib_win32.c"
 
-#elif defined VL_DYNLIB_PTHREAD
+#elif defined VL_DYNLIB_POSIX
 
 #include "platform/posix/vl_dynlib_posix.c"
 
