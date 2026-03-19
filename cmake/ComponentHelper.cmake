@@ -19,10 +19,11 @@ function(vl_add_component COMPONENT_NAME SOURCES_VAR INCLUDE_DIR OUTPUT_NAME)
     target_include_directories(${TARGET_NAME}
             PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${INCLUDE_DIR}/>
+            $<BUILD_INTERFACE:${VL_CONFIG_HEADER_INCLUDE}>
+            
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
             PRIVATE
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${INCLUDE_DIR}/vl>
-            ${VL_CONFIG_HEADER_INCLUDE}
     )
 
     # Set standard library properties
