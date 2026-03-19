@@ -1,0 +1,15 @@
+#ifndef VL_ATOMIC_TEST_H
+#define VL_ATOMIC_TEST_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <vl/vl_numtypes.h>
+
+VL_API vl_bool_t vlTestAtomicCounter();
+
+#ifdef __cplusplus
+}
+#endif
+#endif //VL_ATOMIC_TEST_H

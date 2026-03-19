@@ -1,6 +1,6 @@
 ![Veritable Lasagna](docs/image/vl_logo.svg)
 
-# Veritable Lasagna (v0.14.1)
+# Veritable Lasagna (v1.0.0)
 
 > A Data Structures & Algorithms Library for C
 
@@ -12,18 +12,19 @@
 ![Test Status](https://github.com/walkerje/veritable_lasagna/actions/workflows/build_and_test.yml/badge.svg)
 
 ## Table of Contents
-- [Overview](#introduction)
+- [Introduction](#introduction)
 - [Features](#features)
-- [Roadmap](#roadmap-to-v100)
-- [Installation](#quick-start)
+- [Code Samples](#code-samples)
+- [Quick Start](#quick-start)
   - [Requirements](#requirements)
-  - [Option 1: Package Installation](#option-1-recommended-automated-build--install-from-repo)
-  - [Option 2: Embed as Subdirectory](#option-2-embed-as-subdirectory)
-  - [Option 3: Manual Build](#option-3-manual-build-and-install)
+  - [Installation Options](#installation-options)
+    - [Option 1: Conan Package Manager](#option-1-conan-package-manager)
+    - [Option 2: Embed as Subdirectory](#option-2-embed-as-subdirectory)
+    - [Option 3: Manual Build](#option-3-manual-build-and-install)
   - [Configuration Options](#configuration-options)
-- [Usage Examples](#code-samples)
 - [Testing](#building-and-running-tests)
 - [Documentation](#generating-documentation)
+- [Contributing](#contributing)
 - [License](#license)
 
 ---
@@ -32,32 +33,42 @@
 
 **Veritable Lasagna** (or **VL** for short) is a cross-platform library written in C11 that provides
 efficient implementations of common memory allocators, data structures,
-and algorithms. The API is inspired by the C++ Standard Template Library (STL), making it intuitive
-for developers familiar with C++, while maintaining pure C compatibility.
-
+and algorithms.
 Key design principles:
 
-- **Minimum Dependencies**: Relies almost entirely on the C standard library
-- **No Macro Templates**: Clean API without macro-based generic programming
-- **Comprehensive Testing**: Rigorous test suite ensures consistent behavior
+- **Minimal Dependencies**: Relies almost entirely on the C standard library.
+  - Also depends on POSIX/Win32 for filesystem operations and thread-related functionality.
+- **Cross-Platform**: Fully supports POSIX (Linux, macOS) and Win32 systems.
+- **Performant**: Implemented in C11 and optimized for speed and memory efficiency.
+- **Comprehensive Testing**: A fairly comprehensive test suite ensures consistent behavior across platforms.
+- **Stable ABI**: The ABI is guaranteed to remain stable between major version releases.
+
+
+### A note from the author
+    This project started as the culmination of 6 years of personal interest in C programming. It serves first and foremost
+    as a basis for my own applications, research, and education. It is a toolbox of my own code gathered from a collection
+    of personal projects that will never see the light of day, and documented education resources. It is presented here in
+    adherence to a set of design goals to make this a cohesive and comprehensive resource.
+    
+    This project was a stress-reliever, like what some people find in knitting or cooking. It served as a way to hone
+    my skills in C programming, cross-platform development, and problem-solving. I worked on this project while raising my
+    family, working overtime at my restaurant job, and working on building my career. I hope you find it as useful
+    and enjoyable to use as I found it to write and test.
+    
+    Don't let life steal your interest in what you do not know, your joy in what you do, nor your strength to distinguish the two.
+    -JWS
 
 ## Features
 
 Veritable Lasagna provides a robust set of components:
 
-## Roadmap to v1.0.0
-
-This roadmap outlines what is needed for Veritable Lasagna to be considered feature-complete. After v1.0.0, new features will be released in minor versions, while major releases will introduce significant architectural changes.
-
-* Note: ABI Compatibility between minor version changes is not guaranteed until reaching v1.0.0.
-
-All features must be cross-platform between POSIX and WIN32 systems.
-
 ### Memory Management
 - ✅ Memory blocks with metadata (`vl_memory`)
 - ✅ Memory Pools (`vl_pool`, `vl_async_pool`)
 - ✅ Arena Allocator (`vl_arena`)
-- ✅ Data (De)Serialization (`vl_msgpack`)
+- ✅ Data (De)serialization (`vl_msgpack`)
+- ✅ Extensible Stream API (`vl_stream`)
+  - See also `vl_stream_filesys` and `vl_stream_memory`
 
 ### Data Structures
 - ✅ Buffer (`vl_buffer`)
@@ -73,31 +84,47 @@ All features must be cross-platform between POSIX and WIN32 systems.
 - ✅ Hashing (`vl_hash`)
 - ✅ Comparisons (`vl_compare`)
 - ✅ Sorting
-  - ✅ Available to `vl_memory` and `vl_linked_list`
-  - ✅ Implicit to `vl_set`
+  - ✅ Available for `vl_memory` and `vl_linked_list`
+  - ✅ Implicit for `vl_set`
 - ✅ Search
   - ✅ Sorted (`vl_memory`)
   - ✅ Unsorted (`vl_memory` and `vl_linked_list`)
-  - ✅ Implicit to `vl_set` and `vl_hashtable`
+  - ✅ Implicit for `vl_set` and `vl_hashtable`
+- ✅ Math Components (`vl_algo`)
+  - ✅ Least Common Multiple (LCM)
+  - ✅ Greatest Common Divisor (GCD)
+  - ✅ Population Count
+  - ✅ Count Leading/Trailing Zeros
 
-### Async
-- Primitives
-  - ✅ Threads (`vl_thread`)
-  - ✅ Atomic Types (`vl_atomic`)
-  - ✅ Mutex (`vl_mutex`)
-  - ✅ SRWLock (`vl_srwlock`)
-  - ✅ Conditional Variable (`vl_condition`)
-  - ✅ Semaphore (`vl_semaphore`)
-- Data Structures
-  - ✅ Lockless Async Memory Pool (`vl_async_pool`)
-  - ✅ Lockless Async Queue (`vl_async_queue`)
+### Async Primitives & Structures
+- ✅ Threads (`vl_thread`)
+- ✅ Atomic Types (`vl_atomic`)
+- ✅ Mutex (`vl_mutex`)
+- ✅ SRWLock (`vl_srwlock`)
+- ✅ Condition Variable (`vl_condition`)
+- ✅ Semaphore (`vl_semaphore`)
+- ✅ Lockless Async Memory Pool (`vl_async_pool`)
+- ✅ Lockless Async Queue (`vl_async_queue`)
 
 ### Filesystem
-- ❌ Directory listing
-- ❌ Path handling
+- ✅ Directory iteration (flat and recursive) (`vl_filesys`)
+- ✅ Path handling (`vl_filesys`)
+  - UTF-8 enforced across platforms
 
-### Other
-- ✅ Runtime Dynamic Library Handling `vl_dynlib`
+### Additional Components
+- ✅ Runtime Dynamic Library Handling (`vl_dynlib`)
+- ✅ SIMD Intrinsics with Runtime Dispatch (`vl_simd`)
+  - x86_64: SSE2, AVX2
+  - ARM: NEON
+- ✅ 16-Bit Floating-Point Support (`vl_half`)
+- ✅ 4-bit Integer Support (`vl_nibble`)
+- ✅ ANSI Terminal Control Definitions (`vl_ansi_term`)
+- ✅ Thread-Safe Logging (`vl_log`)
+  - Includes file rotation and log level filtering.
+- ✅ Cross-Platform Socket Networking Abstraction (`vl_socket`)
+  - ✅ IPv4 & IPv6 Support
+  - ✅ TCP (Stream) & UDP (Datagram)
+  - ✅ Blocking & Non-blocking I/O
 
 ## Code Samples
 
@@ -114,7 +141,7 @@ Create, populate, and iterate through a linked list of integers:
 
 int main(int argc, const char** argv) {
     // Create a new list of integers
-    vl_list* list = vlListNew(sizeof(int));
+    vl_linked_list* list = vlListNew(sizeof(int));
 
     // Add 10 integers to the list
     for(int i = 0; i < 10; i++) {
@@ -125,7 +152,7 @@ int main(int argc, const char** argv) {
     // Iterate through the list and print each value
     VL_LIST_FOREACH(list, curIter) {
         const int val = *((int*)vlListSample(list, curIter));
-        printf("Value: %d\n", val);  // Added newline
+        printf("Value: %d\n", val);
     }
 
     // Clean up
@@ -175,15 +202,13 @@ int main(int argc, const char** argv) {
     // Iterate through all entries and print them
     VL_HASHTABLE_FOREACH(wealthTable, curIter) {
         // Get key and value sizes in bytes
-        size_t keyLen, valLen;
+        vl_memsize_t keyLen, valLen;
 
         // Access the key and value data
         const char* key = (const char*)vlHashTableSampleKey(wealthTable, curIter, &keyLen);
         const float val = *((float*)vlHashTableSampleValue(wealthTable, curIter, &valLen));
 
         printf("%s has %.2f$ in the bank!\n", key, val);
-        // If we didn't preserve the null terminator, length can be stated explicitly:
-        // printf("%.*s has %.2f$ in the bank!", (int)keyLen, key, val);
     }
 
     // Clean up
@@ -214,9 +239,9 @@ int main(int argc, const char** argv) {
     }
 
     // Print the size and all values in the set (in sorted order)
-    printf("Sorted %d elements:\n", vlSetSize(set));
+    printf("Sorted %d elements:\n", (int)vlSetSize(set));
     VL_SET_FOREACH(set, curIter) {
-        const int value = *((int*)vlSetSample(curIter));
+        const int value = *((int*)vlSetSample(set, curIter));
         printf("\t%d\n", value);
     }
 
@@ -233,52 +258,35 @@ int main(int argc, const char** argv) {
 
 To build and use Veritable Lasagna, you'll need:
 
-- A C11-compatible compiler (GCC, Clang, MSVC, etc.)
+- A C11-compatible compiler (GCC, Clang, or MSVC)
 - CMake 3.22.1 or higher
-- For testing: GoogleTest
-- For documentation: Doxygen and Graphviz
+- [Conan 2.0+](https://conan.io/) (Optional, for package management)
+- Doxygen and Graphviz (Optional, for documentation)
 
 ## Installation Options
 
-There are three ways to incorporate Veritable Lasagna into your project:
+### Option 1: Conan Package Manager (Recommended)
 
-## Option 1 (Recommended): Automated Build & Install from Repo
+Veritable Lasagna is designed to be easily integrated using [Conan](https://conan.io/). While it's not yet on Conan Center, you can build it locally from the provided recipe.
 
-### Install with [vcpkg](https://vcpkg.io/) (Cross-Platform)
+To build the package and run the integration tests:
+
 ```shell
 git clone https://github.com/walkerje/veritable_lasagna.git
-vcpkg install --overlay-ports=.\veritable_lasagna\vcpkg veritable-lasagna
+cd veritable_lasagna
+conan create .
 ```
 
-### Bash (Linux/MSYS/Cygwin/etc) (See [install.sh](install.sh) first!)
-```shell
-wget -O - https://raw.githubusercontent.com/walkerje/veritable_lasagna/main/install.sh | bash -s -- --all
-```
+This will:
+1. Export the recipe to your local cache.
+2. Build the library from source.
+3. Verify the installation using the test package in `test/package`.
 
-- Available options:
-  - `--build-type=TYPE` : Set build type(s): Debug and/or Release (use semicolon for multiple)
-  - `--all` : Build and install both Debug and Release configurations
-  - `--no-sudo` : Don't use sudo for installation
-  - `--help` : Show help message
+To use it in your project, add the following to your `CMakeLists.txt`:
 
-Note: The installation path is determined by your CMake configuration.
-
-
-You can reference the installation in your project by using `find_package` in your own
-`CMakeLists.txt`.
-
-```CMake
-# 
-# Your project setup...
-#
-
+```cmake
 find_package(VLasagna REQUIRED)
-
-#
-# Target setup...
-#
-
-target_link_libraries(my_target_name VLasagna::Core)
+target_link_libraries(your_target VLasagna::Core)
 ```
 
 ## Option 2: Embed as Subdirectory
@@ -333,14 +341,13 @@ Finally, build the library.
 cmake --build .
 ```
 
-Installing this package to your system is as simple specifying the `install` target.
+Installing the package to your system is as simple as specifying the `install` target:
 
 ```bash
 cmake --build . --target install
 ```
 
-See [Option 1](#option-1-recommended-automated-build--install-from-repo) for a snippet on finding the installed package
-from your `CMakeLists.txt`
+See [Option 1](#option-1-conan-package-manager-recommended) for a snippet on finding the installed package from your `CMakeLists.txt`.
 
 ## Configuration Options
 
@@ -349,11 +356,10 @@ but they are described here nonetheless.
 
 | Argument            | Type   | Default              | Description                                                                                                                                                                                                                                                       |
 |---------------------|--------|----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `CMAKE_BUILD_TYPE`  | STRING | `Toolchain Specific` | Specifies the build configuration type. Common values: <br>• `Debug` - No optimizations, includes debug info<br>• `Release` - Full optimizations, no debug info<br>• `RelWithDebInfo` - Full optimizations with debug info<br>• `MinSizeRel` - Size optimizations |
-| `BUILD_SHARED_LIBS` | BOOL   | `OFF`                | Global flag affecting the how the library is built: <br>• `ON` - Libraries are built as shared/dynamic (DLL/SO)<br>• `OFF` - Libraries are built as static (LIB/A)                                                                                                |
-| `BUILD_TESTING`     | BOOL   | `OFF`                | CTest module flag that controls test building:<br>• `ON` - Configure to build tests via CTest and GTest <br>• `OFF` - Skips building tests                                                                                                                        |
-
-
+| `CMAKE_BUILD_TYPE`  | STRING | `Release`            | Specifies the build configuration type. Common values: <br>• `Debug` - No optimizations, includes debug info<br>• `Release` - Full optimizations, no debug info<br>• `RelWithDebInfo` - Full optimizations with debug info<br>• `MinSizeRel` - Size optimizations |
+| `BUILD_SHARED_LIBS` | BOOL   | `OFF`                | Global flag affecting how the library is built: <br>• `ON` - Libraries are built as shared/dynamic (DLL/SO)<br>• `OFF` - Libraries are built as static (LIB/A)                                                                                                    |
+| `BUILD_TESTING`     | BOOL   | `OFF`                | CTest module flag that controls test building:<br>• `ON` - Configure to build tests via CTest and GoogleTest <br>• `OFF` - Skips building tests                                                                                                                     |
+| `VL_STRICT_BUILD`   | BOOL   | `OFF`                | Enables strict compilation. <br>• GCC/Clang: `-Werror -Wall -Wextra -Wpedantic` <br>• MSVC: `/W4 /WX /permissive- /Zc:preprocessor`                                                                                                                               |
 
 ## Building and Running Tests
 
@@ -392,7 +398,7 @@ Usage example:
 cmake -DBUILD_TESTING=ON -DVL_ENABLE_ASAN=ON -DVL_ENABLE_COVERAGE=ON
 ```
 Note:
-- These options are only available with GCC and Clang compilers
+- These options are only available with GNU and Clang compilers
 - Only one sanitizer should be enabled at a time (ASAN, TSAN, or UBSAN)
 - Coverage reporting works best with Debug builds
 - When using sanitizers, it's recommended to build in Debug mode for better error reporting
@@ -423,8 +429,12 @@ doxygen
 
 The generated documentation will be available in the `docs/html` directory. Open `index.html` in your browser to view it.
 
+## Contributing
+
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on the code of conduct for this repository.
+
 ## License
 
 Veritable Lasagna is available under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-[Back to Top](#veritable-lasagna-v0.14.1)
+[Back to Top](#table-of-contents)

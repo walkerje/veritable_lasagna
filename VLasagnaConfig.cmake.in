@@ -9,8 +9,6 @@ set(VL_VERSION_MINOR    @VL_VERSION_MINOR@)
 set(VL_VERSION_PATCH    @VL_VERSION_PATCH@)
 set(VL_VERSION          @VL_VERSION@)
 
-# There are no dependencies for VLasagna aside from the C standard library.
-
 set(VL_U8_T                     @VL_U8_T@)
 set(VL_U16_T                    @VL_U16_T@)
 set(VL_U32_T                    @VL_U32_T@)

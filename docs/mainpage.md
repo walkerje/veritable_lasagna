@@ -1,56 +1,90 @@
-# Landing Page
+# Veritable Lasagna Documentation
 ![](vl_logo.svg)
-#### Thanks for taking a second to read the docs!
-## What is this project?
 
-Veritable Lasagna (VL) is a data structures and algorithms library written for C11. It provides a variety of
-memory management utilities, data structures, and algorithms.
+### Welcome to the Veritable Lasagna (VL) Documentation!
 
-##### The mission statement for this project is as follows:
+Veritable Lasagna is a high-performance, cross-platform data structures and algorithms library written in C11. Designed with a focus on efficiency, portability, and a clean API, VL provides a robust foundation for C applications ranging from embedded systems to high-performance computing.
 
--   Veritable Lasagna aims to be an approachable open-source toolbox project that offers flexibility, accessible documentation, portability, and a concise codebase.
+---
 
-Let's break it down.
-- Flexibility
-  - There are very few type-dependent algorithms.
-  - Due to the layered nature of the memory management and data structures, many underlying
-    mechanisms are not obfuscated away but rather explicitly exposed.
-- Accessible Documentation
-  - Every function and top-level structure is documented in the souce code.
-  - Rendered graphs are interspersed throughout the documentation, as well as interactive call/caller graphs on a per-function basis.
-  - Many functions are tagged with a note denoting their complexity in Big-O notation.
-- Portability
-  - Care has been taken to offer compatibility for a wide range of system targets.
-    - Independent "largest" and "smallest" integer type resolution (See `vl_(i/u)large_t` and `vl_(i/u)small_t`)
-    - Compilers with high-precision floating point types. (Intel's 128-bit floats for example, see `vl_float_highp_t` type)
-    - Routinely tested on MSVC/MinGW for Windows 11, and GCC for >= Ubuntu 22.04 LTS.
-- Concise Codebase
-  - Follows the "one family of functions, one include file" paradigm.
-  - Strict adherence to a consistent naming convention modeled after the OpenGL API.
+## 🎯 Mission Statement
 
-## Structures
+**Veritable Lasagna aims to be an approachable open-source toolbox that offers flexibility, accessible documentation, portability, and a concise codebase.**
 
-At the time of writing, the following memory management schemes are available:
-- Plain block of memory, aligned and unaligned, `vl_memory`.
-- Memory buffer with dynamic size (automatic reallocation), `vl_buffer`.
-- Pool buffers of fixed-sized blocks of memory, `vl_linearpool`, `vl_fixedpool`, and the atomic `vl_async_pool`.
-- [Arena allocation](https://en.wikipedia.org/wiki/Region-based_memory_management) of variably-size blocks of memory from a dynamically sized buffer, `vl_arena`
+### Key Design Pillars:
+- **Flexibility**: Layered architecture that exposes underlying mechanisms without unnecessary obfuscation.
+- **Accessible Documentation**: Comprehensive in-source documentation with Big-O complexity notes and interactive call graphs.
+- **Portability**: Rigorous support for POSIX and Win32 systems, with consistent behavior across GCC, Clang, and MSVC.
+- **Concise Codebase**: Follows a strict "one family of functions, one include file" paradigm with an intuitive, OpenGL-inspired naming convention.
 
-... alongside the following conventional data structures:
-- Hash Table `vl_hashtable`
-- Buffer `vl_buffer`
-- Unique Ordered Set `vl_set`
-- Doubly Linked List `vl_linked_list`
-- Queue `vl_queue`, or `vl_async_queue`
-- Deque `vl_deque`
-- Stack `vl_stack`
+---
 
-... and some higher-level functionality:
-- Tagged Atomic Pointers `vl_tagged_ptr`
-- Full MessagePack implementatio `vl_msgpack`
+## 🛠️ Feature Overview
 
-## How is this project structured?
+Veritable Lasagna is organized into several core modules, each providing specialized functionality:
+ 
+### 🧠 Memory Management & Streams
+Efficient allocation strategies and data streaming:
+- **`vl_memory`**: Basic memory blocks with alignment support and metadata.
+- **`vl_buffer`**: Dynamically resizing memory buffers.
+- **`vl_pool`**: Fixed-size block allocator for high-frequency allocations.
+- **`vl_arena`**: Region-based memory management for grouped allocations.
+- **`vl_stream`**: Extensible streaming API with `vl_stream_filesys` and `vl_stream_memory` implementations.
 
-CMake is used by this project to support cross-platform compilation and the accompanying test suites.
+### 🏗️ Data Structures
+A collection of standard and specialized containers:
+- **`vl_hashtable`**: Fast, generic hash map implementation.
+- **`vl_set`**: Unique ordered set.
+- **`vl_linked_list`**: Doubly linked list.
+- **`vl_queue` / `vl_deque` / `vl_stack`**: Standard FIFO and LIFO structures.
+- **`vl_msgpack`**: Full implementation of the MessagePack serialization format.
 
-![Build Process](vl_build_graph.svg)
+### ⚡ Async & Concurrency
+Modern primitives for multi-threaded applications:
+- **`vl_thread` / `vl_thread_pool`**: Thread management and task scheduling.
+- **`vl_atomic` / `vl_atomic_ptr`**: Lock-free atomic operations and tagged pointers.
+- **Synchronization**: `vl_mutex`, `vl_semaphore`, `vl_condition`, and `vl_srwlock` (Slim Reader/Writer locks).
+- **Lock-free Containers**: `vl_async_pool` and `vl_async_queue` for high-concurrency scenarios.
+
+### 📂 Filesystem & OS
+Cross-platform abstractions for system operations:
+- **`vl_filesys`**: Path manipulation and recursive directory iteration with enforced UTF-8 support.
+- **`vl_dynlib`**: Runtime dynamic library loading and symbol resolution.
+- **`vl_ansi_term`**: ANSI terminal control and styling utilities.
+- **`vl_log`**: Thread-safe, formatted logging system with configurable output sinks.
+
+### 🌐 Networking
+Cross-platform socket communication:
+- **`vl_socket`**: Unified API for IPv4/IPv6, TCP, and UDP.
+- **Support**: Blocking/non-blocking modes, and standard socket options (ReuseAddr, NoDelay, KeepAlive).
+
+### 🧮 Algorithms & Math
+Optimized computational utilities:
+- **`vl_algo`**: Core algorithms including GCD, LCM, Popcount, and Bit-scanning.
+- **`vl_simd`**: Runtime-dispatched SIMD intrinsics for x86 (SSE2, AVX2) and ARM (NEON).
+- **`vl_rand`**: High-quality pseudo-random number generation.
+- **`vl_half` / `vl_nibble`**: Support for 16-bit floats and 4-bit integers.
+- **`vl_hash` / `vl_compare`**: Standardized hashing and comparison interfaces.
+
+---
+
+## 🚀 Getting Started
+
+Veritable Lasagna is designed to be easy to integrate. For a comprehensive guide, please refer to the **[Full Manual](@ref manual)**.
+
+### 📋 Prerequisites
+- **Compiler**: C11-compliant (GCC, Clang, MSVC)
+- **Build System**: [CMake](https://cmake.org/) (3.22+)
+- **OS**: Windows (Win32 API) or Linux/macOS (POSIX)
+
+### 📦 Integration
+You can integrate VL into your project using several methods:
+- **[Conan](https://conan.io/)**: `conan create .` and use `find_package(VLasagna REQUIRED)`.
+- **Subdirectory**: Add via `add_subdirectory(veritable_lasagna)` in your `CMakeLists.txt`.
+- **Manual Build**: Standard CMake build and install workflow.
+
+For detailed instructions, see the **[Getting Started Manual](@ref man_getting_started)**.
+
+---
+
+*Happy Coding!*
